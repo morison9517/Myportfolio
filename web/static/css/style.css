@@ -1,329 +1,526 @@
-/* ===========================================================================
-   style.css
+/*全体*/
+:root{
+    --bg-color: #f6f7f8;
+    --text-color: #111827;
+    --card-color: #f3f4f6;
+    --accent-color: #00752b;
+    --hover-color: #353535;
 
-   構成: 1.パレット / 2.リセット / 3.共通部品 / 4.ページごと
-   色や余白は :root にまとめてあるので、テーマ変更はパレットだけ触れば済む。
-   =========================================================================== */
-
-/* ===========================================================================
-   1. パレット
-
-   色や余白の値はここで1回だけ決めて、あとは var(--名前) で呼ぶ。
-   プロダクトの色が決まったら、ここの1行を直せば全画面に反映される。
-
-       :root { --color-primary: #00a29a; }
-       .btn-primary { background: var(--color-primary); }
-
-   ★新しい部品も必ず var(--...) で書く。#ffffff の直書きはしない。
-     直書きすると、そこだけ暗い画面で白く光る。
-   =========================================================================== */
-:root {
-  --color-bg: #f7f8fb;
-  --color-surface: #ffffff;
-  --color-text: #1f2333;
-  --color-text-muted: #6b7280;
-  --color-border: #e3e6ef;
-
-  --color-primary: #00a29a;
-  --color-primary-dark: #00847e;
-  --color-primary-soft: #e4f5f4;
-
-  --color-success: #0f8f5f;
-  --color-success-soft: #e6f7ef;
-  --color-error: #d13b3b;
-  --color-error-soft: #fdeded;
-  --color-warning: #b7791f;
-  --color-warning-soft: #fdf6e3;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
-
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 3px rgba(20, 24, 45, 0.06), 0 6px 18px rgba(20, 24, 45, 0.05);
-
-  --container: 1040px;
+    --header-bg: rgba(255,255,255,.75);
 }
 
-/* OSがダークモードのときだけ、変わる値を上書きする。部品側は触らない。 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #14161f;
-    --color-surface: #1c1f2b;
-    --color-text: #eceef5;
-    --color-text-muted: #a0a6b8;
-    --color-border: #2c3040;
-
-    --color-primary: #3ed6cd;
-    --color-primary-dark: #6ee7e0;
-    --color-primary-soft: #1b3330;
-
-    --color-success-soft: #172f26;
-    --color-error-soft: #33201f;
-    --color-warning-soft: #322a1a;
-  }
+a,
+a:visited{
+    text-decoration: none;
 }
 
-/* ===========================================================================
-   2. リセット
+body.dark{
+    --bg-color: #111827;
+    --text-color: #f9fafb;
+    --card-color: #1f2937;
 
-   ブラウザが勝手に付ける余白や装飾をならして、出発点を揃える場所。
-   ページを作るときはここを触らない。
-   =========================================================================== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+    --header-bg: rgba(17,24,39,.75);
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans",
-    "Noto Sans JP", "Yu Gothic UI", sans-serif;
-  line-height: 1.7;
-  font-size: 16px;
+body{
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    /* transitionは付けない。
+       header・#about・#productsは自前の背景を持っていて即座に切り替わるが、
+       footerは背景を持たずbodyの背景が透けているため、ここに時間を付けると
+       footerだけ遅れて切り替わって見える。 */
+
+    font-family: sans-serif;
+}
+/*ヘッダー*/
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 40px;
+
+    background-color: var(--header-bg);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    transition:none;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    box-sizing: border-box;
+
+    z-index: 100;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+nav ul{
+    display: flex;
+    gap: 30px;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
+nav a{
+    text-decoration: none;
+    color: var(--text-color);
 }
-a:hover {
-  text-decoration: underline;
-}
-
-code {
-  background: var(--color-primary-soft);
-  color: var(--color-primary-dark);
-  padding: 1px 5px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9em;
+/*ヘッダー：ダークモード*/
+.theme-switch{
+    position: relative;
 }
 
-.container {
-  width: 100%;
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 0 var(--space-4);
+.theme-switch__input{
+    display: none;
 }
 
-/* ===========================================================================
-   3. 共通部品
+.theme-switch__label{
+    position: relative;
 
-   どのページでも使う部品(ヘッダー・ボタン・入力欄・メッセージなど)。
-   ★ここを直すと全ページに効く。1ページだけ変えたいときは 4 に書く。
-   =========================================================================== */
+    display: block;
 
-/* --- ヘッダー --- */
-.site-header {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+    width: 70px;
+    height: 35px;
+
+    border-radius: 50px;
+
+    background-color: #64748b;
+
+    cursor: pointer;
+
+    transition: .3s;
 }
 
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-height: 60px;
-  flex-wrap: wrap;
+.theme-switch__label::before{
+    content: "☀";
+
+    position: absolute;
+    left: -24px;
+    top: 47%;
+
+    transform: translateY(-50%);
+
+    color: #f59e0b;
+    font-size: 15px;
 }
 
-.site-title {
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: var(--color-text);
+.theme-switch__label::after{
+    content: "☾";
+
+    position: absolute;
+    right: -17px;
+    top: 47%;
+
+    transform: translateY(-50%);
+
+    color: #94a3b8;
+    font-size: 16px;
 }
 
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+.theme-switch__label span{
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    width: 29px;
+    height: 29px;
+
+    border-radius: 50%;
+
+    background-color: white;
+
+    transition: .3s;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
 
-.nav-user {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin-right: var(--space-2);
+.theme-switch__input:checked
++ .theme-switch__label{
+    background-color: #64748b;
 }
 
-/* ログアウトはPOSTなのでフォーム。ヘッダー内で横並びにする */
-.inline-form {
-  display: inline-flex;
-  margin: 0;
+.theme-switch__input:checked
++ .theme-switch__label span{
+    transform: translateX(35px);
+}
+/*ヘッダー：ハンバーガーメニュー*/
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: 40px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
 }
 
-/* --- ボタン --- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 9px 16px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+.hamburger-icon span {
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-color);
+    transition:
+        transform 0.3s ease,
+        background-color 0.2s ease;
 }
 
-.btn-primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-.btn-primary:hover {
-  background: var(--color-primary-dark);
-  text-decoration: none;
+.hamburger-icon.open span {
+    background-color: white;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--color-text);
-  border-color: var(--color-border);
-}
-.btn-ghost:hover {
-  background: var(--color-primary-soft);
-  text-decoration: none;
+.hamburger-icon span:first-child {
+    opacity: 1;
 }
 
-.btn-block {
-  width: 100%;
+.hamburger-icon.open span:first-child {
+    transform: rotate(45deg) translate(6px, 6px);
 }
 
-/* 二重送信防止でJSが無効化したときの見た目(main.js の withBusy) */
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+.hamburger-icon.open span:last-child {
+    transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* --- メッセージ ---
-   クラス名の後半は Go の middleware.Flash(c, "success", ...) の
-   2つ目の引数と対応している。 */
-.flash-list {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-4) 0 0;
-  display: grid;
-  gap: var(--space-2);
+
+.menu-links {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 320px;
+    height: 100vh;
+
+    background-color: #737272;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0s linear 0.5s;
+
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding-top: 50px;
 }
 
-/* 既定の見た目。middleware.Flash(c, "○○", ...) に
-   下で色を決めていないカテゴリを渡しても、これで形にはなる。 */
-.flash {
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
-  border-left: 4px solid var(--color-primary);
-  background: var(--color-primary-soft);
-  font-size: 0.95rem;
+.menu-links h1,
+.menu-links li {
+    opacity: 0;
+    transform: translateY(20px);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
 }
 
-.flash-success {
-  background: var(--color-success-soft);
-  border-color: var(--color-success);
-}
-.flash-error {
-  background: var(--color-error-soft);
-  border-color: var(--color-error);
-}
-.flash-warning {
-  background: var(--color-warning-soft);
-  border-color: var(--color-warning);
+.menu-links.open h1,
+.menu-links.open li {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* --- フォーム --- */
-.stacked-form {
-  display: grid;
-  gap: var(--space-4);
+.menu-links h1 {
+    color: #f9fafb;
+    font-size: 3.5rem;
+    margin-top: 50px;
+    margin-bottom: 40px;
 }
 
-.field {
-  display: grid;
-  gap: var(--space-1);
+.menu-links ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    list-style: none;
+    padding: 0;
 }
 
-.field label {
-  font-weight: 600;
-  font-size: 0.9rem;
+.menu-links a {
+    font-size: 1.5rem;
+    color: #f9fafb;
+    text-decoration: none;
 }
 
-.field input,
-.field textarea,
-.field select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+.menu-links li {
+    list-style: none;
+    margin: 20px 0;
 }
 
-.field input:focus-visible,
-.field textarea:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-  border-color: var(--color-primary);
+.menu-links.open {
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0s linear 0s;
 }
 
-.hint {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
+.menu-links.open h1 {
+    transition-delay: 0s;
 }
 
-/* ===========================================================================
-   4. ページごと
-
-   そのページでしか使わない見た目。
-   ★2ページ以上で使うようになったら 3 に引っ越す。
-   =========================================================================== */
-
-/* --- ログイン / 新規登録 --- */
-.auth-panel {
-  max-width: 400px;
-  margin: var(--space-7) auto;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: var(--space-6);
+.menu-links.open li:nth-child(1) {
+    transition-delay: 0.1s;
 }
 
-.auth-panel h1 {
-  margin: 0 0 var(--space-5);
-  font-size: 1.3rem;
-  text-align: center;
+.menu-links.open li:nth-child(2) {
+    transition-delay: 0.2s;
 }
 
-.auth-switch {
-  margin: var(--space-5) 0 0;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
+.menu-links.open li:nth-child(3) {
+    transition-delay: 0.3s;
 }
 
-/* --- フッター --- */
-.site-footer {
-  margin-top: var(--space-7);
-  padding: var(--space-5) 0;
-  border-top: 1px solid var(--color-border);
-  color: var(--color-text-muted);
+.menu-links.open li:nth-child(4) {
+    transition-delay: 0.4s;
+}
+
+.menu-links.open li:nth-child(5) {
+    transition-delay: 0.5s;
+}
+
+/*welcome section*/
+#welcome {
+    min-height: 100vh;
+
+    background-image: url("../images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-attachment: fixed;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+
+    text-align: center;
+
+    color: #f9fafb;
+}
+
+#welcome::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.hero {
+    position: relative;
+    z-index: 1;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-top: 20px;
+}
+
+.hero p {
+    margin-top: 15px;
+    font-size: 2.0rem;
+}
+
+.scroll-indicator{
+    position: absolute;
+
+    bottom: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    z-index: 2;
+}
+
+.scroll-indicator::after{
+    content: "";
+
+    width: 1px;
+    height: 35px;
+
+    background-color: #f9fafb;
+
+    animation: scroll-line 1.4s ease-in-out infinite;
+}
+/*about section*/
+#about {
+    background-color: var(--bg-color);
+    padding: 80px 10%;
+}
+
+#about h2 {
+    margin-bottom: 3.5rem;
+    font-size: 3rem;
+
+    text-align: center;
+}
+
+.about-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 5rem;
+}
+
+.about-image img {
+    width: 320px;
+    height: 320px;
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.about-text {
+    max-width: 600px;
+    margin-top: -25px;
+}
+
+.about-text h3 {
+    font-size: 2.5rem;
+    margin-bottom: 0.1rem;
+}
+
+.about-text h5 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.about-text p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.about-details {
+    list-style: none;
+    padding: 0;
+}
+
+.about-details li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.6rem;
+}
+
+.about-details a,
+.about-details a:visited{
+    color: #2997ff;
+
+    transition: 0.2s ease;
+}
+
+.about-details a:hover{
+    color: var(--hover-color);
+}
+/*skills section*/
+#skills {
+    background-color: var(--accent-color);
+    padding: 100px 0;
+}
+
+#skills h2 {
+    font-size: 3rem;
+    color: #f9fafb;
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+
+.skill-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 2rem;
+
+    background: var(--card-color);
+    border-radius: 20px;
+}
+
+
+/*products section*/
+#products {
+    padding: 100px 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.product-card {
+    overflow: hidden;
+}
+
+.product-card img {
+    width: 100%;
+    display: block;
+
+    transition: transform 0.2s ease;
+}
+
+.product-card a:hover img {
+    transform: scale(1.03);
+}
+
+.product-card a:hover h3 {
+    color: var(--hover-color);
+}
+
+.product-card a h3,
+.product-card a h3:visited{
+    color: var(--text-color);
+
+    transition: color 0.2s ease;
+}
+
+.products-more {
+    margin-top: 3rem;
+    text-align: right;
+}
+
+.products-more a {
+    font-size: 1rem;
+    font-weight: 600;
 }

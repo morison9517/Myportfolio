@@ -16,7 +16,7 @@
     // --- テンプレート / HTML ---
     "formulahendry.auto-rename-tag",
 
-    // --- チーム開発 ---
+    // --- Git / 文章 ---
     "eamodio.gitlens", // 誰がどの行をいつ書いたか見える
     "streetsidesoftware.code-spell-checker"
   ]

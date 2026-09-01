@@ -7,7 +7,7 @@
 //	どのページに行くお客さんも必ずここを通るので、
 //	「毎回やること」を1か所にまとめられる。
 //
-//	    ブラウザ → [セッション] → [ログイン確認] → [成りすまし対策] → 各ページ
+//	    ブラウザ → [セッション] → [成りすまし対策] → 各ページ
 //
 //	これが無いと、全部のページの先頭に同じコードを書く羽目になる。
 //
@@ -15,12 +15,11 @@
 // このファイル(session.go)= ブラウザに小さなメモを持たせる仕組み
 //
 //	HTTPは「1回のやり取りが終わると相手を忘れる」仕組みなので、
-//	そのままだとログインしても次のページで他人になってしまう。
-//	そこでブラウザに「あなたは3番の人」というメモ(Cookie)を持たせる。
+//	ページをまたいで覚えておきたいことはブラウザにメモ(Cookie)として持たせる。
+//	今は「保存しました」などのメッセージ(flash)と、整理券(CSRF)の保管に使っている。
 //
 //	★メモの中身は SECRET_KEY で署名されている。
-//	  中身を書き換えると署名が合わなくなるので、
-//	  「自分は1番(管理者)です」と偽装できない。
+//	  中身を書き換えると署名が合わなくなるので、利用者が勝手に細工できない。
 //
 // =============================================================================
 package middleware
@@ -34,10 +33,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	sessionName = "hackapp_session" // ブラウザに保存されるメモの名前
-	keyUserID   = "user_id"         // メモの中の「誰か」の欄
-)
+const sessionName = "myportfolio_session" // ブラウザに保存されるメモの名前
 
 // FlashMessage = 次の画面に一度だけ出すメッセージ。
 //
@@ -64,7 +60,7 @@ func Session(secretKey string, secure bool) gin.HandlerFunc {
 
 	store.Options(sessions.Options{
 		Path:   "/",
-		MaxAge: 60 * 60 * 24 * 7, // 7日間。過ぎたら自動でログアウト
+		MaxAge: 60 * 60 * 24 * 7, // 7日間。過ぎたらメモは破棄される
 
 		// JavaScriptからメモを読めなくする。
 		// 万一ページに悪意のあるスクリプトを埋め込まれても、盗まれない。
@@ -81,42 +77,10 @@ func Session(secretKey string, secure bool) gin.HandlerFunc {
 	return sessions.Sessions(sessionName, store)
 }
 
-// Login = 「あなたは○番の人」とメモに書き込む。
-func Login(c *gin.Context, userID uint) error {
-	s := sessions.Default(c)
-	s.Set(keyUserID, userID)
-
-	// ★Save() を呼ばないとブラウザに届かない。
-	//   「ログインしたのに次のページで未ログインに戻る」の原因はほぼこれ。
-	return s.Save()
-}
-
-// Logout = メモを丸ごと捨てる。
-func Logout(c *gin.Context) error {
-	s := sessions.Default(c)
-
-	// Delete ではなく Clear にしている理由:
-	// 前の人の情報が1つでも残っていると事故のもとなので、全部消す。
-	s.Clear()
-	return s.Save()
-}
-
-// UserID = メモに書かれている番号を読む。ログインしていなければ 0。
-func UserID(c *gin.Context) uint {
-	s := sessions.Default(c)
-
-	// ★.(uint) は「中身が uint 型なら取り出す」という書き方。
-	//   メモには何でも入れられる形で保存されているので、取り出すときに型を指定する。
-	if id, ok := s.Get(keyUserID).(uint); ok {
-		return id
-	}
-	return 0
-}
-
 // -----------------------------------------------------------------------------
 // flash = 次の画面に一度だけ出すメッセージ
 //
-//	「保存しました」「パスワードが違います」など。
+//	「保存しました」「入力に誤りがあります」など。
 //	表示する場所は base.html に1か所だけ書いてあるので、
 //	各ページで自作する必要はない。
 //

@@ -14,8 +14,6 @@
 //	  ↓
 //	[セッション]   ブラウザのメモを読めるようにする
 //	  ↓
-//	[ログイン確認] 今アクセスしているのが誰か調べる
-//	  ↓
 //	[成りすまし対策] 送信に整理券が付いているか確認する
 //	  ↓
 //	[各ページ]     handlers/ の中の関数
@@ -27,7 +25,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"case_gin/internal/config"
-	"case_gin/internal/demo"
 	"case_gin/internal/handlers"
 	"case_gin/internal/middleware"
 	"case_gin/internal/view"
@@ -79,8 +76,14 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	// --- CSS / JS / 画像 ---
 	// ★ここを Use より先に書いている理由
 	//   Ginは「Useより後に登録したURL」にだけ仕掛けを適用する。
-	//   先に書くことで、画像1枚読むたびにログイン確認が走るのを避けられる。
+	//   先に書くことで、画像1枚読むたびに共通の仕掛けが走るのを避けられる。
 	r.Static("/static", staticDir)
+
+	// --- サイト直下の /favicon.ico ---
+	// ★HTMLを返さないURL(/health のようなJSON)や、<link rel="icon"> を読む前の
+	//   ブラウザは、最後の手段としてサイト直下の /favicon.ico を取りに来る。
+	//   ここで応答しておくと、どのURLでもタブにアイコンが出る。
+	r.StaticFile("/favicon.ico", staticDir+"/tabicon.png")
 
 	// --- 利用者が上げたファイル(プロフィールアイコンなど) ---
 	// ★開発モードのときだけ、Ginが自分で画像を配る。
@@ -90,32 +93,15 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	}
 
 	// --- 全ページ共通の仕掛け(順番に意味がある) ---
-	// ★2つ目の引数が「HTTPSのときだけログイン状態を送る」の指定。
+	// ★2つ目の引数が「HTTPSのときだけメモ(Cookie)を送る」の指定。
 	//   本番でも練習中はHTTPなので、.env の SECURE_COOKIES で切り替えられる。
 	r.Use(middleware.Session(cfg.SecretKey, cfg.IsProduction() && cfg.SecureCookies))
-	r.Use(middleware.LoadUser()) // セッションが読めないと誰か分からないので、後
 	r.Use(middleware.CSRF())
 
 	// --- 担当ごとの受付を取り付ける ---
 	// ★新しい担当ファイル(例:handlers/room.go)を作ったら、ここに1行足す。
 	handlers.RegisterPageRoutes(r)
 	handlers.RegisterAPIRoutes(r)
-
-	// AUTH_ENABLED が false なら取り付けない(コードを消さずにOFFにできる)。
-	if cfg.AuthEnabled {
-		handlers.RegisterAuthRoutes(r)
-	}
-
-	// --- デモ(動作確認用のページ) ---
-	// ★必ず最後に取り付ける。
-	//   「自分たちのトップページが既にあるか」を見てから動くので、
-	//   先に取り付けると判定できず、URLの二重登録でGinが起動時に落ちる。
-	//   開発モードのときだけ。本番では取り付けないので絶対に出ない。
-	if !cfg.IsProduction() {
-		if err := demo.Register(r, cfg); err != nil {
-			return nil, err
-		}
-	}
 
 	return r, nil
 }

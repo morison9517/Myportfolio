@@ -1,0 +1,198 @@
+{{/* ==========================================================================
+     index.html = トップページの中身
+
+     ヘッダー・フッター・<head> は書きません。
+     layouts/base.html の {{ block "content" }} の穴にここが入ります。
+
+     ★元の frontend/index.html の <main> の中身をそのまま持ってきています。
+       画像の src だけ /static/images/... に付け替えてあります
+       (web/static/ が /static として配信されるため)。
+     ========================================================================== */}}
+{{ define "content" }}
+        <section id="welcome">
+            <div class="hero">
+
+                <h1>Welcome to My Portfolio!</h1>
+
+                <p>
+                    Aspiring Backend Engineer
+                </p>
+
+            </div>
+
+            <div class="scroll-indicator">
+                <p>Scroll</p>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2>About Me</h2>
+
+                <div class="about-content">
+                    <div class="about-image">
+                        <img src="/static/images/About.jpg" alt="プロフィール画像" draggable="false">
+                    </div>
+                
+                    <div class="about-text">
+                        <h3>Kota Morito</h3>
+                        <h5>森藤 滉太</h5>
+                    
+                        <p>
+                            Webエンジニアを目指している専門学生です。<br>
+                            現在はGo言語を中心にバックエンド開発を学びながら、
+                            Webアプリケーション制作やインフラ技術にも挑戦しています。
+                        </p>
+                    
+                        <ul class="about-details">
+                            <li>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Takamatsu, Kagawa
+                            </li>
+                        
+                            <li>
+                                <i class="fa-brands fa-github"></i>
+                                <a href="https://github.com/morison9517">morison9517</a>
+                            </li>
+
+                            <li>
+                                <i class="fa-brands fa-x-twitter"></i>
+                                <a href="https://x.com/mrrn456456">mrrn456456</a>
+                            </li>
+
+                            <li>
+                                <i class="fa-brands fa-instagram"></i>
+                                <a href="https://www.instagram.com/mrrn.balloon95">mrrn.balloon95</a>
+                            </li>
+
+                            <li>
+                                <i class="fa-brands fa-facebook"></i>
+                                <a href="https://www.facebook.com/profile.php?id=100066339425358">森藤滉太</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="container">
+                <div class="skills-title">
+                    <h2>Skills</h2>
+                </div>
+            
+                <div class="skills-grid">
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-3">
+                            <img src="/static/images/skills/go.svg" alt="Go">
+                        </div>
+                        <h3>Go</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-2">
+                            <img src="/static/images/skills/docker.svg" alt="Docker">
+                        </div>
+                        <h3>Docker</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-1">
+                            <img src="/static/images/skills/aws.svg" alt="AWS">
+                        </div>
+                        <h3>AWS</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-3">
+                            <img src="/static/images/skills/git.svg" alt="Git">
+                        </div>
+                        <h3>Git</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-2">
+                            <img src="/static/images/skills/linux.svg" alt="Linux">
+                        </div>
+                        <h3>Linux</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-4">
+                            <img src="/static/images/skills/html.svg" alt="HTML">
+                        </div>
+                        <h3>HTML</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-4">
+                            <img src="/static/images/skills/css.svg" alt="CSS">
+                        </div>
+                        <h3>CSS</h3>
+                    </article>
+                
+                    <article class="skill-card">
+                        <div class="skill-circle skill-2">
+                            <img src="/static/images/skills/javascript.svg" alt="JavaScript">
+                        </div>
+                        <h3>JavaScript</h3>
+                    </article>
+                
+                </div>
+            
+                <div class="skills-more">
+                    <a href="skills.html">
+                        Read More >>
+                    </a>
+                </div>
+            
+            </div>
+        </section>
+
+        <section id="products">
+            <div class="container">
+
+                <h2>Products</h2>
+
+                <div class="products-grid">
+
+                    <article class="product-card">
+                        <a href="products/product1.html">
+                            <img src="/static/images/product1.jpg" alt="Product1">
+                            <h3>Product 1</h3>
+                        </a>
+                        <p>
+                            プロダクトの簡単な説明
+                        </p>
+                    </article>
+
+                    <article class="product-card">
+                        <!-- Product2 -->
+                    </article>
+
+                    <article class="product-card">
+                        <!-- Product3 -->
+                    </article>
+
+                    <article class="product-card">
+                        <!-- Product4 -->
+                    </article>
+                
+                </div>
+
+                <div class="products-more">
+                    <a href="products.html">
+                        Read More >>
+                    </a>
+                </div>
+            
+            </div>
+        </section>
+
+        <section id="experience">
+        </section>
+
+        <section id="contact">
+        </section>
+{{ end }}

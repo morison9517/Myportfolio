@@ -1,133 +1,131 @@
 {{/* ==========================================================================
-   base.html = 全ページ共通の「型紙」
+     base.html = 全ページ共通の型紙
 
-   ここに書いたヘッダー・フッター・CSS読み込みを、全ページが受け継ぐ。
-   各ページは「真ん中の中身だけ」を書けばよく、ヘッダーの重複がなくなる。
-   ヘッダーを直したいときは、このファイル1枚を直せば全ページに反映される。
+     ★ここはポートフォリオの「外枠」です。
+       元の frontend/index.html の <head> ・ヘッダー・フッターを
+       そのまま持ってきています。見た目は元サイトと同じです。
 
-   --------------------------------------------------------------------------
-   ▼ 型紙に空けた「穴」= block
+     ▼ 各ページとの関係
 
-     {{ block "名前" . }} ... {{ end }} と書くと、そこが穴になる。
-     各ページが {{ define "名前" }} ... {{ end }} を書くと、その中身が
-     ここに差し込まれる。ページ側が書かなければ、穴の中に書いてある初期値が出る。
+       base.html(この型紙)              pages/index.html(中身)
+       ┌──────────────────┐
+       │ ヘッダー          │
+       ├──────────────────┤
+       │ {{ block "content" }} │  ←──  {{ define "content" }} ～ {{ end }}
+       ├──────────────────┤
+       │ フッター          │
+       └──────────────────┘
 
-     このファイルにある穴は3つ:
-         head_extra … そのページ専用のCSSを足したいとき
-         content    … ページの本体(必須)
-         scripts    … そのページ専用のJSを足したいとき
+     ▼ ★つまずきやすい点
 
-   --------------------------------------------------------------------------
-   ▼ カッコの使い分け
+       1. 渡していない情報は空になる(エラーも出ない)。
+          共通の値は internal/view/page.go で詰めている。
+       2. {{ range }} の中ではドットの意味が変わる。
+          全体の情報を使いたいときは {{ $.SiteName }} のように $ を付ける。
 
-     {{ .Title }}         … 値を表示する
-     {{ if ... }}{{ end }}… 条件分岐(必ず end で閉じる)
-     {{ range ... }}      … 繰り返し
-     {{/* ... * /}}       … コメント(HTMLにも出力されない)← いま読んでいるこれ
+     ▼ 静的ファイルの置き場所
 
-   --------------------------------------------------------------------------
-   ▼ ★「. (ドット)」の正体 — ここが一番のつまずきどころ
-
-     ドットは「今この場所に渡されている情報」を指す。
-     Goのテンプレートは、渡された情報しか見えない(勝手に外から読めない)。
-
-     渡しているのは internal/view/page.go の view.Page(...)。
-     そこに書いてある項目だけが {{ .○○ }} で使える。
-
-     ★穴に情報を渡し忘れる事故に注意
-         {{ block "content" . }}   ← 末尾のドットが「情報も一緒に渡す」印
-         {{ block "content" }}     ← これだと中身から {{ .Title }} が空になる
-
-     ★{{ range }} の中ではドットの意味が変わる
-         繰り返しの中では、ドットは「今の1件」に切り替わる。
-         全体の情報を使いたいときは、ドットの代わりに $ を付ける:
-             {{ $.SiteName }}
-
-   --------------------------------------------------------------------------
-   ▼ 表示は自動的に安全にされる
-
-     利用者が入力した文字に <script> が混ざっていても、
-     Goが自動で無害な文字に変換してから表示する。
-     エスケープ処理を自分で書く必要はない。
-
-   ========================================================================== */}}
+       /static/... は web/static/ を指す(登録は internal/router/router.go)。
+       元サイトの css/ js/ images/ が、そのまま web/static/ の下に入っている。
+     ========================================================================== */}}
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    {{/* JavaScriptから送信するときにも整理券(CSRFトークン)が必要なので、
-         ここに置いてJS側から読み取れるようにしている(仕掛けは main.js)。 */}}
-    <meta name="csrf-token" content="{{ .CSRFToken }}" />
-
-    {{/* 各ページから Title を渡せば「ホーム | Gin Template Demo」になり、
-         渡さなければサイト名だけになる。 */}}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}</title>
 
-    <link rel="stylesheet" href="/static/css/style.css" />
+    {{/* JavaScriptから送信するときにも整理券(CSRFトークン)が必要なので、
+         ここに置いてJS側から読み取れるようにしている(仕掛けは main.js)。
+         画面には出ません。 */}}
+    <meta name="csrf-token" content="{{ .CSRFToken }}" />
 
+    {{/* タブに出るアイコン。base.htmlに置いているので全ページ共通で効く。 */}}
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/tabicon.png">
+
+    {{/* スマホでホーム画面に追加したときのアイコン(180x180) */}}
+    <link rel="apple-touch-icon" href="/static/phoneicon.png">
+
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/mediaqueries.css">
+
+    {{/* そのページだけで使うCSSを足したいとき用の穴 */}}
     {{ block "head_extra" . }}{{ end }}
-  </head>
-
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a class="site-title" href="/">{{ .SiteName }}</a>
-
-        <nav class="site-nav">
-          {{/* AuthEnabled は .env の設定値。
-               ログイン機能をOFFにしたときにリンクが壊れないようにしている。
-
-               CurrentUser は今アクセスしている人。未ログインだと空になるので、
-               {{ if .CurrentUser }} だけで「ログイン中か」を判定できる。 */}}
-          {{ if .AuthEnabled }} {{ if .CurrentUser }}
-          <span class="nav-user">{{ .CurrentUser.Username }} さん</span>
-
-          {{/* ログアウトはPOST(理由は handlers/auth.go のコメント参照) */}}
-          <form action="/auth/logout" method="post" class="inline-form">
-            <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
-            <button type="submit" class="btn btn-ghost">ログアウト</button>
-          </form>
-          {{ else }}
-          <a class="btn btn-ghost" href="/auth/login">ログイン</a>
-          <a class="btn btn-primary" href="/auth/register">新規登録</a>
-          {{ end }} {{ end }}
+</head>
+<body>
+    <header>
+        <nav id="hamburger-nav">
+            <div class="hamburger-menu">
+                <div class="hamburger-icon" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-links">
+                    <h1>Menu</h1>
+                    <ul>
+                        <li><a href="#about" onclick="toggleMenu()">About me</a></li>
+                        <li><a href="#products" onclick="toggleMenu()">Products</a></li>
+                        <li><a href="#skills" onclick="toggleMenu()">Skills</a></li>
+                        <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+                        <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
         </nav>
-      </div>
+
+        <div class="theme-switch">
+            <input
+                type="checkbox"
+                id="themeSwitch"
+                class="theme-switch__input"
+            >
+            <label
+                for="themeSwitch"
+                class="theme-switch__label"
+            >
+                <span></span>
+            </label>
+        </div>
     </header>
 
     {{/* ▼ メッセージの表示場所(全ページ共通なのでここに1回だけ書く)
 
          Go側で middleware.Flash(c, "success", "保存しました") と書いたものが
-         ここに出る。各ページで「保存できました」の表示を自作する必要はない。
-
-         Category("success"/"error"/"warning")をCSSのクラス名にして色を変えている。
+         ここに出る。★メッセージが1件も無いときは、この要素自体が出ないので
+         元サイトのレイアウトには一切影響しない。
 
          ★range の中なので、ドットは「今の1件」を指している。
            .Category / .Message は FlashMessage の項目名
            (internal/middleware/session.go で決めている)。 */}}
-    <div class="container">
-      {{ if .Flashes }}
-      <ul class="flash-list">
+    {{ if .Flashes }}
+    <ul class="flash-list">
         {{ range .Flashes }}
         <li class="flash flash-{{ .Category }}">{{ .Message }}</li>
         {{ end }}
-      </ul>
-      {{ end }}
-    </div>
+    </ul>
+    {{ end }}
 
     {{/* 各ページの中身がここに入る */}}
-    <main class="container">{{ block "content" . }}{{ end }}</main>
+    <main>{{ block "content" . }}{{ end }}</main>
 
-    <footer class="site-footer">
-      <div class="container">
-        <small>Team AIB</small>
-      </div>
+    <footer>
+        <p><a href="#">利用規約</a></p>
+        <p><a href="#">プライバシーポリシー</a></p>
+        <p>&copy; 2026 Kota Morito</p>
     </footer>
 
+    {{/* main.js = Gin側とやり取りするための共通の道具(整理券の付与など)。
+         定義を置くだけで、読み込んだだけでは画面は何も変わらない。 */}}
     <script src="/static/js/main.js"></script>
 
+    {{/* script.js = 元サイトのダークモード切り替えとハンバーガーメニュー */}}
+    <script src="/static/js/script.js"></script>
+
+    {{/* そのページだけで使うJSを足したいとき用の穴 */}}
     {{ block "scripts" . }}{{ end }}
-  </body>
+</body>
 </html>

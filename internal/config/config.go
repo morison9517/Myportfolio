@@ -35,22 +35,20 @@ import (
 //
 //	「設定」という1つの塊にしておくと、関数に渡すときも引数1個で済む。
 type Config struct {
-	Env         string // development / production
-	Port        string // アプリが待ち受ける番号
-	SecretKey   string // ログイン状態をブラウザに預けるときの割り印
-	AuthEnabled bool   // ログイン機能を使うか
+	Env       string // development / production
+	Port      string // アプリが待ち受ける番号
+	SecretKey string // ブラウザに預けるメモ(Cookie)に署名するときの割り印
 
 	// ▼ ★本番でいちばんハマる設定
 	//
-	//	true にすると「HTTPSのときだけログイン状態を持ち歩く」という意味になる。
+	//	true にすると「HTTPSのときだけメモ(Cookie)を持ち歩く」という意味になる。
 	//	本番は必ずHTTPSにするので true が正解。
 	//
 	//	★ただし、まだHTTPSにしていない状態(http:// のまま)で true にすると、
-	//	  ログイン自体は成功しているのに、次のページで必ずログイン画面に
-	//	  戻されます。エラーも出ないので原因がまず分かりません。
-	//	  「ログインできない」と思ったら、まずここを疑ってください。
+	//	  メモがブラウザに保存されず、フラッシュメッセージなどが消えます。
+	//	  エラーも出ないので原因がまず分かりません。
 	//
-	//	デプロイの練習でHTTPのまま動かすときだけ .env に
+	//	HTTPのまま動かすときだけ .env に
 	//	    SECURE_COOKIES=false
 	//	と書いて一時的に切る。★HTTPSにしたら必ず true に戻すこと。
 	SecureCookies bool
@@ -100,10 +98,9 @@ func Load() *Config {
 	}
 
 	cfg := &Config{
-		Env:         env("APP_ENV", "development"),
-		Port:        env("PORT", "8080"),
-		SecretKey:   env("SECRET_KEY", "dev-secret-key-change-me"),
-		AuthEnabled: envBool("AUTH_ENABLED", true),
+		Env:       env("APP_ENV", "development"),
+		Port:      env("PORT", "8080"),
+		SecretKey: env("SECRET_KEY", "dev-secret-key-change-me"),
 
 		SecureCookies:  envBool("SECURE_COOKIES", true),
 		TrustedProxies: envList("TRUSTED_PROXIES"),
@@ -116,7 +113,7 @@ func Load() *Config {
 		DBPassword: env("DB_PASSWORD", "hack_password"),
 	}
 
-	// ★本番で割り印が初期値のままだと、ログイン状態を偽造される。
+	// ★本番で割り印が初期値のままだと、メモの中身を偽造される。
 	//   起動時に気づけるよう、警告を出す。
 	if cfg.IsProduction() && cfg.SecretKey == "dev-secret-key-change-me" {
 		log.Println("[config] ⚠ 本番なのに SECRET_KEY が初期値のままです")

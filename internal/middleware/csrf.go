@@ -3,9 +3,9 @@
 //
 // ▼ 何を防いでいるのか
 //
-//	うちのサイトにログインしたまま、別のサイトの罠を踏んだとする。
+//	うちのサイトを開いたまま、別のサイトの罠を踏んだとする。
 //	罠のページに「うちのサイトへ送信するフォーム」が仕込まれていると、
-//	ブラウザはログインのメモを一緒に送ってしまうので、
+//	ブラウザはうちのサイトのメモを一緒に送ってしまうので、
 //	本人が押したことになって勝手に投稿・削除されてしまう。
 //
 // ▼ 対策
@@ -87,7 +87,7 @@ func CSRF() gin.HandlerFunc {
 func rejectCSRF(c *gin.Context) {
 	// APIならJSONで返す。HTMLを返すとJavaScript側が読めずに混乱する。
 	path := c.Request.URL.Path
-	if strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "/__demo/api/") {
+	if strings.HasPrefix(path, "/api/") {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "整理券(CSRFトークン)が正しくありません。ページを再読み込みしてください。",
 		})

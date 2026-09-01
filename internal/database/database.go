@@ -24,7 +24,6 @@ import (
 	gormlogger "gorm.io/gorm/logger"
 
 	"case_gin/internal/config"
-	"case_gin/internal/models"
 )
 
 // DB = みんなで使い回すDBの窓口。
@@ -78,14 +77,11 @@ func Connect(cfg *config.Config) error {
 //
 // ★新しいモデルを作ったら、下のリストに1行足すこと。忘れると表が作られない。
 //
-// ※ デモ用の表(demo_todos)はここには書かない。
-//
-//	開発モードのときだけ internal/demo/demo.go が自分で用意するので、
-//	本番のDBには作られない。
+//	return DB.AutoMigrate(
+//		&models.Work{},
+//	)
 func Migrate() error {
-	return DB.AutoMigrate(
-		&models.User{},
-	)
+	return DB.AutoMigrate()
 }
 
 // Reset = 表を全部消してから作り直す。★中のデータも全部消える★
@@ -97,10 +93,8 @@ func Reset() error {
 	//   表どうしが紐付いている場合、参照している側(子)から先に消す。
 	//   逆にすると「まだ使われている」と怒られて消せない。
 	//
-	//   "demo_todos" はデモ用の表。デモは本番のどの表とも紐付いていないので
-	//   順番は関係ない。無ければ何も起きないので、そのままでよい。
-	//   internal/demo/ を削除したら、この "demo_todos" も消してよい。
-	if err := DB.Migrator().DropTable("demo_todos", &models.User{}); err != nil {
+	//   ★モデルを作ったら、Migrate() と同じ並びでここにも足す。
+	if err := DB.Migrator().DropTable(); err != nil {
 		return err
 	}
 	return Migrate()

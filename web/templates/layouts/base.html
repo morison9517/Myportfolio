@@ -1,0 +1,133 @@
+{{/* ==========================================================================
+   base.html = 全ページ共通の「型紙」
+
+   ここに書いたヘッダー・フッター・CSS読み込みを、全ページが受け継ぐ。
+   各ページは「真ん中の中身だけ」を書けばよく、ヘッダーの重複がなくなる。
+   ヘッダーを直したいときは、このファイル1枚を直せば全ページに反映される。
+
+   --------------------------------------------------------------------------
+   ▼ 型紙に空けた「穴」= block
+
+     {{ block "名前" . }} ... {{ end }} と書くと、そこが穴になる。
+     各ページが {{ define "名前" }} ... {{ end }} を書くと、その中身が
+     ここに差し込まれる。ページ側が書かなければ、穴の中に書いてある初期値が出る。
+
+     このファイルにある穴は3つ:
+         head_extra … そのページ専用のCSSを足したいとき
+         content    … ページの本体(必須)
+         scripts    … そのページ専用のJSを足したいとき
+
+   --------------------------------------------------------------------------
+   ▼ カッコの使い分け
+
+     {{ .Title }}         … 値を表示する
+     {{ if ... }}{{ end }}… 条件分岐(必ず end で閉じる)
+     {{ range ... }}      … 繰り返し
+     {{/* ... * /}}       … コメント(HTMLにも出力されない)← いま読んでいるこれ
+
+   --------------------------------------------------------------------------
+   ▼ ★「. (ドット)」の正体 — ここが一番のつまずきどころ
+
+     ドットは「今この場所に渡されている情報」を指す。
+     Goのテンプレートは、渡された情報しか見えない(勝手に外から読めない)。
+
+     渡しているのは internal/view/page.go の view.Page(...)。
+     そこに書いてある項目だけが {{ .○○ }} で使える。
+
+     ★穴に情報を渡し忘れる事故に注意
+         {{ block "content" . }}   ← 末尾のドットが「情報も一緒に渡す」印
+         {{ block "content" }}     ← これだと中身から {{ .Title }} が空になる
+
+     ★{{ range }} の中ではドットの意味が変わる
+         繰り返しの中では、ドットは「今の1件」に切り替わる。
+         全体の情報を使いたいときは、ドットの代わりに $ を付ける:
+             {{ $.SiteName }}
+
+   --------------------------------------------------------------------------
+   ▼ 表示は自動的に安全にされる
+
+     利用者が入力した文字に <script> が混ざっていても、
+     Goが自動で無害な文字に変換してから表示する。
+     エスケープ処理を自分で書く必要はない。
+
+   ========================================================================== */}}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {{/* JavaScriptから送信するときにも整理券(CSRFトークン)が必要なので、
+         ここに置いてJS側から読み取れるようにしている(仕掛けは main.js)。 */}}
+    <meta name="csrf-token" content="{{ .CSRFToken }}" />
+
+    {{/* 各ページから Title を渡せば「ホーム | Gin Template Demo」になり、
+         渡さなければサイト名だけになる。 */}}
+    <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}</title>
+
+    <link rel="stylesheet" href="/static/css/style.css" />
+
+    {{ block "head_extra" . }}{{ end }}
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="site-title" href="/">{{ .SiteName }}</a>
+
+        <nav class="site-nav">
+          {{/* AuthEnabled は .env の設定値。
+               ログイン機能をOFFにしたときにリンクが壊れないようにしている。
+
+               CurrentUser は今アクセスしている人。未ログインだと空になるので、
+               {{ if .CurrentUser }} だけで「ログイン中か」を判定できる。 */}}
+          {{ if .AuthEnabled }} {{ if .CurrentUser }}
+          <span class="nav-user">{{ .CurrentUser.Username }} さん</span>
+
+          {{/* ログアウトはPOST(理由は handlers/auth.go のコメント参照) */}}
+          <form action="/auth/logout" method="post" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
+            <button type="submit" class="btn btn-ghost">ログアウト</button>
+          </form>
+          {{ else }}
+          <a class="btn btn-ghost" href="/auth/login">ログイン</a>
+          <a class="btn btn-primary" href="/auth/register">新規登録</a>
+          {{ end }} {{ end }}
+        </nav>
+      </div>
+    </header>
+
+    {{/* ▼ メッセージの表示場所(全ページ共通なのでここに1回だけ書く)
+
+         Go側で middleware.Flash(c, "success", "保存しました") と書いたものが
+         ここに出る。各ページで「保存できました」の表示を自作する必要はない。
+
+         Category("success"/"error"/"warning")をCSSのクラス名にして色を変えている。
+
+         ★range の中なので、ドットは「今の1件」を指している。
+           .Category / .Message は FlashMessage の項目名
+           (internal/middleware/session.go で決めている)。 */}}
+    <div class="container">
+      {{ if .Flashes }}
+      <ul class="flash-list">
+        {{ range .Flashes }}
+        <li class="flash flash-{{ .Category }}">{{ .Message }}</li>
+        {{ end }}
+      </ul>
+      {{ end }}
+    </div>
+
+    {{/* 各ページの中身がここに入る */}}
+    <main class="container">{{ block "content" . }}{{ end }}</main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <small>Team AIB</small>
+      </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+
+    {{ block "scripts" . }}{{ end }}
+  </body>
+</html>

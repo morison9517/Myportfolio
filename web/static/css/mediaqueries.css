@@ -58,6 +58,22 @@
     }
 }
 
+/* ★6列のままだと画面からはみ出す幅を塞ぐための中間指定
+
+   6列の合計幅 = 72px × 6 + 横の隙間 × 5
+   横の隙間が 2.5rem(40px) のとき 632px 必要だが、
+   #skills の左右padding(10%)を引いた表示領域は 画面幅 × 0.8 しかない。
+   つまり画面幅が 790px を下回ると入りきらない。
+   下の 768px の指定が効き始めるまでの間、横の隙間だけ詰めて6列を保つ。
+
+   ★はみ出すと justify-content: center のせいで左側が画面外に出て
+     戻せなくなるので、ただの見た目の問題では済まない。 */
+@media (max-width: 900px) {
+    .skills-grid {
+        gap: 1.75rem 2.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     #welcome {
         background-attachment: scroll;
@@ -75,5 +91,22 @@
     .about-image img {
         width: 250px;
         height: 250px;
+    }
+
+    /* Skills:6列×2行 → 3列×4行 */
+    #skills {
+        padding: 80px 6%;
+    }
+
+    .skills-grid {
+        grid-template-columns: repeat(3, 72px);
+        gap: 1.5rem 1rem;
+    }
+
+    .skill-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 11px;
+        padding: 9px;
     }
 }

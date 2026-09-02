@@ -272,23 +272,23 @@ nav a{
 }
 
 .menu-links.open li:nth-child(1) {
-    transition-delay: 0.1s;
+    transition-delay: 0.07s;
 }
 
 .menu-links.open li:nth-child(2) {
-    transition-delay: 0.2s;
+    transition-delay: 0.14s;
 }
 
 .menu-links.open li:nth-child(3) {
-    transition-delay: 0.3s;
+    transition-delay: 0.21s;
 }
 
 .menu-links.open li:nth-child(4) {
-    transition-delay: 0.4s;
+    transition-delay: 0.28s;
 }
 
 .menu-links.open li:nth-child(5) {
-    transition-delay: 0.5s;
+    transition-delay: 0.35s;
 }
 
 /*welcome section*/
@@ -438,42 +438,112 @@ nav a{
 .about-details a:visited{
     color: #2997ff;
 
-    transition: 0.2s ease;
+    transition: 0.15s ease;
 }
 
 .about-details a:hover{
     color: var(--hover-color);
 }
 /*skills section*/
+/* ★背景がアクセントカラー(濃い緑)で固定なので、この中の文字は
+   ライト/ダークどちらでも常に白にする。var(--text-color)を使うと
+   ライトモードで黒になって読めなくなる。 */
 #skills {
     background-color: var(--accent-color);
-    padding: 100px 0;
+    padding: 80px 10%;
 }
 
+/* 見出しは #about h2 と同じ大きさ・余白にそろえてある */
 #skills h2 {
+    margin-bottom: 3.5rem;
     font-size: 3rem;
     color: #f9fafb;
+
     text-align: center;
-    margin-bottom: 60px;
 }
 
+/* 6列×2行。スマホでの3列×4行は mediaqueries.css 側
+
+   ★列幅を 1fr(均等割り) ではなく 72px 固定にしている理由
+     1fr にすると画面幅いっぱいに広がり、アイコン同士が離れてしまう。
+     固定幅にして justify-content: center を付けると、
+     必要な幅だけを使って全体が中央にまとまる。 */
 .skills-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(6, 72px);
+    gap: 1.75rem 2.5rem;   /* 縦の間隔 / 横の間隔 */
+    justify-content: center;
 }
 
 .skill-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    padding: 2rem;
-
-    background: var(--card-color);
-    border-radius: 20px;
+    gap: 0.55rem;           /* ロゴと文字の隙間 */
 }
 
+/* ロゴを載せる白い角丸の四角。
+   ロゴは背景が透過しているので、緑の背景に直接置くと
+   黒いもの(GitHub / Flask)や濃い緑のもの(Django)が沈んでしまう。
+   白を敷くことで、どの色のロゴでも同じ条件で見える。
+
+   ★padding と box-sizing はセットで必要。
+     box-sizing が無いと padding の分だけ全体が大きくなり、
+     指定した大きさにならない。 */
+.skill-icon {
+    width: 73px;
+    height: 73px;
+    border-radius: 15px;
+    background-color: #f6f7f8;
+
+    padding: 8px;          /* 増やすとロゴが小さくなる */
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 縦横比を保ったまま白い四角の中に収める。
+   画像の元サイズや縦横比が揃っていなくてよい。 */
+.skill-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.skill-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #f9fafb;
+
+    text-align: center;
+}
+
+/* Read More。文字の大きさと太さは .products-more にそろえてある */
+.skills-more {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.skills-more a,
+.skills-more a:visited {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f9fafb;
+
+    transition: color 0.15s ease;
+}
+
+/* ホバー時の色は他セクション(.about-details a / .product-card a h3)と同じ
+   var(--hover-color) を使う */
+.skills-more a:hover {
+    color: var(--hover-color);
+}
 
 /*products section*/
 #products {
@@ -523,4 +593,55 @@ nav a{
 .products-more a {
     font-size: 1rem;
     font-weight: 600;
+}
+
+/*フッター*/
+/* ★背景がアクセントカラーで固定なので、中の文字は #skills と同じく
+   ライト/ダークどちらでも白にする。var(--text-color)を使うと
+   ライトモードで黒になって読めなくなる。 */
+footer {
+    background-color: var(--accent-color);
+    color: #f9fafb;
+
+    padding: 2.5rem 6%;
+    text-align: center;
+}
+
+/* 利用規約とプライバシーポリシーの横並び。
+   justify-content: center で2つまとめて中央に置く。 */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+footer a,
+footer a:visited {
+    color: #f9fafb;
+
+    transition: color 0.2s ease;
+}
+
+/* ホバーの色は他セクションと同じ var(--hover-color) にそろえてある */
+footer a:hover {
+    color: var(--hover-color);
+}
+
+.footer-copyright {
+    margin: 1.2rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* ロゴのクレジット。opacity で薄くしている。
+   色を別に指定していないので、白のまま濃さだけが下がる。 */
+.footer-credits {
+    margin: 0.8rem 0 0;
+    font-size: 0.7rem;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.footer-credits a,
+.footer-credits a:visited {
+    text-decoration: underline;
 }

@@ -1,13 +1,3 @@
-{{/* ==========================================================================
-     index.html = トップページの中身
-
-     ヘッダー・フッター・<head> は書きません。
-     layouts/base.html の {{ block "content" }} の穴にここが入ります。
-
-     ★元の frontend/index.html の <main> の中身をそのまま持ってきています。
-       画像の src だけ /static/images/... に付け替えてあります
-       (web/static/ が /static として配信されるため)。
-     ========================================================================== */}}
 {{ define "content" }}
         <section id="welcome">
             <div class="hero">
@@ -33,23 +23,23 @@
                     <div class="about-image">
                         <img src="/static/images/About.jpg" alt="プロフィール画像" draggable="false">
                     </div>
-                
+
                     <div class="about-text">
                         <h3>Kota Morito</h3>
                         <h5>森藤 滉太</h5>
-                    
+
                         <p>
                             Webエンジニアを目指している専門学生です。<br>
                             現在はGo言語を中心にバックエンド開発を学びながら、
                             Webアプリケーション制作やインフラ技術にも挑戦しています。
                         </p>
-                    
+
                         <ul class="about-details">
                             <li>
                                 <i class="fa-solid fa-location-dot"></i>
                                 Takamatsu, Kagawa
                             </li>
-                        
+
                             <li>
                                 <i class="fa-brands fa-github"></i>
                                 <a href="https://github.com/morison9517">morison9517</a>
@@ -77,117 +67,109 @@
 
         <section id="skills">
             <div class="container">
-                <div class="skills-title">
-                    <h2>Skills</h2>
-                </div>
-            
-                <div class="skills-grid">
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-3">
-                            <img src="/static/images/skills/go.svg" alt="Go">
+                <h2>Skills</h2>
+
+                {{/* 6列×2行。スマホ(768px以下)では3列×4行になる(mediaqueries.css)。
+                     アイコンは web/static/images/skills/ に置く。 */}}
+                <ul class="skills-grid">
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/go.png" alt="">
                         </div>
-                        <h3>Go</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-2">
-                            <img src="/static/images/skills/docker.svg" alt="Docker">
+                        <span class="skill-name">Go</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/python.png" alt="">
                         </div>
-                        <h3>Docker</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-1">
-                            <img src="/static/images/skills/aws.svg" alt="AWS">
+                        <span class="skill-name">Python</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/java.png" alt="">
                         </div>
-                        <h3>AWS</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-3">
-                            <img src="/static/images/skills/git.svg" alt="Git">
+                        <span class="skill-name">Java</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/php.png" alt="">
                         </div>
-                        <h3>Git</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-2">
-                            <img src="/static/images/skills/linux.svg" alt="Linux">
+                        <span class="skill-name">PHP</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/html5.png" alt="">
                         </div>
-                        <h3>Linux</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-4">
-                            <img src="/static/images/skills/html.svg" alt="HTML">
+                        <span class="skill-name">HTML5</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/css3.png" alt="">
                         </div>
-                        <h3>HTML</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-4">
-                            <img src="/static/images/skills/css.svg" alt="CSS">
+                        <span class="skill-name">CSS3</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/gin.png" alt="">
                         </div>
-                        <h3>CSS</h3>
-                    </article>
-                
-                    <article class="skill-card">
-                        <div class="skill-circle skill-2">
-                            <img src="/static/images/skills/javascript.svg" alt="JavaScript">
+                        <span class="skill-name">Gin</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/django.png" alt="">
                         </div>
-                        <h3>JavaScript</h3>
-                    </article>
-                
-                </div>
-            
+                        <span class="skill-name">Django</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/flask.png" alt="">
+                        </div>
+                        <span class="skill-name">Flask</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/github.png" alt="">
+                        </div>
+                        <span class="skill-name">GitHub</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/mysql.png" alt="">
+                        </div>
+                        <span class="skill-name">MySQL</span>
+                    </li>
+
+                    <li class="skill-card">
+                        <div class="skill-icon">
+                            <img src="/static/images/skills/aws.png" alt="">
+                        </div>
+                        <span class="skill-name">AWS</span>
+                    </li>
+
+                </ul>
+
                 <div class="skills-more">
                     <a href="skills.html">
-                        Read More >>
+                        Read More &gt;&gt;
                     </a>
                 </div>
-            
+
             </div>
         </section>
 
         <section id="products">
-            <div class="container">
 
-                <h2>Products</h2>
-
-                <div class="products-grid">
-
-                    <article class="product-card">
-                        <a href="products/product1.html">
-                            <img src="/static/images/product1.jpg" alt="Product1">
-                            <h3>Product 1</h3>
-                        </a>
-                        <p>
-                            プロダクトの簡単な説明
-                        </p>
-                    </article>
-
-                    <article class="product-card">
-                        <!-- Product2 -->
-                    </article>
-
-                    <article class="product-card">
-                        <!-- Product3 -->
-                    </article>
-
-                    <article class="product-card">
-                        <!-- Product4 -->
-                    </article>
-                
-                </div>
-
-                <div class="products-more">
-                    <a href="products.html">
-                        Read More >>
-                    </a>
-                </div>
-            
-            </div>
         </section>
 
         <section id="experience">

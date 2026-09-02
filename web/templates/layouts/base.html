@@ -113,9 +113,21 @@
     <main>{{ block "content" . }}{{ end }}</main>
 
     <footer>
-        <p><a href="#">利用規約</a></p>
-        <p><a href="#">プライバシーポリシー</a></p>
-        <p>&copy; 2026 Kota Morito</p>
+        {{/* 利用規約とプライバシーポリシーを横並びにする。
+             並べるだけなので flex を使い、間隔は gap で決めている。 */}}
+        <div class="footer-links">
+            <a href="#">利用規約</a>
+            <a href="#">プライバシーポリシー</a>
+        </div>
+
+        <p class="footer-copyright">&copy; 2026 Kota Morito. All Right Reserved.</p>
+
+        {{/* ロゴのクレジット。
+
+             Gin のロゴは Renée French 氏の Go Gopher の派生で、
+             ライセンスが CC BY 3.0。CC BY は「作者の表示」が条件なので、
+             ロゴを載せる以上ここに書いておく必要がある。 */}}
+        <p class="footer-credits">各ロゴは各所有者の商標です。Gin のロゴは <a href="https://go.dev/blog/gopher">Go Gopher</a> (&copy; Renée French / <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>) に基づきます。</p>
     </footer>
 
     {{/* main.js = Gin側とやり取りするための共通の道具(整理券の付与など)。

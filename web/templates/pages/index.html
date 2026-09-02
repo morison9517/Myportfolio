@@ -173,6 +173,78 @@
         </section>
 
         <section id="experience">
+            <div class="container">
+                <h2>Experience</h2>
+
+                {{/* 年表。1件 = <li> 1つ。
+                     左に年(.timeline-year)、右に内容(.timeline-body)。
+                     縦線は .timeline-body の左borderで引いている。
+
+                     ★中身は仮置きです。実際の経歴に書き換えてください。
+                       上が古く、下が新しい並びにしてあります。
+                       逆にしたい場合は <li> の順番を入れ替えるだけです。 */}}
+                <ol class="timeline">
+
+                    <li class="timeline-item">
+                        <span class="timeline-year">2005/9</span>
+                        <div class="timeline-body">
+                            <h3>香川県にて生まれる</h3>
+                        </div>
+                    </li>
+
+                    {{/* 間が長く空くところ。timeline-gap を足すと縦線が波線になる。
+                         年の欄に期間、右側は他と同じくタイトルと説明。 */}}
+                    <li class="timeline-item timeline-gap">
+                        <span class="timeline-year">2005~</span>
+                        <div class="timeline-body">
+                            <p>幼少・小・中学時代</p>
+                        </div>
+                    </li>
+
+                    <li class="timeline-item">
+                        <span class="timeline-year">2021/4</span>
+                        <div class="timeline-body">
+                            <h3>香川高等専門学校へ入学</h3>
+                            <p>高専に入ってIT、通信の業界で働くことを志し、<br>
+                            香川高専　通信ネットワーク工学科へ入学。</p>
+                        </div>
+                    </li>
+
+                    <li class="timeline-item timeline-gap">
+                        <span class="timeline-year">2021~</span>
+                        <div class="timeline-body">
+                            <h3>ITではなく電気の学科だった</h3>
+                            <p>自分のやりたいこととは離れたことを専門としており<br>
+                            日々の勉強に徐々についていけなくなる。</p>
+                        </div>
+                    </li>
+
+                    <li class="timeline-item">
+                        <span class="timeline-year">2024/3</span>
+                        <div class="timeline-body">
+                            <h3>Kloudハッカソン#4へ参加　デザイン賞を受賞</h3>
+                            <p>
+                                2週間2人でDjangoフルスタックを担当。<br>
+                                音楽でつながるSNS『Chorus』を開発し<br>
+                                デザイン賞を受賞。
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="timeline-item">
+                        <span class="timeline-year">2024/8</span>
+                        <div class="timeline-body">
+                            <h3>TwoGate Dev Camp 2024 Summerへ参加</h3>
+                            <p>
+                                3日間2人でDjangoフルスタックを担当。<br>
+                                お遍路を快適にしてくれるLine bot『HENRO+』を開発<br>
+                                大きな経験となった。
+                            </p>
+                        </div>
+                    </li>
+
+                </ol>
+            </div>
         </section>
 
         <section id="contact">

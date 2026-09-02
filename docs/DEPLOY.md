@@ -120,6 +120,11 @@ docker compose -f compose.prod.yml up -d --build
 
 練習の段階では `http://` のままで構いません。**本番では必ずHTTPSにします。**
 
+> ★HTTPSにしたら、あわせて **HTTP/2 を有効にしてください。**
+> `docker/nginx/prod.conf` の 443 のブロックに `http2 on;` を1行足すだけです。
+> CSSを複数ファイルに分けているため、まとめて取得できるHTTP/2の効果が大きく出ます。
+> ブラウザはHTTPSのときしかHTTP/2を使わないので、それまでは書いても効きません。
+
 やり方は2つあります。
 
 ### ① サーバーの中で証明書を取る(Let's Encrypt)

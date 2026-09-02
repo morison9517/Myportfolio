@@ -50,7 +50,25 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     />
-    <link rel="stylesheet" href="/static/css/style.css">
+    {{/* ★CSSは読み込む順番に意味がある。
+
+         同じ強さの指定がぶつかったとき、CSSは「後に書かれたほう」が勝つ。
+         そのため並び順を入れ替えると、意図しない側が優先されて表示が崩れる。
+
+           base        … 色の定義(:root)・body・aなど、全体の土台
+           header〜footer … セクションごと。上から画面に並ぶ順
+           mediaqueries … 画面幅による上書き。★必ず最後
+
+         新しいセクションを作ったら、そのCSSは products と footer の間、
+         つまり画面に並ぶ位置と同じところに1行足す。 */}}
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/welcome.css">
+    <link rel="stylesheet" href="/static/css/about.css">
+    <link rel="stylesheet" href="/static/css/skills.css">
+    <link rel="stylesheet" href="/static/css/products.css">
+    <link rel="stylesheet" href="/static/css/experience.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
     <link rel="stylesheet" href="/static/css/mediaqueries.css">
 
     {{/* そのページだけで使うCSSを足したいとき用の穴 */}}
@@ -68,8 +86,8 @@
                     <h1>Menu</h1>
                     <ul>
                         <li><a href="#about" onclick="toggleMenu()">About me</a></li>
-                        <li><a href="#products" onclick="toggleMenu()">Products</a></li>
                         <li><a href="#skills" onclick="toggleMenu()">Skills</a></li>
+                        <li><a href="#products" onclick="toggleMenu()">Products</a></li>
                         <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
                         <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
                     </ul>
@@ -121,12 +139,6 @@
         </div>
 
         <p class="footer-copyright">&copy; 2026 Kota Morito. All Right Reserved.</p>
-
-        {{/* ロゴのクレジット。
-
-             Gin のロゴは Renée French 氏の Go Gopher の派生で、
-             ライセンスが CC BY 3.0。CC BY は「作者の表示」が条件なので、
-             ロゴを載せる以上ここに書いておく必要がある。 */}}
         <p class="footer-credits">各ロゴは各所有者の商標です。Gin のロゴは <a href="https://go.dev/blog/gopher">Go Gopher</a> (&copy; Renée French / <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>) に基づきます。</p>
     </footer>
 

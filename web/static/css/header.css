@@ -1,0 +1,257 @@
+/*ヘッダー*/
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 40px;
+
+    background-color: var(--header-bg);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    transition:none;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    box-sizing: border-box;
+
+    z-index: 100;
+}
+
+nav ul{
+    display: flex;
+    gap: 30px;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav a{
+    text-decoration: none;
+    color: var(--text-color);
+}
+/*ヘッダー：ダークモード*/
+.theme-switch{
+    position: relative;
+}
+
+.theme-switch__input{
+    display: none;
+}
+
+.theme-switch__label{
+    position: relative;
+
+    display: block;
+
+    width: 70px;
+    height: 35px;
+
+    border-radius: 50px;
+
+    background-color: #64748b;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.theme-switch__label::before{
+    content: "☀";
+
+    position: absolute;
+    left: -24px;
+    top: 47%;
+
+    transform: translateY(-50%);
+
+    color: #f59e0b;
+    font-size: 15px;
+}
+
+.theme-switch__label::after{
+    content: "☾";
+
+    position: absolute;
+    right: -17px;
+    top: 47%;
+
+    transform: translateY(-50%);
+
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+.theme-switch__label span{
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    width: 29px;
+    height: 29px;
+
+    border-radius: 50%;
+
+    background-color: white;
+
+    transition: .3s;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.theme-switch__input:checked
++ .theme-switch__label{
+    background-color: #64748b;
+}
+
+.theme-switch__input:checked
++ .theme-switch__label span{
+    transform: translateX(35px);
+}
+/*ヘッダー：ハンバーガーメニュー*/
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: 40px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
+}
+
+.hamburger-icon span {
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-color);
+    transition:
+        transform 0.3s ease,
+        background-color 0.2s ease;
+}
+
+.hamburger-icon.open span {
+    background-color: white;
+}
+
+.hamburger-icon span:first-child {
+    opacity: 1;
+}
+
+.hamburger-icon.open span:first-child {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger-icon.open span:last-child {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+
+.menu-links {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 320px;
+    height: 100vh;
+
+    background-color: #737272;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0s linear 0.5s;
+
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding-top: 50px;
+}
+
+.menu-links h1,
+.menu-links li {
+    opacity: 0;
+    transform: translateY(20px);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+.menu-links.open h1,
+.menu-links.open li {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.menu-links h1 {
+    color: #f9fafb;
+    font-size: 3.5rem;
+    margin-top: 50px;
+    margin-bottom: 40px;
+}
+
+.menu-links ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+}
+
+.menu-links a {
+    font-size: 1.5rem;
+    color: #f9fafb;
+    text-decoration: none;
+}
+
+.menu-links li {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.menu-links.open {
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0s linear 0s;
+}
+
+.menu-links.open h1 {
+    transition-delay: 0s;
+}
+
+.menu-links.open li:nth-child(1) {
+    transition-delay: 0.07s;
+}
+
+.menu-links.open li:nth-child(2) {
+    transition-delay: 0.14s;
+}
+
+.menu-links.open li:nth-child(3) {
+    transition-delay: 0.21s;
+}
+
+.menu-links.open li:nth-child(4) {
+    transition-delay: 0.28s;
+}
+
+.menu-links.open li:nth-child(5) {
+    transition-delay: 0.35s;
+}
+

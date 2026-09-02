@@ -1,0 +1,36 @@
+/*全体*/
+:root{
+    --bg-color: #fffef9;
+    --text-color: #111827;
+    --card-color: #f3f4f6;
+    --accent-color: #00752b;
+    --hover-color: #353535;
+
+    --header-bg: rgba(255, 255, 255, 0.65);
+}
+
+a,
+a:visited{
+    text-decoration: none;
+}
+
+body.dark{
+    --bg-color: #111827;
+    --text-color: #f9fafb;
+    --card-color: #1f2937;
+
+    --header-bg: rgba(17,24,39,0.65);
+}
+
+body{
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    /* transitionは付けない。
+       header・#about・#productsは自前の背景を持っていて即座に切り替わるが、
+       footerは背景を持たずbodyの背景が透けているため、ここに時間を付けると
+       footerだけ遅れて切り替わって見える。 */
+
+    font-family: sans-serif;
+}

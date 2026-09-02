@@ -4,36 +4,17 @@
         display: flex;
     }
 
-    #experience,
-    .experience-details-container {
+    #experience {
         margin-top: 2rem;
     }
 
-    .arrow {
-        display: none;
-    }
-
-    section,
-    .section-container {
-        height: fit-content;
-    }
-
     section {
-        margin: 0 ;
+        height: fit-content;
+        margin: 0;
     }
 
     #welcome {
         margin: 0;
-    }
-
-    .section__pic-container {
-        width: 275px;
-        height: 275px;
-        margin: 0 auto 2rem;
-    }
-
-    .about-containers {
-        margin-top: 0;
     }
 }
 
@@ -108,5 +89,27 @@
         height: 58px;
         border-radius: 11px;
         padding: 9px;
+    }
+
+    /* Experience
+       ★background-attachment: fixed はスマホ(特にiOS)で描画がおかしくなるため、
+         #welcome と同じく scroll に戻す。 */
+    #experience {
+        background-attachment: scroll;
+        padding: 80px 6%;
+    }
+
+    /* 年の列を狭めて、内容に幅を回す */
+    .timeline-item {
+        grid-template-columns: 3.2rem 1fr;
+        gap: 1rem;
+    }
+
+    .timeline-body {
+        padding-left: 1.25rem;
+    }
+
+    .timeline-year {
+        font-size: 1rem;
     }
 }

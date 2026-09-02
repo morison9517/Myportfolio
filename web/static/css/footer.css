@@ -1,0 +1,50 @@
+/*フッター*/
+/* ★背景がアクセントカラーで固定なので、中の文字は #skills と同じく
+   ライト/ダークどちらでも白にする。var(--text-color)を使うと
+   ライトモードで黒になって読めなくなる。 */
+footer {
+    background-color: var(--accent-color);
+    color: #f9fafb;
+
+    padding: 2.5rem 6%;
+    text-align: center;
+}
+
+/* 利用規約とプライバシーポリシーの横並び。
+   justify-content: center で2つまとめて中央に置く。 */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+footer a,
+footer a:visited {
+    color: #f9fafb;
+
+    transition: color 0.15s ease;
+}
+
+/* ホバーの色は他セクションと同じ var(--hover-color) にそろえてある */
+footer a:hover {
+    color: var(--hover-color);
+}
+
+.footer-copyright {
+    margin: 1.2rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* ロゴのクレジット。opacity で薄くしている。
+   色を別に指定していないので、白のまま濃さだけが下がる。 */
+.footer-credits {
+    margin: 0.8rem 0 0;
+    font-size: 0.7rem;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.footer-credits a,
+.footer-credits a:visited {
+    text-decoration: underline;
+}

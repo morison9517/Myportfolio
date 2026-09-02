@@ -1,0 +1,50 @@
+/*products section*/
+#products {
+    padding: 100px 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.product-card {
+    overflow: hidden;
+}
+
+.product-card img {
+    width: 100%;
+    display: block;
+
+    transition: transform 0.2s ease;
+}
+
+.product-card a:hover img {
+    transform: scale(1.03);
+}
+
+.product-card a:hover h3 {
+    color: var(--hover-color);
+}
+
+.product-card a h3,
+.product-card a h3:visited{
+    color: var(--text-color);
+
+    transition: color 0.2s ease;
+}
+
+.products-more {
+    margin-top: 3rem;
+    text-align: right;
+}
+
+.products-more a {
+    font-size: 1rem;
+    font-weight: 600;
+}
+

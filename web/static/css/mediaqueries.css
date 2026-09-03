@@ -1,3 +1,25 @@
+/* ★ここだけ min-width(「〇〇px以上のとき」)。
+     他は max-width(狭いとき)なので、条件の向きが逆になっている。
+
+   Skills:6列×2行 → 12列×1行。PCで全画面表示にしたときだけ横一列に並べる。
+
+   ▼ ★1536px という数字の出どころ
+
+     12列の合計幅 = 72px × 12 + 横の隙間 × 11
+     隙間を 1.75rem(28px) にすると 864 + 308 = 1172px 必要。
+     #skills の左右padding(10%)を引いた表示領域は 画面幅 × 0.8 なので、
+     1536px なら 1228px 使えて収まる(1920pxを125%表示にした幅がこれ)。
+
+     ★隙間を広げるとこの計算が変わる。
+       広げるなら、入りきる画面幅も一緒に上げること。
+       はみ出すと justify-content: center のせいで左側が画面外に出てしまう。 */
+@media (min-width: 1536px) {
+    .skills-grid {
+        grid-template-columns: repeat(12, 72px);
+        gap: 1.75rem;
+    }
+}
+
 @media screen and (max-width: 1200px) {
 
     #hamburger-nav {

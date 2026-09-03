@@ -16,7 +16,8 @@
     text-align: center;
 }
 
-/* 6列×2行。スマホでの3列×4行は mediaqueries.css 側
+/* 6列×2行。画面が広いときの12列×1行と、スマホでの3列×4行は
+   どちらも mediaqueries.css 側
 
    ★列幅を 1fr(均等割り) ではなく 72px 固定にしている理由
      1fr にすると画面幅いっぱいに広がり、アイコン同士が離れてしまう。
@@ -71,10 +72,9 @@
 }
 
 .skill-name {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.3rem;
+    font-weight: 600;
     color: #f9fafb;
-
     text-align: center;
 }
 
@@ -98,4 +98,3 @@
 .skills-more a:hover {
     color: var(--hover-color);
 }
-

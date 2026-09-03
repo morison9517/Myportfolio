@@ -34,3 +34,22 @@ body{
 
     font-family: sans-serif;
 }
+
+/* 外部サイトへ飛ぶリンクの印。<a> の外(すぐ後ろ)に
+   <i class="fa-solid fa-arrow-up-right-from-square external-link-icon"> を置く。
+
+   ★リンクの中ではなく外に置いているのは、
+     読み上げソフトがリンク名にアイコンを含めてしまわないようにするため。
+
+   ★アイコンは飾りなので、文字より小さくして目立たせすぎない。
+     ★単位は em ではなく rem。
+       em はその場所の文字サイズ基準なので、文字の小さい footer では
+       アイコンだけさらに小さくなってしまう。
+       rem なら画面のどこに置いても同じ大きさになる。
+
+   文字との間隔は置き場所ごとに決まる。
+     #about / #experience … li 側の gap
+     footer のクレジット   … 文章の中なので footer.css で margin を付けている */
+.external-link-icon {
+    font-size: 0.75rem;
+}

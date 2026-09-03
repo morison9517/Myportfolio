@@ -57,7 +57,7 @@
 .about-details li {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 7px;
     margin-bottom: 0.6rem;
 }
 

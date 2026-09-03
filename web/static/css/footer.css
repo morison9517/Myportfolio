@@ -48,3 +48,9 @@ footer a:hover {
 .footer-credits a:visited {
     text-decoration: underline;
 }
+
+
+.footer-credits .external-link-icon {
+    font-size: 0.6rem;
+    margin-left: 3px;
+}

@@ -16,15 +16,14 @@
     color: #f9fafb;
 }
 
-/* 文字を読みやすくするための黒い膜。
-   ★#welcome と同じ濃さ(0.6)にそろえてある。 */
+/* 文字を読みやすくするための黒い膜。*/
 #experience::before {
     content: "";
 
     position: absolute;
     inset: 0;
 
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 /* ★中身を膜より前に出す。これが無いと膜の下に隠れて何も見えない。 */
@@ -226,13 +225,45 @@
 
 .timeline-body h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
 }
 
 .timeline-body p {
     margin: 0.5rem 0 0;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     line-height: 1.8;
 
-    opacity: 0.85;
+    opacity: 0.88;
+}
+
+/* 年表の中に置くリンク(インターン先など)。
+   見た目は #about の .about-details とそろえてある。
+   アイコン(<i>)とリンクを横並びにして、間隔と色を同じにする。 */
+.timeline-links {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+}
+
+.timeline-links li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 0.6rem;
+}
+
+.timeline-links li:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-links a,
+.timeline-links a:visited {
+    color: #2997ff;
+
+    transition: 0.15s ease;
+}
+
+.timeline-links a:hover {
+    color: var(--hover-color);
 }

@@ -225,7 +225,7 @@
 
 .timeline-body h3 {
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
 .timeline-body p {
@@ -233,7 +233,7 @@
     font-size: 1.05rem;
     line-height: 1.8;
 
-    opacity: 0.88;
+    opacity: 0.85;
 }
 
 /* 年表の中に置くリンク(インターン先など)。

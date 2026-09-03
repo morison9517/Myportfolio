@@ -50,6 +50,29 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     />
+
+    {{/* Adobe Fonts(Source Han Sans JP)。kyv2mdg はこのサイト用のkit ID。
+         Adobeの管理画面が出すコードをそのまま貼っている。
+         実際にどの文字に使うかは base.css の body(font-family)で決めている。
+
+         ★<link>1行では読み込めない。
+           日本語フォントは字数が多く容量が大きいので、
+           ページに出てくる文字だけを選んで配信する仕組みになっている。
+           その判定にJavaScriptが要るため、CSS版(.css)は412を返す。
+
+         ★scriptTimeout(3秒)を過ぎたら諦めて、<html>に wf-inactive を付ける。
+           そのときは base.css の sans-serif が使われるので、
+           読み込めなくても文字が消えることはない。 */}}
+    <script>
+      (function(d) {
+        var config = {
+          kitId: 'kyv2mdg',
+          scriptTimeout: 3000,
+          async: true
+        },
+        h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+      })(document);
+    </script>
     {{/* ★CSSは読み込む順番に意味がある。
 
          同じ強さの指定がぶつかったとき、CSSは「後に書かれたほう」が勝つ。

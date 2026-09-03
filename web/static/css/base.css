@@ -32,24 +32,24 @@ body{
        footerは背景を持たずbodyの背景が透けているため、ここに時間を付けると
        footerだけ遅れて切り替わって見える。 */
 
-    font-family: sans-serif;
+    /* ★Adobe Fonts の Source Han Sans JP(可変フォント)。
+         読み込みは base.html の <head>(use.typekit.net のスクリプト)。
+
+       ★最後の sans-serif は保険。
+         読み込みに失敗したときや、読み込みが終わるまでの間はこちらが使われる。 */
+    font-family: "source-han-sans-jp-variable", sans-serif;
+
+    /* ★可変フォントなので、太さを数値で細かく指定できる。
+
+       ★Adobeのサンプルにある font-variation-settings は使わない。
+         あちらは font-weight より優先されるうえ全体に受け継がれるので、
+         見出しの bold が効かなくなり、どこも同じ太さになってしまう。
+         font-weight なら見出し側の指定がそのまま勝つ。 */
+    font-weight: 600;
+    font-style: normal;
 }
 
-/* 外部サイトへ飛ぶリンクの印。<a> の外(すぐ後ろ)に
-   <i class="fa-solid fa-arrow-up-right-from-square external-link-icon"> を置く。
-
-   ★リンクの中ではなく外に置いているのは、
-     読み上げソフトがリンク名にアイコンを含めてしまわないようにするため。
-
-   ★アイコンは飾りなので、文字より小さくして目立たせすぎない。
-     ★単位は em ではなく rem。
-       em はその場所の文字サイズ基準なので、文字の小さい footer では
-       アイコンだけさらに小さくなってしまう。
-       rem なら画面のどこに置いても同じ大きさになる。
-
-   文字との間隔は置き場所ごとに決まる。
-     #about / #experience … li 側の gap
-     footer のクレジット   … 文章の中なので footer.css で margin を付けている */
+/* フッターのアイコンのみfooter.cssに独立させている。 */
 .external-link-icon {
     font-size: 0.75rem;
 }

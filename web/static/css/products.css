@@ -3,6 +3,10 @@
     padding: 100px 0;
     background-color: var(--bg-color);
     color: var(--text-color);
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
 }
 
 .products-grid {
@@ -35,7 +39,9 @@
 .product-card a h3:visited{
     color: var(--text-color);
 
-    transition: color 0.2s ease;
+    /* ホバーの色変化も兼ねるが、テーマ切り替えでも動く場所なので
+       時間は var(--theme-fade) にそろえる。 */
+    transition: color var(--theme-fade);
 }
 
 .products-more {

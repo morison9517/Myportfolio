@@ -1,0 +1,149 @@
+/*error page(400 / 401 / 404 / 500 共通)*/
+/* 背景の作りは #experience と同じ。
+   画像の上に黒い膜(::before)を敷いて、その上に白文字を載せる。
+
+   ★このCSSはエラーページでしか使わないので、base.html には書かず
+     pages/error.html の head_extra から読み込んでいる。 */
+#error {
+    /* 画面の高さいっぱいを使い、その真ん中に文字を置く。
+       ★padding を高さに含めたいので box-sizing を border-box にする。
+         これが無いと min-height の 100vh に padding が足されて、
+         中身が短いのに縦スクロールが出てしまう。 */
+    min-height: 100vh;
+    padding: 100px 10%;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-image: url("../images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-attachment: fixed;
+
+    position: relative;
+
+    text-align: center;
+
+    /* ダークでもライトでも背景は暗い写真のままなので、
+       var(--text-color) は使わず白で固定する(#experience と同じ考え方)。 */
+    color: #f9fafb;
+}
+
+/* 文字を読みやすくするための黒い膜。*/
+#error::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* ★中身を膜より前に出す。これが無いと膜の下に隠れて何も見えない。 */
+#error .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ★以下の4つの --fade-delay が、上から順に出すときの待ち時間。
+     数字を大きくするほど後に出る。仕掛け(font-fade)は base.css。 */
+
+/* 400 / 401 / 404 / 500 の数字。このページの主役なので大きく。 */
+#error h1 {
+    margin: 0;
+
+    font-size: 13rem;
+    line-height: 1;
+
+    /* 数字なので字間を少し空けたほうが読みやすい */
+    letter-spacing: 0.07em;
+
+    --fade-delay: 0.15s;
+}
+
+/* エラーの種類(英語)。数字のすぐ下。 */
+.error-name {
+    margin: 1.5rem 0 0;
+
+    font-size: 3rem;
+    letter-spacing: 0.05em;
+
+    --fade-delay: 0.15s;
+}
+
+/* エラーの内容(日本語)。本文と同じ大きさ。 */
+.error-message {
+    margin: 1rem 0 0;
+
+    font-size: 1.5rem;
+
+    /* 少しだけ控えめにして、上の2行との差をつける。
+       ★opacity ではなく色の透明度で薄くしている。
+         opacity は font-fade(表示するときのふわっと)が使っているので、
+         ここで指定すると打ち消し合って、文字が隠れなかったり
+         出たあとに薄くならなかったりする。 */
+    color: rgba(249, 250, 251, 0.9);
+
+    --fade-delay: 0.15s;
+}
+
+/* ホームへ戻るリンク。大きさは上の説明文と同じ。 */
+.error-home,
+.error-home:visited {
+    /* ★inline-block にすること。
+         font-fade の「下から20pxずらして出す」は transform で行っているが、
+         transform は inline の要素には効かない。
+         a は何も指定しないと inline なので、このままだと
+         濃さだけ変わって、ずれずに出てしまう。 */
+    display: inline-block;
+
+    margin: 2.5rem 0 0;
+
+    font-size: 1.5rem;
+
+    /* 色とホバーは #experience のリンクと同じ。
+       背景(写真+黒い膜)の作りが同じなのでそろえてある。 */
+    color: #2997ff;
+
+    transition: color 0.15s ease;
+
+    --fade-delay: 0.45s;
+}
+
+.error-home:hover {
+    color: var(--hover-color);
+}
+
+/* ---------- スマホ用 ---------- */
+/* ★★このページの画面幅の調整だけは mediaqueries.css ではなくここに書く。
+     error.css は head_extra から読み込まれるので mediaqueries.css より後になり、
+     あちらに #error を書いても、こちらの指定に打ち消されてしまうため。 */
+@media (max-width: 768px) {
+    /* ★background-attachment: fixed はスマホ(特にiOS)で描画がおかしくなるため、
+         #welcome・#experience と同じく scroll に戻す。 */
+    #error {
+        background-attachment: scroll;
+        padding: 80px 6%;
+    }
+
+    /* 8remのままだと3桁の数字が画面からはみ出す */
+    #error h1 {
+        font-size: 7rem;
+    }
+
+    .error-name {
+        font-size: 1.7rem;
+    }
+
+    .error-message{
+        font-size: 1.1rem;
+    }
+
+    .error-home {
+        font-size: 1.1rem;
+    }
+}

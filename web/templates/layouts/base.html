@@ -29,7 +29,9 @@
        元サイトの css/ js/ images/ が、そのまま web/static/ の下に入っている。
      ========================================================================== */}}
 <!DOCTYPE html>
-<html lang="ja">
+{{/* fade-hold … フォント待ちのふわっと(font-fade)を、
+     この画面が実際に映るまで待たせておくための印。下の<script>が外す。 */}}
+<html lang="ja" class="fade-hold">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,6 +75,50 @@
         h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
       })(document);
     </script>
+    {{/* ★fade-hold を外す係。font-fade(base.css)の開始の合図。
+
+         ▼ なぜ必要か
+
+           ブラウザは「たぶん次に開く」と判断したページを、裏で先に
+           読み込んで完成させておくことがある(先読み)。
+           アドレスバーにURLを入力したときが分かりやすい例で、
+           Enterを押した時点では、そのページはもう出来上がっている。
+
+           何もしないと、アニメーションもその「裏で作っていた間」に
+           終わってしまい、画面に出たときには文字が表示済みになる。
+           これが「直接URLを開いたときだけフェードしない」の正体。
+
+         ▼ やっていること
+
+           requestAnimationFrame は「画面を描くとき」に呼ばれる関数で、
+           裏で作っている間や、別のタブを見ている間は呼ばれない。
+           つまりここで印を外せば、必ず「画面に映る直前」になる。
+
+         ★document.prerendering は先読み中かどうかの目印(Chrome)。
+           先読み中に描画が走る場合に備えて、
+           実際に開かれた合図(prerenderingchange)まで待つ。
+
+         ★この中身は<head>に直接書くこと。
+           別ファイル(script.js)にすると読み込み待ちの間ずっと
+           文字が隠れたままになり、かえって遅く見える。 */}}
+    <script>
+      (function () {
+        var html = document.documentElement;
+
+        function release() {
+          requestAnimationFrame(function () {
+            html.classList.remove("fade-hold");
+          });
+        }
+
+        if (document.prerendering) {
+          document.addEventListener("prerenderingchange", release, { once: true });
+        } else {
+          release();
+        }
+      })();
+    </script>
+
     {{/* ★CSSは読み込む順番に意味がある。
 
          同じ強さの指定がぶつかったとき、CSSは「後に書かれたほう」が勝つ。
@@ -96,8 +142,23 @@
 
     {{/* そのページだけで使うCSSを足したいとき用の穴 */}}
     {{ block "head_extra" . }}{{ end }}
+
+    {{/* ★JavaScriptを切っている人向けの保険。
+         font-fade は「JSが印(fade-hold)を外したら出す」仕組みなので、
+         JSが動かないと文字が隠れたままになってしまう。
+         そのときは動きを諦めて、最初から表示する。
+         ★CSSの読み込みより後に置くこと。先に置くと打ち消される。 */}}
+    <noscript>
+        <style>
+            .font-fade {
+                opacity: 1;
+            }
+        </style>
+    </noscript>
 </head>
-<body>
+{{/* theme-loading … 読み込み直後のフェードを止めるための印。
+     script.js がテーマを決めた直後に外す(仕掛けは base.css)。 */}}
+<body class="theme-loading">
     <header>
         <nav id="hamburger-nav">
             <div class="hamburger-menu">
@@ -105,14 +166,19 @@
                     <span></span>
                     <span></span>
                 </div>
+                {{/* ★リンク先を "#about" ではなく "/#about" にしている。
+                     "#about" は「今開いているページの中の #about」という意味なので、
+                     エラーページ(/hoge など)から押しても何も起きない。
+                     "/" を付けるとトップページの #about へ移動できる。
+                     トップページで押したときの動き(なめらかスクロール)は変わらない。 */}}
                 <div class="menu-links">
                     <h1>Menu</h1>
                     <ul>
-                        <li><a href="#about" onclick="toggleMenu()">About me</a></li>
-                        <li><a href="#skills" onclick="toggleMenu()">Skills</a></li>
-                        <li><a href="#products" onclick="toggleMenu()">Products</a></li>
-                        <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
-                        <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+                        <li><a href="/#about" onclick="toggleMenu()">About me</a></li>
+                        <li><a href="/#skills" onclick="toggleMenu()">Skills</a></li>
+                        <li><a href="/#products" onclick="toggleMenu()">Products</a></li>
+                        <li><a href="/#experience" onclick="toggleMenu()">Experience</a></li>
+                        <li><a href="/#contact" onclick="toggleMenu()">Contact</a></li>
                     </ul>
                 </div>
             </div>

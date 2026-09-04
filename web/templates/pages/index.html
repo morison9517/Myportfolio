@@ -1,15 +1,18 @@
 {{ define "content" }}
+        {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
+             出る順番は welcome.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
         <section id="welcome">
             <div class="hero">
 
-                <h1>Welcome to My Portfolio!</h1>
+                <h1 class="font-fade">Welcome to My Portfolio!</h1>
 
-                <p>
+                <p class="font-fade">
                     Aspiring Backend Engineer
                 </p>
 
             </div>
 
+            {{/* ★ここは font-fade を付けない(最初から出しておく)。 */}}
             <div class="scroll-indicator">
                 <p>Scroll</p>
             </div>
@@ -266,7 +269,7 @@
                                 (現在は穴吹ITビジネスカレッジ)
                             </h3>
                             <p>
-                                専門学校へ再入学し、授業や独学で様々な技術を学んでいる。
+                                専門学校へ再入学し、現在授業や独学で様々な技術を学んでいる。
                             </p>
                         </div>
                     </li>

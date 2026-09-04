@@ -1,0 +1,35 @@
+{{/* ==========================================================================
+     error.html = 400 / 401 / 404 / 500 で共通に使うエラーページ
+
+     ★HTMLは1枚だけです。
+       出す文言(数字・英語名・日本語の説明)は Go 側から渡しています。
+       表は internal/handlers/error.go の errorPages にまとまっているので、
+       文言を直したいときも、種類を増やしたいときもそちらを見てください。
+
+     ▼ 渡ってくる値
+
+       {{ .ErrorCode }}    … 400 / 401 / 404 / 500
+       {{ .ErrorName }}    … Bad Request / Not Found など(英語)
+       {{ .ErrorMessage }} … 指定されたページが見つかりませんでした。など(日本語)
+     ========================================================================== */}}
+
+{{/* このページだけで使うCSS。base.html の head_extra の穴に入る。 */}}
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/error.css">
+{{ end }}
+
+{{ define "content" }}
+        {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
+             出る順番は error.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
+        <section id="error">
+            <div class="container">
+                <h1 class="font-fade">{{ .ErrorCode }}</h1>
+
+                <p class="error-name font-fade">{{ .ErrorName }}</p>
+
+                <p class="error-message font-fade">{{ .ErrorMessage }}</p>
+
+                <a href="/" class="error-home font-fade">ホームへ戻る</a>
+            </div>
+        </section>
+{{ end }}

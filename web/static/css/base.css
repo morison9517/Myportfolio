@@ -7,6 +7,12 @@
     --hover-color: #353535;
 
     --header-bg: rgba(255, 255, 255, 0.65);
+
+    /* ★ダーク/ライト切り替えのフェード時間。
+         テーマ色を持つ要素は必ずこの変数を使う。
+         ばらばらの時間を書くと、切り替えたときに要素ごとに
+         遅れて色が変わって見えてしまう。 */
+    --theme-fade: 0.15s ease;
 }
 
 a,
@@ -33,6 +39,21 @@ html {
     }
 }
 
+/* ★ページを開いた直後だけ、フェードを止めるための保険。
+     テーマはJS(script.js)が localStorage を読んでから決めるので、
+     何もしないとダークモードの人は毎回「白→黒」のフェードが見えてしまう。
+
+     bodyに theme-loading を付けた状態でHTMLが届き、
+     テーマを決め終わった時点で script.js が外す。
+
+   ★止まるのは transition だけ。
+     フォント待ちのふわっと(font-fade・このファイルの下のほう)は
+     animation なので、ここには巻き込まれない。 */
+body.theme-loading,
+body.theme-loading *{
+    transition: none !important;
+}
+
 body.dark{
     --bg-color: #111827;
     --text-color: #f9fafb;
@@ -46,10 +67,16 @@ body{
     background-color: var(--bg-color);
     color: var(--text-color);
 
-    /* transitionは付けない。
-       header・#about・#productsは自前の背景を持っていて即座に切り替わるが、
-       footerは背景を持たずbodyの背景が透けているため、ここに時間を付けると
-       footerだけ遅れて切り替わって見える。 */
+    /* ★テーマ切り替えを一瞬ではなくフェードにする。
+         footerは自前の背景を持たずbodyの背景が透けているので、
+         ここに時間を付けるとfooterも一緒にフェードする。
+
+       ★header・#about・#products・nav a なども自前の色を持っているので、
+         そちらにも同じ var(--theme-fade) を付けてある。
+         付け忘れるとその要素だけ先に切り替わって見える。 */
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
 
     /* ★Adobe Fonts の Source Han Sans JP(可変フォント)。
          読み込みは base.html の <head>(use.typekit.net のスクリプト)。
@@ -71,4 +98,99 @@ body{
 /* フッターのアイコンのみfooter.cssに独立させている。 */
 .external-link-icon {
     font-size: 0.75rem;
+}
+
+/* ===========================================================================
+   font-fade = フォントの読み込みを待ってから、上から順に出す
+   ===========================================================================
+
+   ▼ 何のためか
+
+     Adobe Fonts は読み込みに時間がかかる。その間は保険の sans-serif で
+     文字が表示され、読み込みが終わった瞬間に別のフォントに入れ替わるので、
+     文字の形も幅も変わってガクッとちらつく。
+
+     そこで待っている間は隠しておき、読み込みが終わってから
+     ハンバーガーメニューと同じ「上から順にふわっと」で出す。
+
+   ▼ 使い方(HTML側)
+
+       <h1 class="font-fade">404</h1>
+
+     出る順番はそのページのCSSで決める。数字が大きいほど後に出る。
+
+       #error h1    { --fade-delay: 0s;    }
+       .error-name  { --fade-delay: 0.07s; }
+
+   ▼ ★<html> に付く目印(base.html の Adobe Fonts のスクリプトが付ける)
+
+       wf-loading  … 読み込み中
+       wf-active   … 読み込めた
+       wf-inactive … 3秒待っても読み込めなかった
+
+     出す条件を「wf-loading が付いていない」にしてあるのが要点。
+     ★ここを wf-active にすると、フォントを読み込めなかった人や
+       JavaScriptが動かない人の画面から文字が永久に消える。
+
+   ▼ ★transition ではなく animation を使っている(重要)
+
+     transition は「途中で値が変わったとき」にしか動かない。
+     ところがフォントが読み込み済み(2回目以降の表示)のときは、
+     <body>を読むより先に wf-loading が外れることがあり、
+     その場合 .font-fade は最初から表示された状態で作られる。
+     変化が起きていないので transition は走らず、
+     「たまにフェードせず最初から文字が出ている」状態になる。
+
+     animation は「その指定が付いた状態で要素が現れたら再生する」ので、
+     wf-loading が外れるのが早くても遅くても必ず動く。
+
+   ▼ ★条件が2つある理由(wf-loading と fade-hold)
+
+       wf-loading … フォントの読み込みが終わったか
+       fade-hold  … この画面が実際に映ったか(base.html の<head>が外す)
+
+     ブラウザは「たぶん次に開く」ページを裏で先に完成させることがあり、
+     アドレスバーにURLを入力したときが分かりやすい例。
+     fade-hold が無いと、その「裏で作っていた間」に動きが終わってしまい、
+     画面に出たときには文字が表示済みになる。
+     =========================================================================== */
+/* ★「濃さ」と「動き」で長さが違うので、2つに分けてある。
+     1つにまとめると、どちらかの長さに揃えるしかなくなる。 */
+@keyframes font-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes font-slide-in {
+    from { transform: translateY(20px); }
+    to   { transform: translateY(0); }
+}
+
+/* フォントを待っている間は隠しておく。 */
+.font-fade {
+    opacity: 0;
+}
+
+html:not(.wf-loading):not(.fade-hold) .font-fade {
+    /* ★最後の both は「再生前と再生後の見た目を保つ」指定。
+         これが無いと、待ち時間(animation-delay)の間だけ
+         .font-fade の opacity: 0 が効かず、一瞬文字が見えてしまう。 */
+    animation:
+        font-fade-in 0.5s ease both,
+        font-slide-in 0.4s ease both;
+
+    /* 出る順番。指定が無ければ0.3秒。2つの動きに同じ待ち時間が入る。 */
+    animation-delay: var(--fade-delay, 0.3s);
+}
+
+/* ★OSで「視差効果を減らす」を有効にしている人には動かさない。
+     スクロールと同じ考え方(このファイルの上のほうを参照)。
+     動かさないだけで、文字はちゃんと表示される。
+     ★opacity: 1 を忘れると、animation を消したぶん
+       文字が隠れたままになる。 */
+@media (prefers-reduced-motion: reduce) {
+    html:not(.wf-loading):not(.fade-hold) .font-fade {
+        animation: none;
+        opacity: 1;
+    }
 }

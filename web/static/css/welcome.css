@@ -40,23 +40,27 @@
     align-items: center;
 }
 
+/* ★ここから3つの --fade-delay が、上から順に出す待ち時間。
+     ハンバーガーメニューと同じ0.07秒刻み。仕掛け(font-fade)は base.css。 */
 .hero h1 {
     font-size: 4rem;
     margin-top: 20px;
+
+    --fade-delay: 0.7s;
 }
 
 .hero p {
     margin-top: 15px;
     font-size: 2.0rem;
+
+    --fade-delay: 0.7s;
 }
 
-.scroll-indicator{
+.scroll-indicator {
     position: absolute;
 
     bottom: 20px;
     left: 50%;
-
-    transform: translateX(-50%);
 
     display: flex;
     flex-direction: column;
@@ -68,7 +72,32 @@
     z-index: 2;
 }
 
-.scroll-indicator::after{
+/* ★ここだけ、ずらす動き(base.css の font-slide-in)を差し替えている。
+
+     font-fade は「下から20pxずらして出す」を transform で行うが、
+     ここは左右の中央そろえにも transform(translateX(-50%))を使っている。
+     transform は1つしか持てないので、そのまま重ねると中央そろえが消えて
+     文字が右にずれてしまう。そこで中央そろえを含んだ動きを別に用意する。
+
+   ★差し替えるのは animation-name だけ。
+     長さ(0.5秒/0.4秒)・待ち時間・both は base.css の指定がそのまま使われる。
+     濃さのほう(font-fade-in)も base.css のものをそのまま並べること。
+     省くと、そちらの長さの指定が余ってずれる。 */
+@keyframes font-slide-in-centered {
+    from {
+        transform: translate(-50%, 20px);
+    }
+
+    to {
+        transform: translate(-50%, 0);
+    }
+}
+
+html:not(.wf-loading):not(.fade-hold) .scroll-indicator.font-fade {
+    animation-name: font-fade-in, font-slide-in-centered;
+}
+
+.scroll-indicator::after {
     content: "";
 
     width: 1px;

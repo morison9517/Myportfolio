@@ -103,5 +103,9 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	handlers.RegisterPageRoutes(r)
 	handlers.RegisterAPIRoutes(r)
 
+	// エラー画面(404など)。どのURLにも当てはまらなかったときの受け皿なので、
+	// 読む順が分かりやすいように最後に置いている。
+	handlers.RegisterErrorRoutes(r)
+
 	return r, nil
 }

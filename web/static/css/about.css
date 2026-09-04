@@ -2,6 +2,8 @@
 #about {
     background-color: var(--bg-color);
     padding: 80px 10%;
+
+    transition: background-color var(--theme-fade);
 }
 
 #about h2 {

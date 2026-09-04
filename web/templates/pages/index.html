@@ -299,5 +299,164 @@
         </section>
 
         <section id="contact">
+            <div class="container">
+                <h2>Contact</h2>
+
+                {{/* ▼ 送信の流れ
+
+                     「確認」を押す
+                       → 未入力があればブラウザがここで止める(required)
+                       → 注意事項のポップアップ(#contact-confirm)が出る
+                       → 「送信」で contact.js が /api/contact へ渡す
+                       → handlers/contact.go が保存 + メール2通
+                       → 画面上部にお知らせが出て、入力欄が空になる
+
+                     ★action も method も書いていない。
+                       送信は contact.js が止めて、その場で送っている。
+                       ページが切り替わらないので、入力欄の位置に留まれる。
+
+                     ★ボタンは type="submit" のままにすること。
+                       ここを button にすると、ブラウザの未入力チェックが働かず、
+                       空のままポップアップが出てしまう。
+
+                     ★整理券(CSRFトークン)は main.js の api が自動で付ける。
+                       このフォームには隠し項目を置かなくてよい。 */}}
+                <form id="contact-form" class="contact-form">
+
+                    {{/* ★label の for と input の id をそろえること。
+                         そろえておくと、文字を押しただけで入力欄に移れる。
+
+                         ★required は3つとも付ける。
+                           空のまま送信を押すと、ブラウザがその場で止めてくれる。
+                           ただしこれは親切心の機能で、細工すれば通せてしまうので、
+                           最後は handlers/contact.go の validate() が守っている。 */}}
+                    <div class="form-row">
+                        {{/* ★aria-hidden … 読み上げソフトには * を読ませない。
+                             「必須かどうか」は input の required から伝わるので、
+                             読ませると「アスタリスク」と二重に言うことになる。 */}}
+                        <label for="contact-name">
+                            お名前<span class="required-mark" aria-hidden="true">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="contact-name"
+                            name="name"
+                            maxlength="100"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="contact-email">
+                            メールアドレス<span class="required-mark" aria-hidden="true">*</span>
+                        </label>
+                        <input
+                            type="email"
+                            id="contact-email"
+                            name="email"
+                            maxlength="255"
+                            autocomplete="email"
+                            required
+                        >
+                        <p class="form-note">
+                            入力いただいたアドレスに、内容のコピーをお送りします。
+                        </p>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="contact-body">
+                            お問い合わせ内容<span class="required-mark" aria-hidden="true">*</span>
+                        </label>
+                        <textarea
+                            id="contact-body"
+                            name="body"
+                            rows="8"
+                            maxlength="2000"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="contact-submit">確認</button>
+                </form>
+
+                {{/* ▼ ここから下はポップアップ2つ
+
+                     ★<dialog> はブラウザに元から入っているポップアップの部品。
+                       showModal() で開くと、次のことを自分でやってくれる:
+                         ・後ろ側を押せなくする
+                         ・後ろを薄暗くする(::backdrop)
+                         ・Escキーで閉じる
+                         ・キーボードの移動先をポップアップの中だけに閉じ込める
+                       自分で作ると、この全部を書く羽目になる。
+
+                     ★スクロールだけは止めてくれないので、
+                       開いている間 <html> に modal-open を付けて止めている
+                       (contact.js と base.css)。
+
+                     ★★form の外に置くこと。
+                       中に入れると、ポップアップの中のボタンが
+                       「フォームの送信ボタン」として扱われてしまう。 */}}
+                <dialog id="contact-confirm" class="modal">
+                    <div class="modal-head">
+                        <h3>送信前のご確認</h3>
+
+                        {{/* aria-label … 読み上げソフトには「閉じる」と伝える。
+                             × だけだと何のボタンか分からないため。 */}}
+                        <button
+                            type="button"
+                            class="modal-close"
+                            data-close
+                            aria-label="閉じる"
+                        >&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <ul class="modal-notes">
+                            <li>
+                                ドメイン指定受信・本文にURLを含むメールの受信拒否など、
+                                受信制限を設定されている場合、こちらからのメールが
+                                届かないことがあります。
+                            </li>
+                            <li>
+                                お返事をお受け取りいただくため、
+                                <strong>@mrrn.jp</strong> からのメールを受信できるよう
+                                ドメイン受信設定をお願いいたします。
+                            </li>
+                            <li>
+                                内容によっては、お返事までにお時間をいただく場合があります。
+                            </li>
+                            <li>
+                                送信いただいた内容は、プライバシーポリシーに基づき
+                                適切に管理いたします。
+                            </li>
+                            <li>
+                                こちらからのお返事は送信者ご本人宛にお送りするものです。
+                                内容を外部で利用することは禁止いたします。
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button
+                            type="button"
+                            class="modal-cancel"
+                            data-close
+                        >キャンセル</button>
+
+                        <button
+                            type="button"
+                            class="modal-send"
+                            id="contact-send"
+                        >送信</button>
+                    </div>
+                </dialog>
+            </div>
         </section>
+{{ end }}
+
+{{/* このページだけで使うJS。base.html の scripts の穴に入る。
+     ★main.js より後に読み込まれるので、api や showMessage をそのまま使える。 */}}
+{{ define "scripts" }}
+    <script src="/static/js/contact.js"></script>
 {{ end }}

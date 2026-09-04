@@ -26,6 +26,7 @@ import (
 
 	"case_gin/internal/config"
 	"case_gin/internal/handlers"
+	"case_gin/internal/mailer"
 	"case_gin/internal/middleware"
 	"case_gin/internal/view"
 )
@@ -66,6 +67,10 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 		return nil, err
 	}
 
+	// --- メールを送る係に設定を渡す ---
+	// ★設定が無ければ送らないだけなので、ここで失敗することはない。
+	mailer.Setup(cfg)
+
 	// --- 画面の型紙(base.html)を使えるようにする ---
 	renderer, err := view.Setup(cfg, templateDir)
 	if err != nil {
@@ -102,6 +107,8 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	// ★新しい担当ファイル(例:handlers/room.go)を作ったら、ここに1行足す。
 	handlers.RegisterPageRoutes(r)
 	handlers.RegisterAPIRoutes(r)
+	handlers.RegisterContactRoutes(r, cfg)
+	handlers.RegisterAdminRoutes(r, cfg)
 
 	// エラー画面(404など)。どのURLにも当てはまらなかったときの受け皿なので、
 	// 読む順が分かりやすいように最後に置いている。

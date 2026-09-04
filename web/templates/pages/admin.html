@@ -1,0 +1,163 @@
+{{/* ==========================================================================
+     admin.html = 届いた問い合わせの一覧(ログインした人だけ見られる)
+
+     ▼ 渡ってくる値
+
+       {{ .Inquiries }} … models.Inquiry の一覧。新しい順に並んでいる。
+
+     ▼ できること
+
+       ・問い合わせを押す      → 返信画面(/admin/inquiries/:id)へ
+       ・右上の「削除」を押す  → 確認のポップアップ → 削除
+
+     ▼ ★range の中ではドットの意味が変わる
+
+       {{ range .Inquiries }} の中では、ドットは「今の1件」を指す。
+       全体の値(整理券など)を使いたいときは {{ $.CSRFToken }} と $ を付ける。
+     ========================================================================== */}}
+
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/admin.css">
+{{ end }}
+
+{{ define "content" }}
+        <section id="admin">
+            <div class="admin-container">
+
+                <div class="admin-head">
+                    <div class="admin-title">
+                        <h1>お問い合わせ一覧</h1>
+
+                        {{/* 更新ボタン。
+
+                             ★ボタン(button)ではなくリンク(a)にしている。
+                               やることは「この一覧をもう一度読み込む」だけなので、
+                               /admin へ行くリンクで足りる。
+                               JavaScriptに頼らないぶん、確実に動く。
+
+                             ★aria-label と title … 中身がアイコンだけで
+                               文字が無いので、読み上げソフトとマウスの吹き出しに
+                               「何のボタンか」を伝えている。
+
+                             ★アイコンは Font Awesome(base.html で全ページ読み込み)。
+                               arrow-rotate-right = 時計回りの循環矢印。 */}}
+                        <a
+                            class="admin-refresh"
+                            href="/admin"
+                            aria-label="最新の状態に更新"
+                            title="最新の状態に更新"
+                        >
+                            <i class="fa-solid fa-arrow-rotate-right"></i>
+                        </a>
+                    </div>
+
+                    {{/* ★ログアウトはリンク(GET)ではなくフォーム(POST)にする。
+                         リンクにすると、他サイトに置かれた画像1枚で
+                         勝手にログアウトさせられてしまう。 */}}
+                    <form method="post" action="/admin/logout">
+                        <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+                        <button type="submit" class="admin-logout">ログアウト</button>
+                    </form>
+                </div>
+
+                {{/* ★1件も無いときの表示を必ず用意する。
+                     無いと真っ白な画面になり、壊れたのか0件なのか分からない。 */}}
+                {{ if not .Inquiries }}
+                    <p class="admin-empty">まだお問い合わせはありません。</p>
+                {{ else }}
+                    <p class="admin-count">{{ len .Inquiries }}件</p>
+
+                    <ul class="inquiry-list">
+                        {{ range .Inquiries }}
+                        <li class="inquiry">
+
+                            {{/* ★ブロック全体を押せるようにする仕掛け。
+
+                                 <a> の中に削除ボタンを入れることはできない
+                                 (押せるものの中に押せるものは置けない決まり)。
+                                 そこで <a> は文字だけを包み、admin.css の
+                                 .inquiry-link::after でブロック全体を覆っている。
+                                 削除ボタンはその上に重ねてある。 */}}
+                            <a class="inquiry-link" href="/admin/inquiries/{{ .ID }}">
+                                <div class="inquiry-head">
+
+                                    {{/* ★RepliedAt(返信した日時)が空かどうかだけで
+                                         出し分けている。空 = まだ返していない。
+                                         色は admin.css(未返信=濃い灰色 / 返信済み=緑)。 */}}
+                                    {{ if .RepliedAt }}
+                                        <span class="inquiry-status inquiry-status-replied">返信済み</span>
+                                    {{ else }}
+                                        <span class="inquiry-status inquiry-status-pending">未返信</span>
+                                    {{ end }}
+
+                                    <span class="inquiry-name">{{ .Name }}</span>
+                                    <span class="inquiry-email">{{ .Email }}</span>
+
+                                    {{/* ★日時の書き方は Go 独特。
+                                         「2006/01/02 15:04」は見本の日時であって、
+                                         好きな数字ではない。この並びが決まりごと。 */}}
+                                    <time class="inquiry-date">
+                                        {{ .CreatedAt.Format "2006/01/02 15:04" }}
+                                    </time>
+                                </div>
+
+                                {{/* ★本文の改行を活かすのは inquiry-body の
+                                     white-space: pre-wrap(admin.css)。
+                                     <br> に置き換える必要はない。 */}}
+                                <p class="inquiry-body">{{ .Body }}</p>
+                            </a>
+
+                            {{/* ★削除もフォーム(POST)。理由はログアウトと同じ。
+                                 送信は admin.js が止めて、確認のポップアップを出す。
+
+                                 ★data-name … ポップアップに「誰の問い合わせか」を
+                                   出すために使う。 */}}
+                            <form
+                                class="inquiry-delete"
+                                method="post"
+                                action="/admin/inquiries/{{ .ID }}/delete"
+                                data-name="{{ .Name }}"
+                            >
+                                <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
+                                <button type="submit" class="inquiry-delete-button">削除</button>
+                            </form>
+                        </li>
+                        {{ end }}
+                    </ul>
+                {{ end }}
+
+                {{/* 削除の確認。1つを使い回す(どの問い合わせかは admin.js が入れ替える)。
+                     ★form の外に置くこと。中に入れると、ポップアップの中のボタンが
+                       そのフォームの送信ボタンとして扱われてしまう。 */}}
+                <dialog id="delete-confirm" class="modal">
+                    <div class="modal-head">
+                        <h3>削除の確認</h3>
+                        <button
+                            type="button"
+                            class="modal-close"
+                            data-close
+                            aria-label="閉じる"
+                        >&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p id="delete-confirm-message">
+                            このお問い合わせを削除します。
+                        </p>
+                        <p class="modal-caution">※元に戻せません。</p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="modal-cancel" data-close>キャンセル</button>
+                        <button type="button" class="modal-danger" id="delete-execute">削除する</button>
+                    </div>
+                </dialog>
+
+            </div>
+        </section>
+{{ end }}
+
+{{/* このページだけで使うJS。base.html の scripts の穴に入る。 */}}
+{{ define "scripts" }}
+    <script src="/static/js/admin.js"></script>
+{{ end }}

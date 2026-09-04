@@ -1,0 +1,559 @@
+/*admin page(ログイン画面 / 問い合わせ一覧)*/
+/* ★このCSSは管理ページでしか使わないので、base.html には書かず
+     各ページの head_extra から読み込んでいる。 */
+#admin {
+    /* ★上の padding を多めに取っている。
+         ヘッダーが画面に貼り付いて(fixed)いるので、
+         少なくすると見出しがヘッダーの下に潜る。 */
+    min-height: 100vh;
+    padding: 140px 6% 100px;
+    box-sizing: border-box;
+
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
+}
+
+.admin-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ログイン画面は入力欄が2つだけなので、もう少し狭くする。 */
+.admin-container-narrow {
+    max-width: 420px;
+}
+
+#admin h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+/* ---------- 一覧の見出し行 ---------- */
+/* 「お問い合わせ一覧」とログアウトボタンを左右に離して並べる。 */
+.admin-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-bottom: 0.5rem;
+}
+
+/* 見出しと更新ボタンを横に並べる。 */
+.admin-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ---------- 更新ボタン ---------- */
+.admin-refresh,
+.admin-refresh:visited {
+    /* ★中のアイコンを真ん中に置くために flex にする。
+         文字の高さに頼ると、円の中でわずかに上下にずれる。 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* ★幅と高さを同じにして、border-radius: 50% で正円にする。
+         どちらか片方だと楕円になる。 */
+    width: 2.8rem;
+    height: 2.8rem;
+
+    font-size: 1.5rem;
+
+    color: var(--text-color);
+    background-color: transparent;
+
+    border: 1px solid var(--field-border);
+    border-radius: 50%;
+
+    /* ★縮まないようにする。
+         見出しが長いと、flex の中でボタンだけ潰されることがある。 */
+    flex-shrink: 0;
+
+    /* ★回転の出発点をはっきり書いておく。
+         書かないと transform が「無し」の状態からの変化になり、
+         ブラウザによっては1回転が途中までしか動かないことがある。 */
+    transform: rotate(0deg);
+
+    transition:
+        color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.4s ease;
+}
+
+/* ★押すと何が起きるかを、矢印を回して伝える。
+     時計回りに1回転(360度)するので、アイコンの向きとも一致する。
+     ★速さは上の transform 0.4s。ゆっくり回したいならそこを伸ばす。 */
+.admin-refresh:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+
+    transform: rotate(360deg);
+}
+
+/* ★OSで「視差効果を減らす」を有効にしている人には回さない。
+     スクロールやポップアップと同じ考え方(base.css を参照)。
+     色は変わるので、押せることは分かる。 */
+@media (prefers-reduced-motion: reduce) {
+    .admin-refresh:hover {
+        transform: none;
+    }
+}
+
+.admin-logout {
+    padding: 0.5rem 1.2rem;
+
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    color: var(--text-color);
+    background-color: transparent;
+
+    border: 1px solid currentColor;
+    border-radius: 999px;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.admin-logout:hover {
+    opacity: 0.6;
+}
+
+.admin-count {
+    margin: 0 0 2rem;
+
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+.admin-empty {
+    margin-top: 3rem;
+    opacity: 0.7;
+}
+
+/* ---------- 問い合わせ1件 ---------- */
+.inquiry-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inquiry {
+    padding: 1.5rem;
+
+    background-color: var(--card-color);
+
+    /* ★ライトモードでは背景色とページの背景がほとんど同じ明るさなので、
+         枠が無いとブロックの輪郭が見えない。
+         入力欄と同じ線を引く(色は base.css の --field-border)。 */
+    border: 1px solid var(--field-border);
+    border-radius: 10px;
+
+    /* ★削除ボタンと「ブロック全体を覆うリンク」の位置の基準。
+         これが無いと、どちらも画面の左上を基準に置かれてしまう。 */
+    position: relative;
+
+    transition:
+        background-color var(--theme-fade),
+        border-color 0.15s ease;
+}
+
+/* ★ブロック全体を押せるようにする仕掛け(一覧のみ)。
+
+     <a> は文字だけを包んでいるが、::after で透明な板を作って
+     ブロック全体に広げている。こうすると余白を押しても反応する。
+     <a> の中に削除ボタンを入れられない(押せるものの中に押せるものは
+     置けない)ので、この形にしている。 */
+.inquiry-link {
+    color: inherit;
+    display: block;
+
+    /* 右上の削除ボタンと文字が重ならないように空ける */
+    padding-right: 5rem;
+}
+
+.inquiry-link::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+}
+
+/* 押せることが分かるようにする */
+.inquiry:has(.inquiry-link):hover {
+    border-color: var(--accent-color);
+}
+
+.inquiry-link:focus-visible::after {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+/* 返信画面に置く「読むだけ」の問い合わせ。押せない。 */
+.inquiry-static {
+    margin-bottom: 2.5rem;
+}
+
+/* ---------- 削除ボタン ---------- */
+/* ★リンクの板(::after)より前に出す。
+     そうしないと押しても返信画面へ飛んでしまう。 */
+.inquiry-delete {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+
+    z-index: 1;
+}
+
+.inquiry-delete-button {
+    padding: 0.35rem 0.9rem;
+
+    font-family: inherit;
+    font-size: 1.0rem;
+
+    color: #b91c1c;
+    background-color: transparent;
+
+    border: 1px solid currentColor;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.inquiry-delete-button:hover {
+    color: #f9fafb;
+    background-color: #b91c1c;
+}
+
+/* 名前・アドレス・日時の1行。
+   狭い画面では折り返す(flex-wrap)。 */
+.inquiry-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+
+    margin-bottom: 1rem;
+}
+
+/* ---------- 未返信 / 返信済み の印 ---------- */
+/* ★色だけで区別していない。
+     文字でも「未返信」「返信済み」と書いてあるので、
+     色の見分けがつきにくい人にも伝わる。 */
+.inquiry-status {
+    padding: 0.2rem 0.7rem;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    /* 背景の色は濃いので、文字はライト/ダークとも白で固定。 */
+    color: #f9fafb;
+
+    border-radius: 999px;
+
+    /* ★狭い画面で「未返 / 信」のように途中で折り返さないようにする。 */
+    white-space: nowrap;
+}
+
+/* 未返信 = 濃い灰色。まだ手を付けていない、という控えめな色。 */
+.inquiry-status-pending {
+    background-color: #4b5563;
+}
+
+/* 返信済み = 緑。サイトのアクセントカラーと同じ。 */
+.inquiry-status-replied {
+    background-color: var(--accent-color);
+}
+
+/* 返信画面にだけ出す「いつ返信したか」。 */
+.inquiry-replied-at {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.inquiry-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* ★リンクではなくただの文字。
+     ブロック全体が返信画面へのリンクになったので、
+     ここを押しても行き先が変わらないようにしてある。
+     色だけ #about のリンクと同じにして、アドレスだと分かるようにしている。 */
+.inquiry-email {
+    color: #2997ff;
+    font-size: 0.9rem;
+
+    /* 長いアドレスで1行が崩れないように */
+    overflow-wrap: anywhere;
+}
+
+.inquiry-date {
+    /* ★margin-left: auto で日時だけ右端に寄せる。 */
+    margin-left: auto;
+
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.inquiry-body {
+    margin: 0;
+
+    line-height: 1.8;
+
+    /* ★pre-wrap = 入力された改行をそのまま出す + 長い行は折り返す。
+         これが無いと、送られてきた文章が1行につながって読みにくい。 */
+    white-space: pre-wrap;
+
+    /* ★改行の無い長い文字列(URLなど)がはみ出すのを防ぐ。 */
+    overflow-wrap: anywhere;
+}
+
+/* ---------- 返信画面 ---------- */
+/* 一覧へ戻るリンク。見出しの右に置く。 */
+.admin-back,
+.admin-back:visited {
+    color: var(--text-color);
+    font-size: 0.85rem;
+
+    /* 押せる範囲を文字ぴったりより少し広げる */
+    padding: 0.5rem;
+
+    transition: opacity 0.15s ease;
+}
+
+.admin-back:hover {
+    opacity: 0.6;
+}
+
+.reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reply-form label {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.reply-form textarea {
+    /* ★書体も太さも入力欄には受け継がれない(contact.css の説明を参照)。
+         書かないとここだけ細い別の書体になる。 */
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: 1rem;
+
+    padding: 0.9rem 1rem;
+
+    color: var(--text-color);
+    background-color: var(--card-color);
+
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+
+    box-sizing: border-box;
+    width: 100%;
+
+    /* 縦にだけ伸ばせるようにする。横に伸ばされると幅が崩れる。 */
+    resize: vertical;
+    min-height: 220px;
+    line-height: 1.8;
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade),
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.reply-form textarea:focus {
+    outline: none;
+
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+/* 送信先の表示と送信ボタンの行。 */
+.reply-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.reply-to {
+    font-size: 0.85rem;
+    opacity: 0.7;
+
+    overflow-wrap: anywhere;
+}
+
+/* ★送信ボタンは .admin-submit(下)を使い回す。
+     ログイン画面と同じ見た目・同じ角丸になる。 */
+.reply-actions .admin-submit {
+    padding: 0.9rem 3rem;
+}
+
+/* ---------- 削除の確認ポップアップ ---------- */
+/* ★ポップアップの基本の見た目(.modal など)は contact.css にある。
+     あちらは base.html で全ページ読み込まれるので、ここでは
+     この画面だけで使う分を足している。 */
+.modal-caution {
+    margin: 1rem 0 0;
+
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+/* ★消すボタンは赤。
+     形は .modal-send と同じで、色だけ変えている。
+     取り消せない操作なので、送信ボタンと同じ色にはしない。 */
+.modal-danger {
+    padding: 0.7rem 1.8rem;
+
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: 0.95rem;
+
+    color: #f9fafb;
+    background-color: #b91c1c;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.modal-danger:hover {
+    opacity: 0.8;
+}
+
+/* ---------- ログインフォーム ---------- */
+.admin-form {
+    margin-top: 2.5rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ★.form-row の縦並びは contact.css の指定がそのまま効く(あちらは
+     #contact の中に限定していないため)。念のためここにも書いておく。
+     入力欄のほうは .contact-form input と書かれていて #contact 専用なので、
+     こちらには効かない。だから下の .admin-form input が必要。 */
+.admin-form .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.admin-form label {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.admin-form input {
+    /* ★書体も太さも、入力欄には受け継がれない(contact.css の説明を参照)。
+         書かないとここだけ細い別の書体になる。 */
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: 1rem;
+
+    padding: 0.9rem 1rem;
+
+    color: var(--text-color);
+    background-color: var(--card-color);
+
+    /* 枠の考え方は contact.css と同じ(ライトモードで境目が見えなくなるため)。 */
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+
+    box-sizing: border-box;
+    width: 100%;
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade),
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.admin-form input:focus {
+    outline: none;
+
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+/* ブラウザの自動入力対策(contact.css と同じ理由)。
+   ログイン画面は自動入力が特に効きやすいので、ここも必要。 */
+.admin-form input:-webkit-autofill,
+.admin-form input:-webkit-autofill:hover,
+.admin-form input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-color);
+    box-shadow: 0 0 0 1000px var(--card-color) inset;
+}
+
+.admin-submit {
+    padding: 0.9rem;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+
+    /* 背景がアクセントカラーで固定なので文字は白 */
+    color: #f9fafb;
+    background-color: var(--accent-color);
+
+    border: none;
+
+    /* 送信ボタン(contact.css の .contact-submit)と同じ角丸にそろえてある。 */
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.admin-submit:hover {
+    opacity: 0.85;
+}
+
+/* ---------- スマホ用 ---------- */
+/* ★admin.css は head_extra から読み込まれ、mediaqueries.css より後になる。
+     あちらに #admin を書いても打ち消されるので、ここに書く(#error と同じ理由)。 */
+@media (max-width: 768px) {
+    #admin {
+        padding: 120px 5% 80px;
+    }
+
+    #admin h1 {
+        font-size: 1.5rem;
+    }
+
+    .inquiry-date {
+        /* 狭い画面では折り返すので、右端に寄せると位置が崩れる。 */
+        margin-left: 0;
+    }
+}

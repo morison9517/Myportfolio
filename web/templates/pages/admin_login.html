@@ -1,0 +1,52 @@
+{{/* ==========================================================================
+     admin_login.html = 管理ページに入るためのログイン画面
+
+     ★合言葉は .env の ADMIN_EMAIL / ADMIN_PASSWORD。
+       確認しているのは internal/handlers/admin.go。
+
+     ★このフォームは普通のフォーム送信(POST)。
+       #contact と違ってページが切り替わってよいので、JavaScriptは使わない。
+     ========================================================================== */}}
+
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/admin.css">
+{{ end }}
+
+{{ define "content" }}
+        <section id="admin">
+            <div class="admin-container admin-container-narrow">
+                <h1>ログイン</h1>
+
+                <form class="admin-form" method="post" action="/admin/login">
+
+                    {{/* ★整理券(CSRFトークン)。この1行が無いと400で弾かれる。
+                         仕掛けは internal/middleware/csrf.go。 */}}
+                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+
+                    <div class="form-row">
+                        <label for="admin-email">メールアドレス</label>
+                        <input
+                            type="email"
+                            id="admin-email"
+                            name="email"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="admin-password">パスワード</label>
+                        <input
+                            type="password"
+                            id="admin-password"
+                            name="password"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="admin-submit">ログイン</button>
+                </form>
+            </div>
+        </section>
+{{ end }}

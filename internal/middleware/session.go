@@ -78,6 +78,44 @@ func Session(secretKey string, secure bool) gin.HandlerFunc {
 }
 
 // -----------------------------------------------------------------------------
+// 管理者のログイン状態
+//
+//	利用者の新規登録は無く、入れるのは自分1人だけなので、
+//	DBのusers表は作らず「ログイン済みかどうか」だけをメモに書いておく。
+//	合言葉の確認は handlers/admin.go、通す/通さないの判断は auth.go。
+//
+//	★メモは SECRET_KEY で署名されているので、
+//	  利用者が自分で「ログイン済み」と書き込むことはできない。
+// -----------------------------------------------------------------------------
+
+const keyAdmin = "admin_logged_in"
+
+// LoginAdmin = ログイン済みとしてメモに書く。
+func LoginAdmin(c *gin.Context) error {
+	s := sessions.Default(c)
+	s.Set(keyAdmin, true)
+	return s.Save()
+}
+
+// LogoutAdmin = メモからログイン状態を消す。
+func LogoutAdmin(c *gin.Context) error {
+	s := sessions.Default(c)
+	s.Delete(keyAdmin)
+	return s.Save()
+}
+
+// IsAdmin = 今アクセスしている人がログイン済みかどうか。
+func IsAdmin(c *gin.Context) bool {
+	s := sessions.Default(c)
+
+	// ★型を確かめてから使う。
+	//   メモには何が入っているか分からないので、
+	//   いきなり bool として扱うとその場で落ちることがある。
+	value, ok := s.Get(keyAdmin).(bool)
+	return ok && value
+}
+
+// -----------------------------------------------------------------------------
 // flash = 次の画面に一度だけ出すメッセージ
 //
 //	「保存しました」「入力に誤りがあります」など。

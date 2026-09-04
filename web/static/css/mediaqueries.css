@@ -134,4 +134,33 @@
     .timeline-year {
         font-size: 1rem;
     }
+
+    /* Contact */
+    #contact {
+        padding: 80px 6%;
+    }
+
+    #contact h2 {
+        font-size: 2.2rem;
+    }
+
+    /* ★狭い画面では押しやすさを優先して横幅いっぱいにする。 */
+    .contact-submit {
+        width: 100%;
+    }
+
+    /* ポップアップ
+       ★狭い画面では2つのボタンを縦に積む。
+         横に並べたままだと、1つあたりが細くなって押しにくい。
+         ★column-reverse … 積んだときは「送信」を上に置く。
+           下は指が届きやすい位置なので、取り消すほうを下にする。 */
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-cancel,
+    .modal-send,
+    .modal-danger {
+        width: 100%;
+    }
 }

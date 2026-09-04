@@ -1,0 +1,441 @@
+/*contact section*/
+/* 背景は #about・#products と同じ、テーマの背景色。
+   ★テーマ切り替えのフェードも同じ var(--theme-fade) にそろえる。
+     付け忘れるとここだけ先に色が変わって見える(base.css の説明を参照)。 */
+#contact {
+    padding: 100px 10%;
+
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
+}
+
+/* 見出しは他のセクションと同じ大きさ・余白 */
+#contact h2 {
+    margin-bottom: 3.5rem;
+    font-size: 3rem;
+
+    text-align: center;
+}
+
+/* ---------- フォーム ---------- */
+/* ★横に広がりすぎると読みにくいので幅を決めて中央に置く。
+     長い1行は目が戻る場所を見失いやすい。 */
+.contact-form {
+    max-width: 640px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* 「見出し + 入力欄」の1組。 */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.form-row label {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* 必須の印。3項目とも必須なので全部に付く。
+   ★色は .flash-error と同じ赤にそろえてある。 */
+.required-mark {
+    margin-left: 0.3rem;
+
+    color: #b91c1c;
+
+    /* ★* は文字の上のほうに描かれるので、少し大きくしないと目立たない。 */
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* ★input と textarea は指定をそろえる。
+     ブラウザが既定で別々の見た目を当てるので、
+     片方だけ指定すると大きさも書体もそろわない。 */
+.contact-form input,
+.contact-form textarea {
+    /* ★これが無いと入力欄だけ別の書体になる。
+         入力欄は body の書体を受け継がない決まりになっている。 */
+    font-family: inherit;
+    font-size: 1rem;
+
+    /* ★太さも同じ理由で受け継がれない。
+         書かないとブラウザ既定の 400 で描かれ、
+         サイト全体(600)より細くなって「文字が薄い」状態になる。
+         可変フォントなので、この差がはっきり出る。 */
+    font-weight: inherit;
+
+    padding: 0.9rem 1rem;
+
+    color: var(--text-color);
+    background-color: var(--card-color);
+
+    /* ★ライトモードでは入力欄の背景とページの背景がほとんど同じ明るさなので、
+         枠を透明にすると「どこに書けばいいか」が分からなくなる。
+         はっきりした線を引く(色は base.css の --field-border)。 */
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+
+    /* ★padding を幅に含める。
+         これが無いと、幅100%の入力欄が padding のぶんだけはみ出す。 */
+    box-sizing: border-box;
+    width: 100%;
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade),
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+/* ★どこを入力しているか分かるようにする。
+     ブラウザ既定の枠を outline: none で消しっぱなしにすると、
+     キーボードだけで操作する人が現在位置を見失う。
+
+   ★box-shadow で枠を太く見せている。
+     border-width を変えると入力欄の大きさが変わって、
+     選ぶたびに文字がガタッと動いてしまう。 */
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+/* ★必須なのに空のまま、などのときだけ赤くする。
+     :user-invalid は「利用者が一度触った後」にだけ効くので、
+     開いた瞬間に全部が赤くなることはない。
+     対応していないブラウザでは、この指定が無視されるだけ。 */
+.contact-form input:user-invalid,
+.contact-form textarea:user-invalid {
+    border-color: #b91c1c;
+}
+
+/* ★ブラウザの自動入力(オートフィル)対策。
+     Chromeは自動入力した欄に独自の背景色と文字色を当ててくる。
+     これがテーマの色を無視するので、指定し直して見た目をそろえる。
+
+   ★文字色は color ではなく -webkit-text-fill-color でないと勝てない。
+   ★背景は内側に大きな影を敷いて塗りつぶす(background-color では効かない)。 */
+.contact-form input:-webkit-autofill,
+.contact-form input:-webkit-autofill:hover,
+.contact-form input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-color);
+    box-shadow: 0 0 0 1000px var(--card-color) inset;
+}
+
+/* 縦にだけ伸ばせるようにする。
+   横に伸ばされるとフォームの幅が崩れる。 */
+.contact-form textarea {
+    resize: vertical;
+    min-height: 180px;
+
+    /* 本文は行間を広めに取ったほうが書きやすい */
+    line-height: 1.7;
+}
+
+/* 入力欄の下に出す補足。本文より小さく、少し控えめに。 */
+.form-note {
+    margin: 0;
+
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* ---------- 送信ボタン ---------- */
+.contact-submit {
+    /* ★横幅いっぱいには広げない。
+         押す場所が広すぎると「押すもの」に見えなくなる。 */
+    align-self: center;
+
+    padding: 0.9rem 3rem;
+
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 700;
+
+    /* 背景がアクセントカラーで固定なので、文字はライト/ダークとも白。
+       var(--text-color) を使うとライトモードで黒になって読みにくい
+       (#skills・footer と同じ考え方)。 */
+    color: #f9fafb;
+    background-color: var(--accent-color);
+
+    border: none;
+
+    /* ★角丸は控えめ。
+         999px にすると丸薬のような形になるので、四角を保つ程度にとどめる。 */
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease;
+}
+
+.contact-submit:hover {
+    opacity: 0.85;
+}
+
+.contact-submit:active {
+    transform: scale(0.98);
+}
+
+/* ★送信中は main.js の withBusy がボタンを押せなくする。
+     見た目でも「今は押せない」と分かるようにしておく。 */
+.contact-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ===========================================================================
+   ポップアップ(送信前の確認 / 送信完了)
+   ===========================================================================
+
+   ★<dialog> はブラウザに元から入っている部品。
+     showModal() で開くと、後ろを押せなくする・薄暗くする・Escで閉じる・
+     キーボードの移動先を中に閉じ込める、までを自分でやってくれる。
+
+   ★閉じているときは display: none になっている(ブラウザ既定)。
+     だから「開いたときだけ表示する」指定は書かなくてよい。
+     逆に display を自分で指定すると、閉じても消えなくなる。
+   =========================================================================== */
+.modal {
+    /* ★position も left/top も書かない。
+         showModal() で開いた <dialog> は、ブラウザが画面の中央に置く。
+         余計な指定をすると、その計算を壊してしまう。 */
+    width: min(560px, calc(100% - 2rem));
+    padding: 0;
+
+    color: var(--text-color);
+    background-color: var(--bg-color);
+
+    border: none;
+    border-radius: 12px;
+
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+
+    /* ★中身が画面より高くなったときは、ポップアップの中だけスクロールさせる。
+         これが無いと、小さい画面で下のボタンに手が届かなくなる。 */
+    max-height: 85vh;
+    overflow-y: auto;
+
+    /* ▼ 閉じているときの見た目(ここが出入りの起点と終点になる)
+
+       ★下に30pxずらしておく。
+         開くとここから 0 へ動くので「下から上へ」出てくる。
+         閉じるときは逆にここへ戻るので、下へ沈みながら消える。
+
+       ★大きさ(scale)は変えない。
+         縦の動きと混ざると、どちらの動きなのか読み取りにくくなる。 */
+    opacity: 0;
+    transform: translateY(30px);
+
+    /* ▼ ★下の display と overlay の2行がフェードの肝
+
+         <dialog> は閉じている間 display: none になっている。
+         display は「有る/無い」しかない値なので、普通は途中経過が作れず、
+         opacity だけ書いても、消えるときは一瞬で消えてしまう。
+
+         allow-discrete を付けると「表示は最後まで残したまま、
+         他の変化が終わってから消す」という扱いになり、
+         閉じるときもフェードしきってから消えるようになる。
+
+         overlay は「いちばん手前に浮かせる層」の指定。
+         こちらも一緒に残さないと、幕だけ先に消える。 */
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        background-color var(--theme-fade),
+        color var(--theme-fade),
+        display 0.2s ease allow-discrete,
+        overlay 0.2s ease allow-discrete;
+}
+
+/* 開いている間の見た目。 */
+.modal[open] {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ★@starting-style = 「現れた瞬間の見た目」を決める指定。
+
+     display: none から現れる要素は、いきなり [open] の状態で作られるので、
+     何もしないと変化が起きず、出るときだけフェードしない。
+     ここで「出発点」を教えると、そこから [open] へ動いてくれる。
+
+   ★対応していないブラウザでは、この指定ごと無視されて
+     ぱっと表示されるだけになる(動かないだけで、壊れはしない)。 */
+@starting-style {
+    .modal[open] {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+}
+
+/* 後ろを薄暗くする幕。
+   ★::backdrop にはページの変数(var(--...))が届かないブラウザがあるので、
+     ここだけ色を直に書いている。 */
+.modal::backdrop {
+    background-color: rgba(0, 0, 0, 0);
+
+    transition:
+        background-color 0.2s ease,
+        display 0.2s ease allow-discrete,
+        overlay 0.2s ease allow-discrete;
+}
+
+.modal[open]::backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+@starting-style {
+    .modal[open]::backdrop {
+        background-color: rgba(0, 0, 0, 0);
+    }
+}
+
+/* ★OSで「視差効果を減らす」を有効にしている人には動かさない。
+     スクロールや font-fade と同じ考え方(base.css を参照)。
+     動かさないだけで、表示・非表示はきちんと行われる。 */
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal::backdrop {
+        transition: none;
+    }
+}
+
+/* ---------- 見出しの行 ---------- */
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 1.5rem 1.5rem 0;
+}
+
+.modal-head h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+/* 右上の × */
+.modal-close {
+    /* ★押せる範囲を指の大きさに合わせる。
+         文字の大きさのままだと、スマホで狙いにくい。 */
+    width: 2.2rem;
+    height: 2.2rem;
+
+    /* 中の × を真ん中に置く */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* ★flex で中央に置くので、行の高さのずれを避けるため 1 にする。 */
+    font-size: 1.6rem;
+    line-height: 1;
+
+    color: var(--text-color);
+    background-color: transparent;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.modal-close:hover {
+    opacity: 0.5;
+}
+
+/* ---------- 本文 ---------- */
+.modal-body {
+    padding: 1.2rem 1.5rem;
+
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+.modal-body p {
+    margin: 0;
+}
+
+.modal-notes {
+    /* 行頭の記号のぶんだけ内側に寄せる */
+    margin: 0;
+    padding-left: 1.2rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* @mrrn.jp の部分だけ目立たせる */
+.modal-notes strong {
+    color: var(--accent-color);
+}
+
+/* ---------- ボタンの行 ---------- */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* ★2つのボタンの形はそろえ、色で役割を分ける。
+     キャンセルは枠だけ、送信は塗り。
+     どちらも塗ると、押してほしいほうが分からなくなる。 */
+.modal-cancel,
+.modal-send {
+    padding: 0.7rem 1.8rem;
+
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: 0.95rem;
+
+    /* 送信ボタン(.contact-submit)と同じ角丸 */
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.modal-cancel {
+    color: var(--text-color);
+    background-color: transparent;
+
+    /* currentColor = 今の文字色。テーマが変わっても枠の色がついてくる。 */
+    border: 1px solid currentColor;
+}
+
+.modal-send {
+    /* 背景がアクセントカラーで固定なので、文字はライト/ダークとも白 */
+    color: #f9fafb;
+    background-color: var(--accent-color);
+
+    border: none;
+}
+
+.modal-cancel:hover,
+.modal-send:hover {
+    opacity: 0.8;
+}
+
+/* ---------- スマホ用 ---------- */
+/* ★contact.css は base.html で mediaqueries.css より前に読み込まれるので、
+     画面幅の調整は mediaqueries.css 側に書いてある(#error だけが例外)。 */

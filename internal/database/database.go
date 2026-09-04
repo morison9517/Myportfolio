@@ -24,6 +24,7 @@ import (
 	gormlogger "gorm.io/gorm/logger"
 
 	"case_gin/internal/config"
+	"case_gin/internal/models"
 )
 
 // DB = みんなで使い回すDBの窓口。
@@ -81,7 +82,9 @@ func Connect(cfg *config.Config) error {
 //		&models.Work{},
 //	)
 func Migrate() error {
-	return DB.AutoMigrate()
+	return DB.AutoMigrate(
+		&models.Inquiry{},
+	)
 }
 
 // Reset = 表を全部消してから作り直す。★中のデータも全部消える★
@@ -94,7 +97,9 @@ func Reset() error {
 	//   逆にすると「まだ使われている」と怒られて消せない。
 	//
 	//   ★モデルを作ったら、Migrate() と同じ並びでここにも足す。
-	if err := DB.Migrator().DropTable(); err != nil {
+	if err := DB.Migrator().DropTable(
+		&models.Inquiry{},
+	); err != nil {
 		return err
 	}
 	return Migrate()

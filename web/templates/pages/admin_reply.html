@@ -1,0 +1,91 @@
+{{/* ==========================================================================
+     admin_reply.html = 1件の問い合わせに返信する画面
+
+     ▼ 渡ってくる値
+
+       {{ .Inquiry }}   … models.Inquiry 1件分
+       {{ .ReplyBody }} … 書きかけの返信(入力に不備があって戻ってきたときだけ)
+
+     ▼ 送られるメールの形(組み立ては handlers/admin.go の buildReplyBody)
+
+       ○○様 / お問い合わせいただきありがとうございます
+       返信の内容
+       ====== の区切り
+       いただいた問い合わせのコピー
+     ========================================================================== */}}
+
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/admin.css">
+{{ end }}
+
+{{ define "content" }}
+        <section id="admin">
+            <div class="admin-container">
+
+                <div class="admin-head">
+                    <h1>返信</h1>
+                    <a class="admin-back" href="/admin">&larr; 一覧へ戻る</a>
+                </div>
+
+                {{/* ▼ もらった問い合わせ(読むだけ)
+                     ★何に返信しているのかを見ながら書けるように、
+                       返信欄の上に置いている。 */}}
+                <div class="inquiry inquiry-static">
+                    <div class="inquiry-head">
+
+                        {{/* 一覧と同じ印。ここでは返信した日時も出す。 */}}
+                        {{ if .Inquiry.RepliedAt }}
+                            <span class="inquiry-status inquiry-status-replied">返信済み</span>
+                            <span class="inquiry-replied-at">
+                                {{ .Inquiry.RepliedAt.Format "2006/01/02 15:04" }} に返信
+                            </span>
+                        {{ else }}
+                            <span class="inquiry-status inquiry-status-pending">未返信</span>
+                        {{ end }}
+
+                        <span class="inquiry-name">{{ .Inquiry.Name }}</span>
+                        <span class="inquiry-email">{{ .Inquiry.Email }}</span>
+                        <time class="inquiry-date">
+                            {{ .Inquiry.CreatedAt.Format "2006/01/02 15:04" }}
+                        </time>
+                    </div>
+
+                    <p class="inquiry-body">{{ .Inquiry.Body }}</p>
+                </div>
+
+                <form class="reply-form" method="post" action="/admin/inquiries/{{ .Inquiry.ID }}/reply">
+
+                    {{/* ★整理券(CSRFトークン)。この1行が無いと400で弾かれる。 */}}
+                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+
+                    <div class="form-row">
+                        <label for="reply-body">
+                            返信内容<span class="required-mark" aria-hidden="true">*</span>
+                        </label>
+
+                        {{/* ★textarea の中に余計な空白や改行を入れないこと。
+                             書いたぶんがそのまま初期値になってしまうので、
+                             開始タグの直後から値を書き、すぐ閉じる。 */}}
+                        <textarea
+                            id="reply-body"
+                            name="body"
+                            rows="12"
+                            maxlength="2000"
+                            required
+                        >{{ .ReplyBody }}</textarea>
+
+                        <p class="form-note">
+                            この内容が、お礼のあいさつの下に入ります。
+                            その下に区切り線と、いただいたお問い合わせの内容が付きます。
+                        </p>
+                    </div>
+
+                    <div class="reply-actions">
+                        <span class="reply-to">送信先: {{ .Inquiry.Email }}</span>
+                        <button type="submit" class="admin-submit">送信</button>
+                    </div>
+                </form>
+
+            </div>
+        </section>
+{{ end }}

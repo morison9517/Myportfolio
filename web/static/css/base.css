@@ -8,6 +8,18 @@
 
     --header-bg: rgba(255, 255, 255, 0.65);
 
+    /* ★ブラウザに「今どちらのテーマか」を伝える。
+         入力欄のカーソル、選択中の文字の背景、スクロールバーなどは
+         ブラウザが描くので、CSSの色指定だけでは追従しない。
+         これを書いておくと、それらもテーマに合わせて描かれる。 */
+    color-scheme: light;
+
+    /* ★入力欄の枠の色。
+         入力欄の背景(--card-color #f3f4f6)とページの背景(--bg-color #fffef9)は
+         ライトモードだとほとんど同じ明るさで、枠が無いとどこが入力欄か分からない。
+         背景だけに頼らず、はっきりした線を引くための色。 */
+    --field-border: #d1d5db;
+
     /* ★ダーク/ライト切り替えのフェード時間。
          テーマ色を持つ要素は必ずこの変数を使う。
          ばらばらの時間を書くと、切り替えたときに要素ごとに
@@ -28,6 +40,24 @@ a:visited{
      body に書いても効かない。 */
 html {
     scroll-behavior: smooth;
+
+    /* ★スクロールバーの場所を常に空けておく。
+         ポップアップを開くと下の modal-open でスクロールを止めるが、
+         そのときスクロールバーが消える。場所を空けていないと、
+         その幅のぶん中身が横にずれて画面がガタッと動く。 */
+    scrollbar-gutter: stable;
+}
+
+/* ★ポップアップ(<dialog>)が開いている間、後ろのページのスクロールを止める。
+
+     <dialog> は「後ろを押せなくする」「後ろを薄暗くする」まではやってくれるが、
+     スクロールだけは止まらない。付け外しは contact.js。
+
+   ★html と body の両方に書く。
+     どちらがページ全体のスクロールを担当するかはブラウザによって違う。 */
+html.modal-open,
+html.modal-open body {
+    overflow: hidden;
 }
 
 /* ★OSで「視差効果を減らす」を有効にしている人には動かさない。
@@ -55,11 +85,15 @@ body.theme-loading *{
 }
 
 body.dark{
+    color-scheme: dark;
+
     --bg-color: #111827;
     --text-color: #f9fafb;
     --card-color: #1f2937;
 
     --header-bg: rgba(17,24,39,0.65);
+
+    --field-border: #4b5563;
 }
 
 body{
@@ -98,6 +132,90 @@ body{
 /* フッターのアイコンのみfooter.cssに独立させている。 */
 .external-link-icon {
     font-size: 0.75rem;
+}
+
+/* ===========================================================================
+   flash = 「送信しました」などのお知らせ
+   ===========================================================================
+
+   出し方は2通りあるが、見た目はここで一括して決めている。
+
+     Go側   … middleware.Flash(c, "success", "…")  → base.html が描く
+     JS側   … showMessage("…", "success")          → main.js が差し込む
+
+   ▼ ★画面に固定して出す理由
+
+     このサイトは1枚もので縦に長い。ページの上端に置くと、
+     問い合わせフォーム(いちばん下)で送信した人にはメッセージが見えない。
+     =========================================================================== */
+.flash-list {
+    /* fixed = 画面に貼り付ける(スクロールしても付いてくる)。 */
+    position: fixed;
+
+    /* ヘッダーの下に出す。 */
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* ★ヘッダー(z-index: 100)より前に出す。
+         でないとヘッダーの下に潜って読めない。 */
+    z-index: 200;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    /* 画面が狭いときにはみ出さないようにする。 */
+    width: max-content;
+    max-width: 90%;
+}
+
+.flash {
+    padding: 0.9rem 1.5rem;
+
+    border-radius: 8px;
+
+    color: #f9fafb;
+    font-size: 0.95rem;
+
+    /* 背景の上に浮いて見えるように影を付ける。 */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+
+    animation: flash-in 0.25s ease;
+}
+
+@keyframes flash-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 種類ごとの色。main.js の showMessage(text, category) の
+   category がそのままクラス名の後ろに付く。 */
+.flash-success {
+    background-color: var(--accent-color);
+}
+
+.flash-error {
+    background-color: #b91c1c;
+}
+
+.flash-warning {
+    background-color: #b45309;
+}
+
+.flash-message {
+    background-color: #374151;
 }
 
 /* ===========================================================================

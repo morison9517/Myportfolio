@@ -3,12 +3,12 @@
 //
 // ▼ ★使い方(各ハンドラから呼ぶ)
 //
-//	 見つからなかったとき:
-//	     handlers.ShowError(c, http.StatusNotFound)
-//	     return
+//	見つからなかったとき:
+//	    handlers.ShowError(c, http.StatusNotFound)
+//	    return
 //
-//	 ★ShowError を呼んだら必ず return すること。
-//	   呼んだだけでは処理は止まらないので、後ろの行が動いてしまう。
+//	★ShowError を呼んだら必ず return すること。
+//	  呼んだだけでは処理は止まらないので、後ろの行が動いてしまう。
 //
 // ▼ 存在しないURLは自動でこの404になる(下の RegisterErrorRoutes)
 //

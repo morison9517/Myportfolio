@@ -5,6 +5,15 @@ themeSwitch.addEventListener("change", () => {
     document.body.classList.toggle("dark");
 });
 
+/* Go側(middleware.Flash)が描いたお知らせも、少し経ったら消す。
+
+   ★JavaScriptから出したもの(main.js の showMessage)は自分で消えるが、
+     こちらはHTMLとして届くので、何もしないと画面に貼り付いたまま残る。
+     見た目は base.css の .flash-list。 */
+document.querySelectorAll(".flash-list .flash").forEach((item) => {
+    setTimeout(() => item.remove(), 4000);
+});
+
 function toggleMenu() {
     const menu = document.querySelector(".menu-links");
     const icon = document.querySelector(".hamburger-icon");

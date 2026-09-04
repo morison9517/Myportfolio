@@ -81,6 +81,35 @@ type Config struct {
 	DBName     string
 	DBUser     string
 	DBPassword string
+
+	// ▼ 管理ページ(問い合わせの一覧)に入るための合言葉
+	//
+	//	利用者の新規登録は無いので、DBのusers表ではなくここで持つ。
+	//	★.env はGitHubに上がらないので、DBのパスワードと同じ扱い。
+	//	  それでも本番では必ず長いものに変えること。
+	AdminEmail    string
+	AdminPassword string
+
+	// ▼ 問い合わせフォームのメール送信(SMTP)
+	//
+	//	独自ドメインのメール(例 contact@mrrn.jp)から送る想定。
+	//	契約しているメールサービスの「メールソフトの設定」に載っている
+	//	送信サーバー名・ポート・IDとパスワードをそのまま入れる。
+	//
+	//	★SMTPHost が空のときはメールを送らない(保存だけする)。
+	//	  開発中にメールを飛ばしたくないときは空にしておけばよい。
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+
+	// MailFrom … 送信元アドレス(例 contact@mrrn.jp)
+	// MailFromName … 受信箱に表示される名前(例 mrrn.jp)
+	MailFrom     string
+	MailFromName string
+
+	// ContactNotifyTo … 新しい問い合わせを知らせる宛先(自分の受信箱)
+	ContactNotifyTo string
 }
 
 // Load = .env を読んで Config を組み立てて返す。起動時に1回だけ呼ぶ。
@@ -111,6 +140,19 @@ func Load() *Config {
 		DBName:     env("DB_NAME", "hack_app"),
 		DBUser:     env("DB_USER", "hack_user"),
 		DBPassword: env("DB_PASSWORD", "hack_password"),
+
+		AdminEmail:    env("ADMIN_EMAIL", ""),
+		AdminPassword: env("ADMIN_PASSWORD", ""),
+
+		SMTPHost:     env("SMTP_HOST", ""),
+		SMTPPort:     env("SMTP_PORT", "587"),
+		SMTPUser:     env("SMTP_USER", ""),
+		SMTPPassword: env("SMTP_PASSWORD", ""),
+
+		MailFrom:     env("MAIL_FROM", ""),
+		MailFromName: env("MAIL_FROM_NAME", ""),
+
+		ContactNotifyTo: env("CONTACT_NOTIFY_TO", ""),
 	}
 
 	// ★本番で割り印が初期値のままだと、メモの中身を偽造される。
@@ -119,7 +161,27 @@ func Load() *Config {
 		log.Println("[config] ⚠ 本番なのに SECRET_KEY が初期値のままです")
 	}
 
+	// ★合言葉が空のままだと管理ページに誰も入れない(空の入力も弾く作りなので、
+	//   誰でも入れてしまうことはない)。気づけるように知らせておく。
+	if cfg.AdminEmail == "" || cfg.AdminPassword == "" {
+		log.Println("[config] ADMIN_EMAIL / ADMIN_PASSWORD が未設定です(管理ページに入れません)")
+	}
+
+	// ★メールの設定が無いときは、問い合わせをDBに保存するだけになる。
+	//   「送ったのに届かない」と悩まないよう、起動時に知らせておく。
+	if !cfg.MailEnabled() {
+		log.Println("[config] SMTP_HOST / MAIL_FROM が未設定です(問い合わせは保存のみ・メールは送りません)")
+	}
+
 	return cfg
+}
+
+// MailEnabled = メールを送れる設定がそろっているか。
+//
+// 送信サーバーと送信元アドレスの両方が無いと送れないので、
+// どちらか欠けていたら「送らない」と判断する。
+func (c *Config) MailEnabled() bool {
+	return c.SMTPHost != "" && c.MailFrom != ""
 }
 
 // IsProduction = 本番モードかどうか。

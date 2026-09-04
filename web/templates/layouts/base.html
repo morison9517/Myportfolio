@@ -137,6 +137,7 @@
     <link rel="stylesheet" href="/static/css/skills.css">
     <link rel="stylesheet" href="/static/css/products.css">
     <link rel="stylesheet" href="/static/css/experience.css">
+    <link rel="stylesheet" href="/static/css/contact.css">
     <link rel="stylesheet" href="/static/css/footer.css">
     <link rel="stylesheet" href="/static/css/mediaqueries.css">
 
@@ -159,7 +160,10 @@
 {{/* theme-loading … 読み込み直後のフェードを止めるための印。
      script.js がテーマを決めた直後に外す(仕掛けは base.css)。 */}}
 <body class="theme-loading">
-    <header>
+    {{/* ★site-header というクラスが要る。
+         main.js の showMessage() が「メッセージをどこに出すか」を
+         この名前で探しているので、外すとJSからのメッセージが出なくなる。 */}}
+    <header class="site-header">
         <nav id="hamburger-nav">
             <div class="hamburger-menu">
                 <div class="hamburger-icon" onclick="toggleMenu()">

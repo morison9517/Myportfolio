@@ -1,8 +1,12 @@
 /* ===========================================================================
-   admin.js = 問い合わせ一覧の「削除」の確認ポップアップ
+   admin.js = 管理ページの確認ポップアップ(削除 / 返信の送信)
 
    ▼ 読み込み場所
-     pages/admin.html の {{ define "scripts" }}。
+     pages/admin.html と pages/admin_reply.html の {{ define "scripts" }}。
+
+   ★2つの画面で同じファイルを使い回している。
+     それぞれの処理は「その画面に部品があるか」を確かめてから動くので、
+     片方の画面にしか無い部品でも問題ない。
 
    ▼ 流れ
 
@@ -22,6 +26,70 @@ const deleteForms = document.querySelectorAll(".inquiry-delete");
 
 if (deleteDialog && deleteForms.length > 0) {
   setupDeleteConfirm();
+}
+
+const replyDialog = document.getElementById("reply-confirm");
+const replyForm = document.querySelector(".reply-form");
+
+if (replyDialog && replyForm) {
+  setupReplyConfirm();
+}
+
+/* ===========================================================================
+   返信の送信の確認
+
+   ▼ なぜ必要か
+     押した瞬間にメールが飛び、取り消せない。
+     指が触れただけで送ってしまう事故を、一段挟んで防ぐ。
+
+   ▼ ★未入力チェックはブラウザに任せている
+     送信ボタンは type="submit" のままなので、
+     返信欄が空なら submit イベント自体が起きず、ここには来ない。
+   =========================================================================== */
+function setupReplyConfirm() {
+  const executeButton = document.getElementById("reply-execute");
+
+  // 送信中かどうか。連打で同じ返信が何通も飛ぶのを防ぐ。
+  let sending = false;
+
+  /* ★<html> に modal-open を付けているのはスクロールを止めるため。
+       <dialog> は後ろを押せなくはしてくれるが、スクロールは止まらない。
+       見た目は base.css と contact.css(.modal)。 */
+  replyDialog.addEventListener("close", () => {
+    document.documentElement.classList.remove("modal-open");
+  });
+
+  // × と キャンセル。閉じるだけで何も起きない。
+  replyDialog.querySelectorAll("[data-close]").forEach((button) => {
+    button.addEventListener("click", () => replyDialog.close());
+  });
+
+  replyForm.addEventListener("submit", (event) => {
+    // ブラウザの「そのまま送信する」動きを止める。
+    event.preventDefault();
+
+    if (sending) {
+      return;
+    }
+
+    document.documentElement.classList.add("modal-open");
+    replyDialog.showModal();
+  });
+
+  executeButton.addEventListener("click", () => {
+    if (sending) {
+      return;
+    }
+    sending = true;
+
+    replyDialog.close();
+
+    /* ★form.submit() を使う(requestSubmit ではない)。
+         submit() は submit イベントを起こさずに送信するので、
+         上の「送信を止めてポップアップを出す」処理に戻ってこない。
+         requestSubmit() だとイベントが起きて、永久にポップアップが出続ける。 */
+    replyForm.submit();
+  });
 }
 
 function setupDeleteConfirm() {

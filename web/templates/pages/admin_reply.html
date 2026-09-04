@@ -1,5 +1,13 @@
 {{/* ==========================================================================
-     admin_reply.html = 1件の問い合わせに返信する画面
+     admin_reply.html = 1件の問い合わせの返信画面
+
+     ▼ 2つの顔がある
+
+       まだ返信していない → 返信を書いて送る画面
+       返信済み           → 何と答えたかを読むだけの画面
+
+       出し分けは {{ if .Inquiry.RepliedAt }} の1か所だけ。
+       ★同じURLで両方を賄っているので、一覧からはどちらも同じリンクで来る。
 
      ▼ 渡ってくる値
 
@@ -9,6 +17,7 @@
      ▼ 送られるメールの形(組み立ては handlers/admin.go の buildReplyBody)
 
        ○○様 / お問い合わせいただきありがとうございます
+       ====== の区切り
        返信の内容
        ====== の区切り
        いただいた問い合わせのコピー
@@ -23,7 +32,7 @@
             <div class="admin-container">
 
                 <div class="admin-head">
-                    <h1>返信</h1>
+                    <h1>{{ if .Inquiry.RepliedAt }}返信内容{{ else }}返信{{ end }}</h1>
                     <a class="admin-back" href="/admin">&larr; 一覧へ戻る</a>
                 </div>
 
@@ -53,39 +62,97 @@
                     <p class="inquiry-body">{{ .Inquiry.Body }}</p>
                 </div>
 
-                <form class="reply-form" method="post" action="/admin/inquiries/{{ .Inquiry.ID }}/reply">
+                {{ if .Inquiry.RepliedAt }}
 
-                    {{/* ★整理券(CSRFトークン)。この1行が無いと400で弾かれる。 */}}
-                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+                    {{/* ▼ ここから「読むだけ」の画面 */}}
+                    <h2 class="reply-heading">送信した返信</h2>
 
-                    <div class="form-row">
-                        <label for="reply-body">
-                            返信内容<span class="required-mark" aria-hidden="true">*</span>
-                        </label>
-
-                        {{/* ★textarea の中に余計な空白や改行を入れないこと。
-                             書いたぶんがそのまま初期値になってしまうので、
-                             開始タグの直後から値を書き、すぐ閉じる。 */}}
-                        <textarea
-                            id="reply-body"
-                            name="body"
-                            rows="12"
-                            maxlength="2000"
-                            required
-                        >{{ .ReplyBody }}</textarea>
-
-                        <p class="form-note">
-                            この内容が、お礼のあいさつの下に入ります。
-                            その下に区切り線と、いただいたお問い合わせの内容が付きます。
+                    {{/* ★この機能を作る前に返信したものには控えが無い。
+                         空欄のまま出すと「送信内容が消えた」と誤解するので、
+                         理由をはっきり書いておく。 */}}
+                    {{ if .Inquiry.ReplyBody }}
+                        <div class="inquiry reply-sent">
+                            <p class="inquiry-body">{{ .Inquiry.ReplyBody }}</p>
+                        </div>
+                    {{ else }}
+                        <p class="admin-empty">
+                            この返信は控えを残す機能より前に送信されたため、内容が記録されていません。
                         </p>
-                    </div>
+                    {{ end }}
 
-                    <div class="reply-actions">
-                        <span class="reply-to">送信先: {{ .Inquiry.Email }}</span>
-                        <button type="submit" class="admin-submit">送信</button>
-                    </div>
-                </form>
+                {{ else }}
+
+                    {{/* ▼ ここから「書いて送る」画面 */}}
+                    <form class="reply-form" method="post" action="/admin/inquiries/{{ .Inquiry.ID }}/reply">
+
+                        {{/* ★整理券(CSRFトークン)。この1行が無いと400で弾かれる。 */}}
+                        <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+
+                        <div class="form-row">
+                            <label for="reply-body">
+                                返信内容<span class="required-mark" aria-hidden="true">*</span>
+                            </label>
+
+                            {{/* ★textarea の中に余計な空白や改行を入れないこと。
+                                 書いたぶんがそのまま初期値になってしまうので、
+                                 開始タグの直後から値を書き、すぐ閉じる。 */}}
+                            <textarea
+                                id="reply-body"
+                                name="body"
+                                rows="12"
+                                maxlength="2000"
+                                required
+                            >{{ .ReplyBody }}</textarea>
+
+                            <p class="form-note">
+                                この内容が、お礼のあいさつの下に区切り線で挟まれて入ります。
+                                その下にいただいたお問い合わせの内容が付きます。
+                            </p>
+                        </div>
+
+                        <div class="reply-actions">
+                            <span class="reply-to">送信先: {{ .Inquiry.Email }}</span>
+                            <button type="submit" class="admin-submit">送信</button>
+                        </div>
+                    </form>
+
+                    {{/* 送信の確認。誤って押したときのための一段。
+                         ★form の外に置くこと。中に入れると、ポップアップの中の
+                           ボタンがそのフォームの送信ボタンとして扱われてしまう。 */}}
+                    <dialog id="reply-confirm" class="modal">
+                        <div class="modal-head">
+                            <h3>送信の確認</h3>
+                            <button
+                                type="button"
+                                class="modal-close"
+                                data-close
+                                aria-label="閉じる"
+                            >&times;</button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>
+                                {{ .Inquiry.Name }} 様（{{ .Inquiry.Email }}）に
+                                返信メールを送信します。
+                            </p>
+                            <p class="modal-caution">※送信後は取り消せません。</p>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="modal-cancel" data-close>キャンセル</button>
+                            <button type="button" class="modal-send" id="reply-execute">送信する</button>
+                        </div>
+                    </dialog>
+
+                {{ end }}
 
             </div>
         </section>
+{{ end }}
+
+{{/* このページだけで使うJS。base.html の scripts の穴に入る。
+     ★一覧と同じファイルを使い回している。中で「その画面にある部品」を
+       確かめてから動くので、片方しか無くても問題ない。 */}}
+{{ define "scripts" }}
+    <script src="/static/js/admin.js"></script>
 {{ end }}

@@ -241,8 +241,15 @@ func inquiryReplyPage(c *gin.Context) {
 		return
 	}
 
+	// ★返信済みなら「読むだけ」の画面になる(出し分けは admin_reply.html)。
+	//   見出しも変える。
+	title := "返信"
+	if inquiry.RepliedAt != nil {
+		title = "返信内容"
+	}
+
 	c.HTML(http.StatusOK, "admin_reply.html", view.Page(c, gin.H{
-		"Title":   "返信",
+		"Title":   title,
 		"Inquiry": inquiry,
 	}))
 }
@@ -251,6 +258,17 @@ func inquiryReplyPage(c *gin.Context) {
 func inquiryReply(c *gin.Context, cfg *config.Config) {
 	inquiry, ok := findInquiry(c)
 	if !ok {
+		return
+	}
+
+	// ★返信済みのものには送らせない。
+	//
+	//   画面は「読むだけ」になっていて送信ボタンが無いが、
+	//   URLを直接叩けばここまで来られる。
+	//   通してしまうと、控えてある返信内容が上書きされて消える。
+	if inquiry.RepliedAt != nil {
+		middleware.Flash(c, "warning", "このお問い合わせには既に返信済みです。")
+		c.Redirect(http.StatusFound, "/admin")
 		return
 	}
 
@@ -303,13 +321,19 @@ func inquiryReply(c *gin.Context, cfg *config.Config) {
 		return
 	}
 
-	// 「返信済み」の印を付ける。
+	// 「返信済み」の印と、送った内容の控えを残す。
 	//
-	// ★Update で1列だけ書き換える。
+	// ★Updates で必要な列だけ書き換える。
 	//   Save だと全部の列を書き直すので、その間に別の場所から
 	//   変更があったときに上書きしてしまう。
+	//
+	// ★控え(reply_body)を残すのは、管理ページで「何と答えたか」を
+	//   後から読み返せるようにするため。メールは送ったら手元に残らない。
 	now := time.Now()
-	if err := database.DB.Model(&inquiry).Update("replied_at", now).Error; err != nil {
+	if err := database.DB.Model(&inquiry).Updates(map[string]any{
+		"replied_at": now,
+		"reply_body": body,
+	}).Error; err != nil {
 		// ★ここで失敗してもメールは届いている。
 		//   利用者に「送れませんでした」と伝えると二重に送ることになるので、
 		//   印が付かなかったことだけをログに残す。
@@ -336,6 +360,8 @@ func buildReplyBody(inquiry models.Inquiry, reply string) string {
 お問い合わせいただきありがとうございます。
 以下のとおりご回答いたします。
 
+======================================================================
+
 %s
 
 ======================================================================
@@ -351,6 +377,12 @@ func buildReplyBody(inquiry models.Inquiry, reply string) string {
 
 お問い合わせ内容:
 %s
+
+----------------------------------------------------------------------
+※このメールは送信専用のアドレスからお送りしています。
+　ご返信いただいても内容を確認できません。
+　追加のご質問は、お手数ですが下記のフォームからお願いいたします。
+　https://mrrn.jp/#contact
 `,
 		inquiry.Name,
 		reply,

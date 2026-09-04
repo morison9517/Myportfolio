@@ -167,8 +167,10 @@ func sendCopyToSender(inquiry models.Inquiry) {
 %s
 ------------------------------------------------------------
 
-※このメールは自動で送信しています。
-　このままご返信いただいても構いません。
+※このメールは送信専用のアドレスから自動でお送りしています。
+　ご返信いただいても内容を確認できません。
+　追加のご連絡は、お手数ですが下記のフォームからお願いいたします。
+　https://mrrn.jp/#contact
 `,
 		inquiry.Name,
 		inquiry.CreatedAt.Format("2006年1月2日 15:04"),
@@ -209,25 +211,25 @@ func sendNoticeToOwner(inquiry models.Inquiry, cfg *config.Config) {
 %s
 
 ------------------------------------------------------------
-このメールに返信すると、そのまま送信者(%s)への返事になります。
+このメールに返信はしないでください
 一覧: /admin
 `,
 		inquiry.CreatedAt.Format("2006年1月2日 15:04"),
 		inquiry.Name,
 		inquiry.Email,
 		inquiry.Body,
-		inquiry.Email,
 	)
 
+	// ★ReplyTo は付けない。
+	//
+	//   付けると、受信箱で「返信」を押したときの宛先が問い合わせた人になる。
+	//   返信は管理ページ(/admin)から行う運用なので、
+	//   メールソフトから直接返せてしまうと経路が2つになり、
+	//   「返信済み」の印(RepliedAt)も付かないまま話が進んでしまう。
 	err := mailer.Send(mailer.Message{
 		To:      cfg.ContactNotifyTo,
 		Subject: fmt.Sprintf("[お問い合わせ] %s 様より", inquiry.Name),
 		Body:    body,
-
-		// ★これが「返答も同じアドレスから」を実現している部分。
-		//   受信箱で「返信」を押すと宛先が問い合わせた人になり、
-		//   差出人は自分のドメインのアドレスのままになる。
-		ReplyTo: inquiry.Email,
 	})
 	if err != nil {
 		log.Printf("[contact] 自分宛の通知を送れません: %v", err)

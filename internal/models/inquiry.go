@@ -63,6 +63,15 @@ type Inquiry struct {
 	// ★画面では「空かどうか」だけを見て、未返信/返信済みを出し分けている
 	//   (admin.html の {{ if .RepliedAt }})。
 	RepliedAt *time.Time `json:"replied_at,omitempty"`
+
+	// ReplyBody = 送った返信の本文。まだ返していなければ空。
+	//
+	// ★管理ページで「何と答えたか」を後から読み返すために残している。
+	//   メールは送ったら手元に残らないので、ここに控えを取っておく。
+	//
+	// ★size ではなく type:text にする(本文と同じ理由)。
+	//   size(VARCHAR)には長さの上限があり、長文を入れると途中で切れる。
+	ReplyBody string `gorm:"type:text" json:"reply_body,omitempty"`
 }
 
 // TableName = この設計図が対応する表の名前。

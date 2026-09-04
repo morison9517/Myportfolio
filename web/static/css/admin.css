@@ -343,6 +343,19 @@
     opacity: 0.6;
 }
 
+/* 「送信した返信」の見出し。問い合わせ本文との境目を作る。 */
+.reply-heading {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+}
+
+/* 送信済みの返信の中身。
+   ★問い合わせのブロック(.inquiry)と同じ見た目を使い回しつつ、
+     左に緑の帯を足して「こちらが送ったもの」と区別できるようにする。 */
+.reply-sent {
+    border-left: 4px solid var(--accent-color);
+}
+
 .reply-form {
     display: flex;
     flex-direction: column;

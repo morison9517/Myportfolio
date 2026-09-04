@@ -5,6 +5,38 @@
 #contact {
     padding: 100px 10%;
 
+    /* ▼ フッターと合わせて画面ちょうど1枚分になる高さにする。
+
+         --footer-height にはフッターの実際の高さが入っている(script.js が測る)。
+         画面の高さからそれを引けば、残りがこのセクションの高さになる。
+
+       ★フッターの高さを決め打ちにしていない理由
+         クレジット文の折り返し方が画面幅で変わるため、
+         スマホとPCでフッターの高さが大きく違う。実測でないと合わない。
+
+       ★2行書いてあるのは、新しい単位に対応していないブラウザ向けの保険。
+         下の行が読めるブラウザだけ、そちらで上書きされる。
+         dvh はスマホでアドレスバーが隠れる分も考えた高さ。
+
+       ★JSが動かないときは 0px を使う(var の2つ目)。
+         つまり #contact だけで画面いっぱいになる。
+         フッターはその下にはみ出すが、少しスクロールすれば見えるだけ。
+         逆に大きすぎる値を仮置きすると #contact が足りなくなり、
+         1つ前のセクションの背景が上に覗いてしまう。
+         どちらに外すかを選べるなら、覗かない側に倒す。
+
+       ★box-sizing … padding をこの高さに含める。
+         無いと padding のぶん背が高くなり、画面からはみ出す。 */
+    min-height: calc(100vh - var(--footer-height, 0px));
+    min-height: calc(100dvh - var(--footer-height, 0px));
+    box-sizing: border-box;
+
+    /* 背が高くなったぶん、中身は縦の真ん中に置く。
+       ★中身の大きさは変えていない。置く位置だけを変えている。 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
     background-color: var(--bg-color);
     color: var(--text-color);
 

@@ -10,6 +10,43 @@ footer {
     text-align: center;
 }
 
+/* ---------- reCAPTCHA のバッジ ----------
+
+   ★v3 は「私はロボットではありません」を出さない代わりに、
+     Googleのロゴが入った小さなバッジを必ず出す決まりになっている。
+     消すこと自体は可能だが、そのときは代わりに
+     プライバシーポリシーと利用規約への注記を近くに置く義務がある。
+
+   ★既定では画面の右下に貼り付いて、スクロールしても付いてくる。
+     ページのどこにいても視界に入るので、
+     注記の類がまとまっているフッターの先頭に移している。 */
+.footer-recaptcha {
+    display: flex;
+    justify-content: center;
+
+    margin-bottom: 1.5rem;
+}
+
+/* ★バッジが入ってこない画面では、この箱ごと消す。
+     バッジを作るスクリプトを読み込むのはトップページだけなので、
+     管理ページでは空のまま残り、余白だけが空いてしまう。 */
+.footer-recaptcha:empty {
+    display: none;
+}
+
+/* ★!important を付けている理由
+     Googleのスクリプトがバッジ本体に style="..." を直接書き込むので、
+     普通の指定では必ず負ける。position: fixed と right: -186px
+     (画面外へ逃がして畳んでおくための指定)をここで打ち消している。 */
+.footer-recaptcha .grecaptcha-badge {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    /* 画面に浮いていないので、影は要らない。 */
+    box-shadow: none !important;
+}
+
 /* 利用規約とプライバシーポリシーの横並び。
    justify-content: center で2つまとめて中央に置く。 */
 .footer-links {

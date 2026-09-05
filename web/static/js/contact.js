@@ -25,6 +25,107 @@
 const contactForm = document.getElementById("contact-form");
 const confirmDialog = document.getElementById("contact-confirm");
 
+/* --- スパム対策(reCAPTCHA v3)------------------------------------------------
+
+   ★v3 はチェックボックスを出さない。
+     送信の直前に Google から合言葉(トークン)をもらい、
+     問い合わせと一緒に送る。本物かどうかはGin側が確かめる。
+
+   ★鍵が無いときは空文字を返す。
+     .env に RECAPTCHA_SITE_KEY を入れる前でもフォームは動く
+     (Gin側も鍵が無ければ検証しない)。
+
+   ★トークンは2分で切れる。
+     だから確認ポップアップを開いた時ではなく、
+     「送信」を押した直後に取る。先に取っておくと、
+     利用者が確認画面で悩んでいる間に切れてしまう。 */
+async function recaptchaToken() {
+  const siteKey = window.RECAPTCHA_SITE_KEY;
+
+  if (!siteKey || typeof grecaptcha === "undefined") {
+    return "";
+  }
+
+  /* grecaptcha.ready は「準備できたら呼ぶ」形なので、
+     await で待てるように Promise に包み直している。 */
+  return new Promise((resolve) => {
+    grecaptcha.ready(async () => {
+      try {
+        /* action は Gin側の recaptchaAction と同じ文字にすること。
+           食い違うと全部弾かれる。 */
+        resolve(await grecaptcha.execute(siteKey, { action: "contact" }));
+      } catch (error) {
+        /* ★取れなくても送信自体は止めない。
+             通信が不安定なだけで問い合わせを諦めさせるのは行き過ぎ。
+             空で送れば、Gin側が「確かめられなかった」として扱う。 */
+        console.warn("reCAPTCHA のトークンを取得できませんでした", error);
+        resolve("");
+      }
+    });
+  });
+}
+
+/* --- バッジをフッターの最上部へ移す -----------------------------------------
+
+   ★なぜJavaScriptが要るのか
+     Googleのスクリプトは、バッジを <body> の直下に勝手に作る。
+     どこに作るかを指定する方法が無いので、
+     出来上がったものを後からこちらの箱へ移している。
+
+   ★いつ現れるか分からないので MutationObserver で見張る
+     バッジはページ読み込みの後、遅れて作られる。
+     その瞬間が読めないため、<body> に要素が足された合図を受け取って、
+     現れていたら移す、という形にしている。
+
+   ★失敗しても送信は止まらない
+     バッジは表示の話で、合言葉(トークン)の取得とは別。
+     移せなくても既定の右下に出るだけで、フォームは普通に動く。
+
+   ★もしバッジの表示が崩れたら
+     要素を移すとき、中のiframeは読み込み直しになる。
+     ここが原因で不具合が出るようなら、移すのをやめて
+     「バッジを消して、代わりに注記を置く」形に替えるのが確実
+     (Googleが認めている方法。文面はGoogleの案内にある)。 */
+function placeRecaptchaBadge() {
+  const slot = document.querySelector(".footer-recaptcha");
+
+  if (!slot || !window.RECAPTCHA_SITE_KEY) {
+    return;
+  }
+
+  // 見つかったら移す。移したかどうかを返す。
+  const move = () => {
+    const badge = document.querySelector(".grecaptcha-badge");
+
+    if (!badge || slot.contains(badge)) {
+      return false;
+    }
+
+    slot.appendChild(badge);
+    return true;
+  };
+
+  // もう出来ていれば、見張らずに済ませる。
+  if (move()) {
+    return;
+  }
+
+  const observer = new MutationObserver(() => {
+    if (move()) {
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(document.body, { childList: true });
+
+  /* ★見張りっぱなしにしない。
+       鍵が間違っているなどでバッジが最後まで作られないと、
+       ページを開いている間ずっと監視が動き続けてしまう。 */
+  setTimeout(() => observer.disconnect(), 15000);
+}
+
+placeRecaptchaBadge();
+
 /* ★このファイルはトップページでしか読み込まないが、
      将来ほかのページで読み込んでも落ちないように確かめておく。
      フォームが無い画面で addEventListener すると、そこで止まる。 */
@@ -83,10 +184,12 @@ function setupContactForm() {
     await withBusy(confirmButton, async () => {
       try {
         // ★整理券(CSRFトークン)は api が自動で付ける。
+        //   こちらの token はスパム対策(reCAPTCHA)用で別物。
         const result = await api.post("/api/contact", {
           name: document.getElementById("contact-name").value,
           email: document.getElementById("contact-email").value,
           body: document.getElementById("contact-body").value,
+          token: await recaptchaToken(),
         });
 
         // 結果は画面上部のお知らせで伝える(見た目は base.css の .flash)。

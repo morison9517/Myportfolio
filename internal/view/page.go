@@ -26,8 +26,18 @@ import (
 	"case_gin/internal/middleware"
 )
 
+// 設定は起動時に1回だけ受け取って、ここに持っておく。
+//
+// ★Page() は毎回のアクセスで呼ばれるが、引数に *gin.Context しか無い。
+//
+//	全ハンドラの呼び出しに設定を足して回るより、
+//	mailer と同じように起動時に1つ預かるほうが変更が小さい。
+var cfg *config.Config
+
 // Setup = テンプレートを準備する。router.go から呼ばれる。
-func Setup(cfg *config.Config, templateDir string) (*Renderer, error) {
+func Setup(c *config.Config, templateDir string) (*Renderer, error) {
+	cfg = c
+
 	// 開発中だけ、HTMLを保存するたびに読み込み直す設定にする。
 	return NewRenderer(templateDir, !cfg.IsProduction())
 }
@@ -36,9 +46,10 @@ func Setup(cfg *config.Config, templateDir string) (*Renderer, error) {
 //
 // 画面から使える共通の値:
 //
-//	{{ .SiteName }}  … サイトの表示名
-//	{{ .CSRFToken }} … フォームに入れる整理券
-//	{{ .Flashes }}   … 「保存しました」などのメッセージ
+//	{{ .SiteName }}          … サイトの表示名
+//	{{ .CSRFToken }}         … フォームに入れる整理券
+//	{{ .Flashes }}           … 「保存しました」などのメッセージ
+//	{{ .RecaptchaSiteKey }}  … スパム対策の鍵(未設定なら空)
 func Page(c *gin.Context, data gin.H) gin.H {
 	if data == nil {
 		data = gin.H{}
@@ -49,6 +60,13 @@ func Page(c *gin.Context, data gin.H) gin.H {
 
 	data["CSRFToken"] = middleware.CSRFToken(c)
 	data["Flashes"] = middleware.TakeFlashes(c)
+
+	// ★渡すのはサイトキー(画面に埋める鍵)だけ。
+	//   シークレットキーは画面に出したら意味が無くなるので絶対に渡さない。
+	//   未設定なら空文字が入り、画面側は {{ if }} で読み込みを飛ばす。
+	if cfg != nil {
+		data["RecaptchaSiteKey"] = cfg.RecaptchaSiteKey
+	}
 
 	return data
 }

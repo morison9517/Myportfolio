@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -110,6 +111,27 @@ type Config struct {
 
 	// ContactNotifyTo … 新しい問い合わせを知らせる宛先(自分の受信箱)
 	ContactNotifyTo string
+
+	// ▼ 問い合わせフォームのスパム対策(reCAPTCHA v3)
+	//
+	//	v3 は「私はロボットではありません」のチェックを出さない。
+	//	画面の裏で利用者の動きを見て 0.0〜1.0 の点数を付け、
+	//	その点数で人間らしさを判断する方式。
+	//
+	//	RecaptchaSiteKey   … 画面に埋める鍵。人に見えてよい
+	//	RecaptchaSecretKey … Googleに問い合わせるときの鍵。★絶対に画面に出さない
+	//
+	//	★両方そろっていないときは検証しない(素通しになる)。
+	//	  鍵を取る前でもフォームが壊れないようにするため。
+	RecaptchaSiteKey   string
+	RecaptchaSecretKey string
+
+	// RecaptchaMinScore = これ未満の点数を機械とみなす境目。
+	//
+	//	1.0 に近いほど人間らしい。Googleの案内どおり 0.5 を既定にしている。
+	//	★上げすぎると普通の利用者まで弾く。
+	//	  実際に弾かれた記録([contact] ログの点数)を見てから動かすこと。
+	RecaptchaMinScore float64
 }
 
 // Load = .env を読んで Config を組み立てて返す。起動時に1回だけ呼ぶ。
@@ -153,6 +175,10 @@ func Load() *Config {
 		MailFromName: env("MAIL_FROM_NAME", ""),
 
 		ContactNotifyTo: env("CONTACT_NOTIFY_TO", ""),
+
+		RecaptchaSiteKey:   env("RECAPTCHA_SITE_KEY", ""),
+		RecaptchaSecretKey: env("RECAPTCHA_SECRET_KEY", ""),
+		RecaptchaMinScore:  envFloat("RECAPTCHA_MIN_SCORE", 0.5),
 	}
 
 	// ★本番で割り印が初期値のままだと、メモの中身を偽造される。
@@ -173,6 +199,12 @@ func Load() *Config {
 		log.Println("[config] SMTP_HOST / MAIL_FROM が未設定です(問い合わせは保存のみ・メールは送りません)")
 	}
 
+	// ★鍵が無いとスパム対策が素通しになる。
+	//   「入れたつもりで効いていない」を防ぐため、起動時に知らせておく。
+	if !cfg.RecaptchaEnabled() {
+		log.Println("[config] RECAPTCHA_SITE_KEY / RECAPTCHA_SECRET_KEY が未設定です(問い合わせのスパム対策は無効)")
+	}
+
 	return cfg
 }
 
@@ -182,6 +214,14 @@ func Load() *Config {
 // どちらか欠けていたら「送らない」と判断する。
 func (c *Config) MailEnabled() bool {
 	return c.SMTPHost != "" && c.MailFrom != ""
+}
+
+// RecaptchaEnabled = スパム対策を動かせる設定がそろっているか。
+//
+// 画面に埋める鍵と、Googleに問い合わせる鍵の両方が要る。
+// どちらか欠けていたら「検証しない」と判断する。
+func (c *Config) RecaptchaEnabled() bool {
+	return c.RecaptchaSiteKey != "" && c.RecaptchaSecretKey != ""
 }
 
 // IsProduction = 本番モードかどうか。
@@ -238,6 +278,26 @@ func envList(key string) []string {
 		}
 	}
 	return out
+}
+
+// envFloat = .env の "0.5" という文字を、Goの小数に変換する。
+//
+// ★読めない文字が書かれていたら既定値に戻す。
+//
+//	ここで 0 にしてしまうと、書き間違えた瞬間に
+//	どんな点数でも通る(=対策が外れる)状態になる。
+func envFloat(key string, fallback float64) float64 {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+
+	n, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		log.Printf("[config] %s の値を数値として読めません(%q)。%.1f を使います", key, value, fallback)
+		return fallback
+	}
+	return n
 }
 
 func envBool(key string, fallback bool) bool {

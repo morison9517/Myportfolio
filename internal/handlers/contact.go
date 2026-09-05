@@ -7,8 +7,9 @@
 //	  ↓ contact.js が api.post("/api/contact", {...})
 //	ここ
 //	  ↓ 1. 中身を確かめる(空、長すぎ、メールの形)
-//	  ↓ 2. DBに保存する          ← ★先に保存する
-//	  ↓ 3. メールを2通送る(送信者へのコピー / 自分への通知)
+//	  ↓ 2. スパム対策(reCAPTCHA)をGoogleに確かめる
+//	  ↓ 3. DBに保存する          ← ★保存はここ
+//	  ↓ 4. メールを2通送る(送信者へのコピー / 自分への通知)
 //	{"message": "..."} を返す
 //
 // ▼ ★保存を先にする理由
@@ -22,6 +23,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -34,6 +36,7 @@ import (
 	"case_gin/internal/database"
 	"case_gin/internal/mailer"
 	"case_gin/internal/models"
+	"case_gin/internal/recaptcha"
 )
 
 // 入力の上限。DBの列の長さと合わせてある。
@@ -56,11 +59,22 @@ const (
 //	別々のところから来たように見えてしまう。
 const mailRule = "──────────────────────────────"
 
+// recaptchaAction = reCAPTCHA の「行動名」。
+//
+// ★contact.js の grecaptcha.execute(..., { action: "contact" }) と
+//
+//	同じ文字にすること。食い違うと全部弾かれる。
+const recaptchaAction = "contact"
+
 // contactForm = 画面から送られてくるJSONの形。
 type contactForm struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Body  string `json:"body"`
+
+	// Token = 画面がGoogleからもらった合言葉(reCAPTCHA v3)。
+	// ★鍵を設定していないときは空で届く。そのときは検証しない。
+	Token string `json:"token"`
 }
 
 // RegisterContactRoutes = このファイルが担当するURLを登録する。
@@ -90,6 +104,28 @@ func createInquiry(c *gin.Context, cfg *config.Config) {
 	if message := validate(name, email, body); message != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": message})
 		return
+	}
+
+	// --- スパム対策 ---
+	//
+	// ★保存の前に置く理由
+	//   機械からの送信をDBに残さないため。後に置くと、弾いた分まで
+	//   管理ページに並んでしまい、一覧が使い物にならなくなる。
+	if err := recaptcha.Verify(form.Token, c.ClientIP(), recaptchaAction); err != nil {
+		// ★「機械と判断した」のと「Googleに確かめられなかった」を分ける。
+		//
+		//   Google側の不調でこちらの問い合わせが受けられなくなるのは
+		//   困るので、確かめられなかったときは通してしまう。
+		//   スパムが1件通るより、本物の問い合わせを1件失うほうが痛い。
+		if errors.Is(err, recaptcha.ErrFailed) {
+			log.Printf("[contact] スパム対策で弾きました(%s): %v", c.ClientIP(), err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "送信を確認できませんでした。お手数ですが、時間をおいて試してください。",
+			})
+			return
+		}
+
+		log.Printf("[contact] スパム対策を確かめられませんでした(通します): %v", err)
 	}
 
 	inquiry := models.Inquiry{

@@ -557,5 +557,26 @@
 {{/* このページだけで使うJS。base.html の scripts の穴に入る。
      ★main.js より後に読み込まれるので、api や showMessage をそのまま使える。 */}}
 {{ define "scripts" }}
+    {{/* reCAPTCHA v3 = 問い合わせフォームのスパム対策。
+
+         ★base.html ではなくここで読み込む理由
+           必要なのは問い合わせフォームのあるこのページだけ。
+           base.html に書くと管理ページでも読み込まれ、
+           右下のバッジまで出てしまう。
+
+         ★{{ if }} で囲っているのは、.env に鍵を入れる前でも
+           このページが普通に開くようにするため。
+           鍵が空なら読み込まず、contact.js も検証を飛ばす。
+
+         ★window に入れているのは、contact.js から鍵を読むため。
+           Goのテンプレートが使えるのはHTMLの中だけで、
+           別ファイルの .js には {{ }} を書けない。 */}}
+    {{ if .RecaptchaSiteKey }}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ .RecaptchaSiteKey }}"></script>
+    <script>
+      window.RECAPTCHA_SITE_KEY = "{{ .RecaptchaSiteKey }}";
+    </script>
+    {{ end }}
+
     <script src="/static/js/contact.js"></script>
 {{ end }}

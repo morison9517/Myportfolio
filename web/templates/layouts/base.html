@@ -224,6 +224,22 @@
     <main>{{ block "content" . }}{{ end }}</main>
 
     <footer>
+        {{/* reCAPTCHA のバッジの置き場所。
+
+             ★中は空でよい。
+               Googleのスクリプトはバッジを <body> の直下に作るので、
+               contact.js が読み込み後にこの箱へ移している。
+               仕組みは contact.js の placeRecaptchaBadge() のコメント。
+
+             ★★中に空白や改行を入れないこと。
+               中身が空のままの画面(管理ページなど。バッジを作る
+               スクリプトを読み込まない)では :empty で消しているので、
+               空白が1つでも入ると「空ではない」と判定されて
+               余白だけが残る。
+
+             ★鍵が未設定のときはそもそも出さない。 */}}
+        {{ if .RecaptchaSiteKey }}<div class="footer-recaptcha"></div>{{ end }}
+
         {{/* 利用規約とプライバシーポリシーを横並びにする。
              並べるだけなので flex を使い、間隔は gap で決めている。 */}}
         <div class="footer-links">

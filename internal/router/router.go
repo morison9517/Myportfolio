@@ -28,6 +28,7 @@ import (
 	"case_gin/internal/handlers"
 	"case_gin/internal/mailer"
 	"case_gin/internal/middleware"
+	"case_gin/internal/recaptcha"
 	"case_gin/internal/view"
 )
 
@@ -70,6 +71,10 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	// --- メールを送る係に設定を渡す ---
 	// ★設定が無ければ送らないだけなので、ここで失敗することはない。
 	mailer.Setup(cfg)
+
+	// --- 問い合わせのスパム対策(reCAPTCHA)に設定を渡す ---
+	// ★こちらも鍵が無ければ検証しないだけで、失敗することはない。
+	recaptcha.Setup(cfg)
 
 	// --- 画面の型紙(base.html)を使えるようにする ---
 	renderer, err := view.Setup(cfg, templateDir)

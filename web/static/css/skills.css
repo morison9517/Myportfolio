@@ -30,7 +30,7 @@
 
     display: grid;
     grid-template-columns: repeat(6, 72px);
-    gap: 1.75rem 2.5rem;   /* 縦の間隔 / 横の間隔 */
+    gap: 1.8rem 3.0rem;   /* 縦の間隔 / 横の間隔 */
     justify-content: center;
 }
 

@@ -176,7 +176,106 @@
         </section>
 
         <section id="products">
+            <div class="container">
+                <h2>Products</h2>
 
+                {{/* 上から時系列順(古い→新しい)に並べてある。
+
+                     並び方は画面幅で3段階に変わる(指定は mediaqueries.css)。
+
+                       PC全画面(1536px〜)        4列×1行(横1行に4枚)
+                       PC半画面・タブレット       2列×2行
+                       スマホ(〜768px)           1列×4行(縦積み)
+
+                     1件 = <li class="product-card"> 1つ。中身は3段。
+
+                       画像 + タイトル … <a> の中。★リンクになるのはここだけ
+                       .product-date   … 年月
+                       .product-event  … 参加イベント名
+                                         賞は <span class="product-award">
+                                         ★賞が無い作品では span ごと消す
+                                           (空のspanを残すと余白だけ空く)
+
+                     ▼ 画像について
+
+                       置くのは 1:1(正方形)のロゴ画像。
+                       それを横長の窓から覗く形で使い、はみ出す上下を
+                       object-fit: cover が切り落とす。
+
+                       窓の幅はカードの幅で決まってしまうので、
+                       切り取る帯の厚みを揃えるために、
+                       列数が変わる段階ごとに比率を作り直している。
+
+                         2列(基準)   16:5  カード434px → 帯136px
+                         4列(広い)   12:5  カード326px → 帯136px
+                         1列(スマホ) 5:2   カード343px → 帯137px
+
+                       ★上下が切られる前提なので、ロゴは正方形の中央に置くこと。
+                         端に寄せると広い画面で見切れる。
+
+                       置き場所は web/static/images/products/
+
+                     ★中身は仮置きです。実際の作品に書き換えてください。
+                       href="#" もダミーなので、公開URLかGitHubに差し替える。 */}}
+                <ul class="products-grid">
+
+                    <li class="product-card">
+                        <a href="#">
+                            <img src="/static/images/products/placeholder1.svg" alt="">
+                            <h3>作品名1</h3>
+                        </a>
+                        <p class="product-date">2024年8月</p>
+                        <p class="product-event">
+                            〇〇ハッカソン
+                            <span class="product-award">最優秀賞</span>
+                        </p>
+                    </li>
+
+                    <li class="product-card">
+                        <a href="#">
+                            <img src="/static/images/products/placeholder2.svg" alt="">
+                            <h3>作品名2</h3>
+                        </a>
+                        <p class="product-date">2025年3月</p>
+                        <p class="product-event">
+                            △△コンテスト
+                        </p>
+                    </li>
+
+                    <li class="product-card">
+                        <a href="#">
+                            <img src="/static/images/products/placeholder3.svg" alt="">
+                            <h3>作品名3</h3>
+                        </a>
+                        <p class="product-date">2025年9月</p>
+                        <p class="product-event">
+                            □□ハッカソン
+                            <span class="product-award">技術賞</span>
+                        </p>
+                    </li>
+
+                    <li class="product-card">
+                        <a href="#">
+                            <img src="/static/images/products/placeholder4.svg" alt="">
+                            <h3>作品名4</h3>
+                        </a>
+                        <p class="product-date">2026年2月</p>
+                        <p class="product-event">
+                            個人開発
+                        </p>
+                    </li>
+
+                </ul>
+
+                {{/* skills と同じ「Read More」。
+                     ★リンク先の products.html はまだ無い(skills.html と同じ状態)。 */}}
+                <div class="products-more">
+                    <a href="products.html">
+                        Read More &gt;&gt;
+                    </a>
+                </div>
+
+            </div>
         </section>
 
         <section id="experience">
@@ -360,7 +459,7 @@
                             required
                         >
                         <p class="form-note">
-                            入力いただいたアドレスに、内容のコピーをお送りします。
+                            入力いただいたアドレスに、問い合わせ内容のコピー及び返答をお送りします。
                         </p>
                     </div>
 

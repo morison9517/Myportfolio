@@ -48,6 +48,14 @@ const (
 	maxBodyLength  = 2000
 )
 
+// mailRule = メール本文の区切り線。
+//
+// ★このファイルと admin.go が出す全てのメールで同じものを使う。
+//
+//	どれも同じ送信元から届くので、線の形が揃っていないと
+//	別々のところから来たように見えてしまう。
+const mailRule = "──────────────────────────────"
+
 // contactForm = 画面から送られてくるJSONの形。
 type contactForm struct {
 	Name  string `json:"name"`
@@ -154,7 +162,7 @@ func sendCopyToSender(inquiry models.Inquiry) {
 お問い合わせありがとうございます。
 以下の内容で受け付けました。改めてご連絡いたします。
 
-------------------------------------------------------------
+%s
 受付日時: %s
 
 お名前:
@@ -165,18 +173,20 @@ func sendCopyToSender(inquiry models.Inquiry) {
 
 お問い合わせ内容:
 %s
-------------------------------------------------------------
 
+%s
 ※このメールは送信専用のアドレスから自動でお送りしています。
 　ご返信いただいても内容を確認できません。
 　追加のご連絡は、お手数ですが下記のフォームからお願いいたします。
 　https://mrrn.jp/#contact
 `,
 		inquiry.Name,
+		mailRule,
 		inquiry.CreatedAt.Format("2006年1月2日 15:04"),
 		inquiry.Name,
 		inquiry.Email,
 		inquiry.Body,
+		mailRule,
 	)
 
 	err := mailer.Send(mailer.Message{
@@ -210,7 +220,7 @@ func sendNoticeToOwner(inquiry models.Inquiry, cfg *config.Config) {
 お問い合わせ内容:
 %s
 
-------------------------------------------------------------
+%s
 このメールに返信はしないでください
 一覧: /admin
 `,
@@ -218,6 +228,7 @@ func sendNoticeToOwner(inquiry models.Inquiry, cfg *config.Config) {
 		inquiry.Name,
 		inquiry.Email,
 		inquiry.Body,
+		mailRule,
 	)
 
 	// ★ReplyTo は付けない。

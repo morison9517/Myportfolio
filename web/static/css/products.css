@@ -1,6 +1,9 @@
 /*products section*/
+/* 上下の余白は #about・#skills と同じ 80px。
+   ★左右の 10% を 0 にすると .container 側に幅の指定が無いため、
+     文字が画面の端に貼り付いてしまう。 */
 #products {
-    padding: 100px 0;
+    padding: 80px 10%;
     background-color: var(--bg-color);
     color: var(--text-color);
 
@@ -9,48 +12,159 @@
         color var(--theme-fade);
 }
 
+/* 見出しは #about h2 / #skills h2 と同じ大きさ・余白 */
+#products h2 {
+    margin-bottom: 4.0rem;
+    font-size: 3.0rem;
+
+    text-align: center;
+}
+
+/* ▼ 並びは画面幅で3段階に変わる
+
+     1536px 以上   PC全画面             4列×1行(横1行に4枚)
+     768〜1536px   PC半画面・タブレット   2列×2行  ← ここが既定値
+     768px 以下    スマホ               1列×4行(縦積み)
+
+   既定を2列にして、上下の端を mediaqueries.css で上書きしている。
+
+   ★max-width で横幅を抑えて中央に置く。
+     これが無いと #products の幅いっぱい(画面の80%)まで広がり、
+     カード1枚が画面を占領する。
+
+   ★margin-top の 3rem と上の h2 の margin-bottom(3.5rem)は
+     隣り合うきょうだい同士なので相殺され、間隔は大きいほうの
+     3.5rem になる。足し算で 6.5rem にはならない。 */
 .products-grid {
+    list-style: none;
+    padding: 0;
+    margin: 3rem auto 0;
+    max-width: 900px;
+
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin-top: 3rem;
+    gap: 2.5rem 3.5rem;   /* 縦の間隔 / 横の間隔 */
 }
 
-.product-card {
-    overflow: hidden;
-}
+/* ★比率を画面幅ごとに変える考え方
 
+     置くのは 1:1 のロゴ画像。それを「横長の窓」から覗く形で使い、
+     窓からはみ出す上下を object_fit: cover が切り落とす。
+     窓の幅はカードの幅で決まってしまうので、
+     切り取る帯の厚みを揃えるには、幅が変わるたびに比率を作り直す。
+
+     ▼ この 16:5 が基準(2列=PC半画面・タブレット時)
+
+       カード幅  434px … .products-grid の max-width 900px から
+                          横の隙間 2rem(32px) を引いて2等分した値
+       帯の厚み  約136px … 434 × 5 / 16
+
+       他の段階の比率も、この 136px に近づくように
+       mediaqueries.css 側で決めてある。
+
+     ★object-fit を contain にすると切れない代わりに
+       余白ができて背景が透ける。ここでは cover を使う。 */
 .product-card img {
     width: 100%;
     display: block;
 
-    transition: transform 0.2s ease;
+    aspect-ratio: 16 / 5;
+    object-fit: cover;
+
+    transition: filter 0.2s ease;
 }
 
-.product-card a:hover img {
-    transform: scale(1.03);
+/* ホバーは拡大ではなく暗くする。
+   ★拡大にすると .product-card に overflow: hidden が要るうえ、
+     画像の端が動くぶん隣のカードとの間隔がちらついて見える。
+
+   ★セレクタが a:hover img ではなく a img:hover なのは、
+     画像とタイトルのホバーを別々に効かせるため。
+     a:hover にすると、どちらに乗せても両方が同時に反応する。 */
+.product-card a img:hover {
+    filter: brightness(0.8);
 }
 
-.product-card a:hover h3 {
+/* タイトルのリンク色は .about-details a と同じ。
+   ★#products の背景は --bg-color(明るい側)なので #2997ff。
+     #skills や footer が #83c3ff なのは背景が濃いから。
+     ここを取り違えると、背景に対して色が沈む。 */
+.product-card a h3,
+.product-card a h3:visited {
+    color: #2997ff;
+
+    transition: color 0.15s ease;
+}
+
+/* ホバー時の色は他セクション(.about-details a / .skills-more a)と同じ。
+   ★画像側と同じく a:hover ではなく h3:hover。 */
+.product-card a h3:hover {
     color: var(--hover-color);
 }
 
-.product-card a h3,
-.product-card a h3:visited{
-    color: var(--text-color);
+.product-card h3 {
+    margin: 1rem 0 0;
+    font-size: 1.25rem;
 
-    /* ホバーの色変化も兼ねるが、テーマ切り替えでも動く場所なので
-       時間は var(--theme-fade) にそろえる。 */
-    transition: color var(--theme-fade);
+    /* ★h3 はブロック要素なので、放っておくとカードの幅いっぱいが
+         ホバー範囲になり、文字の右の余白に乗せても色が変わる。
+         文字の幅だけに縮めて、見た目と反応する範囲をそろえる。 */
+    width: fit-content;
 }
 
+/* 年月。本文より一段弱く見せる。
+   ★色を薄いグレー固定にするとダークモードで沈むので、
+     文字色はそのままに opacity で弱める。 */
+.product-date {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    opacity: 0.65;
+}
+
+.product-event {
+    margin: 0.35rem 0 0;
+    font-size: 0.95rem;
+
+    /* 賞のバッジと縦位置をそろえる。
+       賞が無いときは中身がテキスト1つだけなので影響しない。 */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+/* 賞のバッジ。受賞した作品にだけ付く。
+   ★背景がアクセントカラー固定なので、文字はライト/ダーク問わず白。
+     var(--text-color) にするとライトモードで緑地に黒になる。 */
+.product-award {
+    padding: 0.15rem 0.6rem;
+
+    border-radius: 999px;
+    background-color: var(--accent-color);
+    color: #f9fafb;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    /* 「最優秀賞」などが途中で折り返すと不格好なので折らない。 */
+    white-space: nowrap;
+}
+
+/* 位置は .skills-more と同じ中央ぞろえ */
 .products-more {
     margin-top: 3rem;
-    text-align: right;
+    text-align: center;
 }
 
-.products-more a {
+.products-more a,
+.products-more a:visited {
     font-size: 1rem;
     font-weight: 600;
+    color: #2997ff;
+
+    transition: color 0.15s ease;
 }
 
+.products-more a:hover {
+    color: var(--hover-color);
+}

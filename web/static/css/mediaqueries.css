@@ -18,6 +18,29 @@
         grid-template-columns: repeat(12, 72px);
         gap: 1.75rem;
     }
+
+    /* Products:2列×2行 → 4列×1行(横1行に4枚)
+
+       ★max-width を 900px から広げているのは、
+         900px のまま4等分すると1枚が約200pxまで痩せて、
+         画像もタイトルも読めなくなるため。
+         1400px で止めているのは、ウルトラワイドで
+         際限なく間延びさせないため。 */
+    .products-grid {
+        max-width: 1400px;
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* 4等分でカード幅が 434px → 326px と細くなるので、
+       16:5 のままだと帯が102pxまで痩せる。
+       基準の厚みに戻す方向で比率を立てる。
+
+         カード幅  326px … max-width 1400px から
+                           横の隙間 2rem×3(96px) を引いて4等分
+         326 ÷ 2.4 = 136px  ← 基準と同じ */
+    .product-card img {
+        aspect-ratio: 12 / 5;
+    }
 }
 
 @media screen and (max-width: 1200px) {
@@ -73,7 +96,7 @@
      戻せなくなるので、ただの見た目の問題では済まない。 */
 @media (max-width: 900px) {
     .skills-grid {
-        gap: 1.75rem 2.5rem;
+        gap: 1.75rem 3.5rem;
     }
 }
 
@@ -91,6 +114,18 @@
         max-width: 100%;
     }
 
+    /* ★縦積みにすると画像が左端に張り付く。
+         .about-content は align-items: flex-start なので、
+         横並びのときは「上ぞろえ」だった指定が、
+         縦積みでは「左ぞろえ」に変わるため。
+
+       ★align-items ごと center にしないのは、それだと本文まで
+         中央ぞろえの箱になってしまい、テキストの左端がそろわなくなるから。
+         align-self で画像だけを動かす。 */
+    .about-image {
+        align-self: center;
+    }
+
     .about-image img {
         width: 250px;
         height: 250px;
@@ -103,7 +138,7 @@
 
     .skills-grid {
         grid-template-columns: repeat(3, 72px);
-        gap: 1.5rem 1rem;
+        gap: 2.0rem 1.5rem;
     }
 
     .skill-icon {
@@ -111,6 +146,27 @@
         height: 58px;
         border-radius: 11px;
         padding: 9px;
+    }
+
+    /* Products:2列×2行 → 1列×4行
+       ★2列のまま縮めるとカード幅が150px前後になり、
+         画像もタイトルも読めなくなる。 */
+    #products {
+        padding: 80px 6%;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    /* スマホ(幅390px前後)ではカードが約343pxまで狭まる。
+       16:5 のままだと帯が107pxしか残らずロゴが潰れるので、
+       基準の厚みに戻す方向で比率を立てる。
+
+         343 ÷ 2.5 = 137px  ← 基準の約136pxとほぼ同じ */
+    .product-card img {
+        aspect-ratio: 5 / 2;
     }
 
     /* Experience

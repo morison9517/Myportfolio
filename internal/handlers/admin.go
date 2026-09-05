@@ -346,9 +346,9 @@ func inquiryReply(c *gin.Context, cfg *config.Config) {
 
 // buildReplyBody = 返信メールの本文を組み立てる。
 //
-//	お礼のあいさつ
+//	あて名とお礼のあいさつ(区切りなしで改行2つ空ける)
 //	返信の内容
-//	====== の区切り
+//	── の区切り
 //	いただいた問い合わせのコピー
 //
 // ★問い合わせのコピーを付けているのは、受け取った人が
@@ -356,15 +356,12 @@ func inquiryReply(c *gin.Context, cfg *config.Config) {
 //	「何についての返事か」を思い出せるようにするため。
 func buildReplyBody(inquiry models.Inquiry, reply string) string {
 	return fmt.Sprintf(`%s 様
+この度はお問い合わせいただき誠にありがとうございます。
 
-お問い合わせいただきありがとうございます。
-以下のとおりご回答いたします。
-
-======================================================================
 
 %s
 
-======================================================================
+%s
 以下は、いただいたお問い合わせの内容です。
 
 受付日時: %s
@@ -378,7 +375,7 @@ func buildReplyBody(inquiry models.Inquiry, reply string) string {
 お問い合わせ内容:
 %s
 
-----------------------------------------------------------------------
+%s
 ※このメールは送信専用のアドレスからお送りしています。
 　ご返信いただいても内容を確認できません。
 　追加のご質問は、お手数ですが下記のフォームからお願いいたします。
@@ -386,10 +383,12 @@ func buildReplyBody(inquiry models.Inquiry, reply string) string {
 `,
 		inquiry.Name,
 		reply,
+		mailRule,
 		inquiry.CreatedAt.Format("2006年1月2日 15:04"),
 		inquiry.Name,
 		inquiry.Email,
 		inquiry.Body,
+		mailRule,
 	)
 }
 

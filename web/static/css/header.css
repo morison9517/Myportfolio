@@ -58,37 +58,75 @@ nav a{
 
     border-radius: 50px;
 
-    background-color: #64748b;
+    /* ライトモード時のトラック(溝)の色。ダークは下の :checked 側。 */
+    background-color: #FFEF6C;
 
     cursor: pointer;
 
     transition: .3s;
 }
 
-.theme-switch__label::before{
-    content: "☀";
+/* ▼ 太陽と月はトラックの中に置き、今のモードのほうを見せる
 
+     つまみ(span)は 29px 幅で、左端3px から始まり、
+     押すと 35px 右へ動く。つまり覆う範囲はこうなる。
+
+       ライト(つまみ左)  3px 〜 32px   → 左の月が隠れ、右の太陽が見える
+       ダーク(つまみ右) 38px 〜 67px   → 右の太陽が隠れ、左の月が見える
+
+     ★左を月、右を太陽にしているのはこのため(並びは base.html)。
+       逆にすると「これから切り替わる先」が見える形になる。
+
+   ★位置を left/right + width: 29px + text-align: center で決めている理由
+
+     つまみが覆う範囲とぴったり同じ大きさの箱を作り、その中で中央ぞろえにしている。
+     こうするとアイコンの字幅がどうであれ
+     ・必ず範囲の中央に来る
+     ・隠れるべきときに端から覗かない
+     の2つが保証される。字の左端を left: 9px のように直接指定すると、
+     アイコンを差し替えるたびに調整が要る。
+
+   ★縦位置は top: 50% + translateY(-50%) でトラックの中央に合わせる。
+
+     文字の ☀ ☾ を使っていたときは 47%(中央より約1px上)にしてあったが、
+     アイコンに変えたら上に寄って見えたので、計算どおりの中央に戻した。
+
+     ★上下にずらしたいときは translateY の値で調整する。
+         transform: translateY(calc(-50% + 1px));   1px下げる
+         transform: translateY(calc(-50% - 1px));   1px上げる
+       top の % をいじるより、何px動かしたいのかが読んで分かる。 */
+.theme-switch__moon,
+.theme-switch__sun{
     position: absolute;
-    left: -24px;
-    top: 47%;
+    top: 50%;
+
+    width: 29px;
+    text-align: center;
 
     transform: translateY(-50%);
 
-    color: #f59e0b;
-    font-size: 15px;
+    font-size: 14px;
+
+    /* ★つまみに隠れている側をクリックできてしまわないようにする。
+         label の中なので押せば切り替わるが、
+         アイコンの上だけカーソルが変わるのを防ぐ意味もある。 */
+    pointer-events: none;
 }
 
-.theme-switch__label::after{
-    content: "☾";
+/* ダーク時に見える側。トラックの #64748b に対してコントラスト比 4.8。 */
+.theme-switch__moon{
+    left: 3px;
 
-    position: absolute;
-    right: -17px;
-    top: 47%;
+    color: #ffffff;
+}
 
-    transform: translateY(-50%);
+/* ★ライト時に見える側。
+     白のままだとトラックの #FFEF6C に対して 1.2 しかなく、ほぼ同化する。
+     濃いアンバーにして 6.0 を確保している。 */
+.theme-switch__sun{
+    right: 3px;
 
-    color: #94a3b8;
-    font-size: 16px;
+    color: #92400e;
 }
 
 .theme-switch__label span{
@@ -107,8 +145,22 @@ nav a{
     transition: .3s;
 
     box-shadow: 0 2px 8px rgba(0,0,0,.25);
+
+    /* ★つまみを必ずアイコンより前に出すための保険。
+         位置を指定した要素どうしは、指定が無ければ「後に書いたほうが上」になる。
+         今は base.html でアイコン→つまみの順に並べてあるので効いているが、
+         順番を入れ替えるとアイコンが白いつまみを突き抜ける。 */
+    z-index: 1;
 }
 
+/* ▼ ここから下がダークモード(= つまみが右)のとき
+
+   ★body.dark ではなく :checked を使っているのは、
+     つまみの移動やトラックの色と同じ仕組みでそろえるため。
+     script.js が body.dark とチェック状態を必ず一緒に切り替えている。
+
+   ★アイコンの色はモードで変えないので、ここには色の指定が無い。
+     見えるほうが入れ替わるだけで、それぞれの色は固定でよい。 */
 .theme-switch__input:checked
 + .theme-switch__label{
     background-color: #64748b;
@@ -118,6 +170,7 @@ nav a{
 + .theme-switch__label span{
     transform: translateX(35px);
 }
+
 /*ヘッダー：ハンバーガーメニュー*/
 .hamburger-icon {
     display: flex;

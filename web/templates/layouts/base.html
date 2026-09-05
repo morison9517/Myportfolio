@@ -30,7 +30,13 @@
      ========================================================================== */}}
 <!DOCTYPE html>
 {{/* fade-hold … フォント待ちのふわっと(font-fade)を、
-     この画面が実際に映るまで待たせておくための印。下の<script>が外す。 */}}
+     この画面が実際に映るまで待たせておくための印。下の script タグが外す。
+
+     ★ここで「<」「>」で囲んだタグ名を書かないこと。
+       Goはこのコメントごと出力から消すので表示には出ないが、
+       エディタのHTMLパーサーは {{/* */}} を知らないため、
+       本物の開始タグと解釈してファイル末尾まで中身をJavaScript扱いし、
+       赤い波線だらけになる。 */}}
 <html lang="ja" class="fade-hold">
 <head>
     <meta charset="UTF-8">
@@ -198,6 +204,10 @@
                 for="themeSwitch"
                 class="theme-switch__label"
             >
+
+                <i class="fa-solid fa-moon theme-switch__moon" aria-hidden="true"></i>
+                <i class="fa-solid fa-sun theme-switch__sun" aria-hidden="true"></i>
+
                 <span></span>
             </label>
         </div>

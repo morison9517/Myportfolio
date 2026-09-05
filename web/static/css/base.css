@@ -1,12 +1,12 @@
 /*全体*/
 :root{
-    --bg-color: #fffef9;
+    --bg-color: #fffef2;
     --text-color: #111827;
     --card-color: #f3f4f6;
     --accent-color: #00752b;
     --hover-color: #353535;
 
-    --header-bg: rgba(255, 255, 255, 0.65);
+    --header-bg: rgba(255, 254, 242, 0.65);
 
     /* ★ブラウザに「今どちらのテーマか」を伝える。
          入力欄のカーソル、選択中の文字の背景、スクロールバーなどは
@@ -15,7 +15,7 @@
     color-scheme: light;
 
     /* ★入力欄の枠の色。
-         入力欄の背景(--card-color #f3f4f6)とページの背景(--bg-color #fffef9)は
+         入力欄の背景(--card-color #f3f4f6)とページの背景(--bg-color #fffef2)は
          ライトモードだとほとんど同じ明るさで、枠が無いとどこが入力欄か分からない。
          背景だけに頼らず、はっきりした線を引くための色。 */
     --field-border: #d1d5db;

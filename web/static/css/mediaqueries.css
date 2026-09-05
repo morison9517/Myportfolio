@@ -114,14 +114,6 @@
         max-width: 100%;
     }
 
-    /* ★縦積みにすると画像が左端に張り付く。
-         .about-content は align-items: flex-start なので、
-         横並びのときは「上ぞろえ」だった指定が、
-         縦積みでは「左ぞろえ」に変わるため。
-
-       ★align-items ごと center にしないのは、それだと本文まで
-         中央ぞろえの箱になってしまい、テキストの左端がそろわなくなるから。
-         align-self で画像だけを動かす。 */
     .about-image {
         align-self: center;
     }

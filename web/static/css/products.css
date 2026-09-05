@@ -27,14 +27,7 @@
      768px 以下    スマホ               1列×4行(縦積み)
 
    既定を2列にして、上下の端を mediaqueries.css で上書きしている。
-
-   ★max-width で横幅を抑えて中央に置く。
-     これが無いと #products の幅いっぱい(画面の80%)まで広がり、
-     カード1枚が画面を占領する。
-
-   ★margin-top の 3rem と上の h2 の margin-bottom(3.5rem)は
-     隣り合うきょうだい同士なので相殺され、間隔は大きいほうの
-     3.5rem になる。足し算で 6.5rem にはならない。 */
+ */
 .products-grid {
     list-style: none;
     padding: 0;

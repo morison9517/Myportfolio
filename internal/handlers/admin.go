@@ -356,6 +356,7 @@ func inquiryReply(c *gin.Context, cfg *config.Config) {
 //	「何についての返事か」を思い出せるようにするため。
 func buildReplyBody(inquiry models.Inquiry, reply string) string {
 	return fmt.Sprintf(`%s 様
+
 この度はお問い合わせいただき誠にありがとうございます。
 
 

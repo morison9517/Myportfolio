@@ -105,6 +105,65 @@
         background-attachment: scroll;
     }
 
+    /* ▼ Welcome の見出し
+       ★4rem のままだと「Welcome to My Portfolio!」がスマホ幅で必ず折り返す。
+
+         clamp(最小, 画面幅に連動, 最大)
+
+         真ん中を vw(画面幅の割合)にすると、画面が狭いほど字も小さくなるので、
+         幅が変わっても1行の長さがだいたい一定に保たれる。
+
+       ★6.4vw の出どころ
+         この文は24文字。この書体だと1文字あたり約0.55em なので、
+         必要な横幅は文字サイズの約13倍。
+           390px の端末 … 6.4vw = 25px → 25 × 13 = 325px(画面内に収まる)
+           320px の端末 … 6.4vw = 20px → 20 × 13 = 266px(同上)
+         ★文言を長くするときはこの数字も下げること。上げると折り返す。
+
+       ★上限 2.6rem は、768px 付近で間延びさせないための頭打ち。 */
+    .hero h1 {
+        font-size: clamp(1.5rem, 6.4vw, 2.6rem);
+
+        /* 上の計算どおりなら折り返さないが、念のため1行に固定する。 */
+        white-space: nowrap;
+    }
+
+    .hero p {
+        font-size: clamp(1.15rem, 4vw, 1.6rem);
+    }
+
+    /* ▼ ハンバーガーメニュー
+       ★320px 固定だと、幅390pxのスマホでは画面の8割を覆ってしまう。
+         画面幅に対する割合で決めて、後ろのページが見える余地を残す。 */
+    .menu-links {
+        width: min(62vw, 260px);
+        padding-top: 80px;
+    }
+
+    .menu-links h1 {
+        font-size: 2rem;
+        margin-top: 30px;
+        margin-bottom: 24px;
+    }
+
+    .menu-links a {
+        font-size: 1.05rem;
+    }
+
+    .menu-links li {
+        margin: 14px 0;
+    }
+
+    /* ▼ 各セクションの見出し(PCでは 3rem)。
+         スマホ幅では 3rem だと画面の横幅をほぼ埋めてしまうので下げる。
+         ★#contact h2 もこのファイルの下のほうで同じ値にそろえてある。 */
+    #about h2,
+    #skills h2,
+    #products h2,
+    #experience h2 {
+        font-size: 2.2rem;
+    }
+
     .about-content {
         flex-direction: column;
         gap: 2rem;
@@ -138,6 +197,14 @@
         height: 58px;
         border-radius: 11px;
         padding: 9px;
+    }
+
+    /* Read More >> の文字の大きさ */
+    .skills-more a,
+    .skills-more a:visited,
+    .products-more a,
+    .products-more a:visited {
+        font-size: 1.1rem;
     }
 
     /* Products:2列×2行 → 1列×4行
@@ -180,7 +247,26 @@
     }
 
     .timeline-year {
-        font-size: 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* 「2006~2020」など長い年。上を下げたぶん、こちらも同じ比率で下げる。 */
+    .timeline-gap .timeline-year {
+        font-size: 0.7rem;
+    }
+
+    /* 年表の中身。PCの 1.5rem / 1.05rem は狭い画面だと詰まって見える。 */
+    .timeline-body h3 {
+        font-size: 1.15rem;
+    }
+
+    .timeline-body p {
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+
+    .timeline-links {
+        font-size: 0.85rem;
     }
 
     /* Contact */
@@ -188,6 +274,8 @@
         padding: 80px 6%;
     }
 
+    /* ★上の #about h2 などと同じ値。片方だけ変えるとセクションごとに
+         見出しの大きさが揃わなくなる。 */
     #contact h2 {
         font-size: 2.2rem;
     }

@@ -37,8 +37,7 @@ var cfg *config.Config
 // defaultDescription = 説明文を渡さなかったページで使われる文章。
 //
 // ★120文字前後に収めること。長いと検索結果で途中から切られる。
-const defaultDescription = "Webエンジニアを目指す専門学生 Kota Morito のポートフォリオです。" +
-	"Go言語を中心としたバックエンド開発の作品と経歴を掲載しています。"
+const defaultDescription = "エンジニアを目指すとある専門学生のポートフォリオ"
 
 // siteURL = 「https://ドメイン」までを組み立てる。
 //

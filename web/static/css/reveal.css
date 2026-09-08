@@ -80,14 +80,14 @@ html.reveal :where(
 /* 見出しの次に出るものは、その --reveal-lead 後。 */
 html.reveal :where(
     .about-text,
-    .skills-more,
     .contact-form
 ) {
     --reveal-delay: calc(var(--reveal-lead) * 2);
 }
 
-/* --reveal-step(何番目か)は reveal.js が入れる。 */
-html.reveal :where(.skill-card, .product-card, .products-more) {
+/* --reveal-step(何番目か)は reveal.js が入れる。
+   Read More はカードの続きとして出すので、同じ計算式を使う。 */
+html.reveal :where(.skill-card, .product-card, .skills-more, .products-more) {
     --reveal-delay: calc(var(--reveal-lead) * 2 + var(--reveal-step, 0s));
 }
 

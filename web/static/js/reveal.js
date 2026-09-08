@@ -28,37 +28,50 @@
         return raw.endsWith("ms") ? value : value * 1000;
     })();
 
-    /* ---------- 順番に出すもの ----------
-       ★何番目かをHTMLに書かないこと。カードを1枚足すたびに書き直しになる。 */
-    const productCardGroup = { selector: "#products .product-card", step: 0.1 };
+    /* ---------- カードを順番に出すセクション ----------
+       Skills と Products は作りが同じなので、1つの表で扱う。
 
-    const staggerGroups = [
-        { selector: "#skills .skill-card", step: 0.06 },
-        productCardGroup,
+       step … カード1枚あたり何秒ずらすか
+       more … 一覧の下にある「Read More」
+
+       ★何番目かをHTMLに書かないこと。カードを1枚足すたびに書き直しになる。 */
+    const cardGroups = [
+        {
+            cards: "#skills .skill-card",
+            step: 0.06,
+            grid: "#skills .skills-grid",
+            more: "#skills .skills-more",
+        },
+        {
+            cards: "#products .product-card",
+            step: 0.1,
+            grid: "#products .products-grid",
+            more: "#products .products-more",
+        },
     ];
 
-    staggerGroups.forEach((group) => {
-        document.querySelectorAll(group.selector).forEach((card, index) => {
+    cardGroups.forEach((group) => {
+        const cards = document.querySelectorAll(group.cards);
+
+        cards.forEach((card, index) => {
             card.style.setProperty(
                 "--reveal-step",
                 `${(index * group.step).toFixed(2)}s`
             );
         });
+
+        /* Read More は自分が画面に入るのを待たず、最後のカードの0.3秒後に続けて出す。 */
+        const more = document.querySelector(group.more);
+
+        if (more && cards.length > 0) {
+            const lastStep = (cards.length - 1) * group.step;
+
+            more.style.setProperty(
+                "--reveal-step",
+                `${(lastStep + 0.3).toFixed(2)}s`
+            );
+        }
     });
-
-    /* Read More は自分が画面に入るのを待たず、最後の作品の0.3秒後に続けて出す。 */
-    const productsGrid = document.querySelector("#products .products-grid");
-    const productsMore = document.querySelector("#products .products-more");
-    const productCards = document.querySelectorAll(productCardGroup.selector);
-
-    if (productsMore && productCards.length > 0) {
-        const lastStep = (productCards.length - 1) * productCardGroup.step;
-
-        productsMore.style.setProperty(
-            "--reveal-step",
-            `${(lastStep + 0.3).toFixed(2)}s`
-        );
-    }
 
     /* ---------- 年表 ----------
        線がマークに届く瞬間にマークを出したいので、
@@ -115,7 +128,6 @@
 
         "#skills h2",
         "#skills .skills-grid",
-        "#skills .skills-more",
 
         "#products h2",
         "#products .products-grid",
@@ -125,6 +137,25 @@
         "#contact h2",
         "#contact .contact-form",
     ];
+
+    /* 一覧が出たときに、一緒に出す Read More の対応表。
+       ★一覧が無いセクションでは合図の出しようがないので、そのときだけ単独で見張る。 */
+    const moreByGrid = new Map();
+
+    cardGroups.forEach((group) => {
+        const grid = document.querySelector(group.grid);
+        const more = document.querySelector(group.more);
+
+        if (!more) {
+            return;
+        }
+
+        if (grid) {
+            moreByGrid.set(grid, more);
+        } else {
+            watched.push(group.more);
+        }
+    });
 
     const onEnter = (entries, self) => {
         const entering = entries
@@ -140,8 +171,10 @@
         entering.forEach((target) => {
             target.classList.add("is-visible");
 
-            if (target === productsGrid && productsMore) {
-                productsMore.classList.add("is-visible");
+            const more = moreByGrid.get(target);
+
+            if (more) {
+                more.classList.add("is-visible");
             }
 
             self.unobserve(target);
@@ -159,11 +192,7 @@
     const observer = makeObserver("-25%");
 
     /* 年表は項目の途中から文字が出るので、判定線をその分だけ上げる。 */
-    const timelineObserver = makeObserver("-50%");
-
-    if (!productsGrid) {
-        watched.push("#products .products-more");
-    }
+    const timelineObserver = makeObserver("-45%");
 
     document.querySelectorAll(watched.join(", ")).forEach((target) => {
         observer.observe(target);

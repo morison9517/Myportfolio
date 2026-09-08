@@ -38,6 +38,8 @@ import (
 //  3. その関数を下に書く
 func RegisterPageRoutes(r *gin.Engine) {
 	r.GET("/", index)
+	r.GET("/privacy", privacy)
+	r.GET("/terms", terms)
 	r.GET("/health", health)
 }
 
@@ -54,6 +56,28 @@ func RegisterPageRoutes(r *gin.Engine) {
 //	  下層ページを作るときは "Title": "Products" のように渡す。
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", view.Page(c, nil))
+}
+
+// privacy = プライバシーポリシー。
+//
+//	フッター(base.html)の「プライバシーポリシー」から開く。
+//
+//	★Title を渡している。
+//	  トップページと違い、下層ページは <title> に名前を出したいので
+//	  "プライバシーポリシー | mrrn.jp" になるようにしている。
+func privacy(c *gin.Context) {
+	c.HTML(http.StatusOK, "privacy.html", view.Page(c, gin.H{
+		"Title": "プライバシーポリシー",
+	}))
+}
+
+// terms = 利用規約。
+//
+//	フッター(base.html)の「利用規約」から開く。中身の作りは privacy と同じ。
+func terms(c *gin.Context) {
+	c.HTML(http.StatusOK, "terms.html", view.Page(c, gin.H{
+		"Title": "利用規約",
+	}))
 }
 
 // health = 動作確認用。

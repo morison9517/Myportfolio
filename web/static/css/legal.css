@@ -1,0 +1,187 @@
+/*legal page(プライバシーポリシー / 利用規約 共通)*/
+/* ★このCSSはこの2枚でしか使わないので、base.html には書かず
+     pages/privacy.html と pages/terms.html の head_extra から読み込んでいる。
+     (error.css と同じ扱い)
+
+   ★2枚で1つのファイルを共有している。
+     見出しの大きさも余白も同じものにしたいので、
+     別々に書くと片方だけ直して食い違う事故が起きる。 */
+#legal {
+    background-color: var(--bg-color);
+
+    /* ★上だけ余白が大きい理由
+         ヘッダーは position: fixed で画面に貼り付いており、
+         ページの高さを取らない。100px にすると見出しがヘッダーの下に潜る。 */
+    padding: 140px 10% 100px;
+
+    transition: background-color var(--theme-fade);
+}
+
+/* 本文の幅。1行が長すぎると目が次の行の頭に戻れなくなるので、
+   画面が広くても 800px で止めて中央に置く。 */
+#legal .container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ★以下の --fade-delay が、上から順に出すときの待ち時間。
+     数字を大きくするほど後に出る。仕掛け(font-fade)は base.css。
+
+   ★本文(.legal-body)は段落ごとに分けず、まとめて1つで出している。
+     条文の数だけずらすと、最後の条が出るまで何秒も待つことになる。 */
+
+/* ページの題名(「プライバシーポリシー」など)。 */
+#legal h1 {
+    margin: 0;
+
+    font-size: 2.5rem;
+    letter-spacing: 0.03em;
+
+    --fade-delay: 0.1s;
+}
+
+/* 題名のすぐ下に置く前書き。 */
+.legal-lead {
+    margin: 1.5rem 0 0;
+
+    line-height: 1.9;
+
+    --fade-delay: 0.3s;
+}
+
+/* 条文の本体。 */
+.legal-body {
+    margin-top: 3rem;
+
+    /* 章番号を数える入れ物を用意する。下の h2 で1つずつ増やす。 */
+    counter-reset: legal-section;
+
+    --fade-delay: 0.45s;
+}
+
+/* 各条の見出し。
+   ★番号は手で書かず counter で振っている。
+     手で「1.」「2.」と書くと、後から条を1つ足したり順番を入れ替えたときに
+     以降の番号を全部書き直すことになり、必ずどこかがずれる。 */
+.legal-body h2 {
+    counter-increment: legal-section;
+
+    margin: 2.5rem 0 0.8rem;
+
+    font-size: 1.3rem;
+
+    /* 見出しと本文の切れ目をはっきりさせるための下線。
+         色は文字色から作るので、ライト/ダークどちらでも薄い線になる。 */
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--field-border);
+
+    transition: border-color var(--theme-fade);
+}
+
+.legal-body h2::before {
+    content: counter(legal-section) ". ";
+}
+
+/* 条の中に小見出しを置きたいとき用(番号は振らない)。 */
+.legal-body h3 {
+    margin: 1.8rem 0 0.5rem;
+    font-size: 1.05rem;
+}
+
+.legal-body p {
+    margin: 0 0 1rem;
+    line-height: 1.9;
+}
+
+/* 箇条書き。行間は本文と同じにして、まとまって見えるようにする。 */
+.legal-body ul {
+    margin: 0 0 1rem;
+    padding-left: 1.4rem;
+}
+
+.legal-body li {
+    margin-bottom: 0.5rem;
+    line-height: 1.9;
+}
+
+/* 本文中のリンク。色は #about の外部リンクと同じ。 */
+.legal-body a,
+.legal-body a:visited {
+    color: #2997ff;
+
+    text-decoration: underline;
+
+    transition: color 0.15s ease;
+}
+
+.legal-body a:hover {
+    color: var(--hover-color);
+}
+
+/* 外部サイトへ出ることを示すアイコン(フッターのクレジットと同じ使い方)。 */
+.legal-body .external-link-icon {
+    font-size: 0.7rem;
+    margin-left: 3px;
+}
+
+/* 制定日。本文より小さく、少し薄くして添え書きに見せる。
+   ★opacity ではなく color の透明度で薄くする。
+     opacity は font-fade(表示するときのふわっと)が使っているので、
+     ここで指定すると打ち消し合ってしまう(error.css の .error-message と同じ)。 */
+.legal-date {
+    margin: 3rem 0 0;
+
+    font-size: 0.85rem;
+    text-align: right;
+
+    color: color-mix(in srgb, var(--text-color) 65%, transparent);
+}
+
+/* ホームへ戻るリンク。エラーページと同じ役割なので見た目もそろえてある。 */
+.legal-home,
+.legal-home:visited {
+    /* ★inline-block にすること。
+         font-fade の「下から20pxずらして出す」は transform で行っているが、
+         transform は inline の要素には効かない(error.css の .error-home と同じ)。 */
+    display: inline-block;
+
+    margin: 3rem 0 0;
+
+    color: #2997ff;
+
+    transition: color 0.15s ease;
+
+    --fade-delay: 0.6s;
+}
+
+.legal-home:hover {
+    color: var(--hover-color);
+}
+
+/* ---------- スマホ用 ---------- */
+/* ★★このページの画面幅の調整だけは mediaqueries.css ではなくここに書く。
+     legal.css は head_extra から読み込まれるので mediaqueries.css より後になり、
+     あちらに #legal を書いても、こちらの指定に打ち消されてしまうため
+     (error.css と同じ事情)。 */
+@media (max-width: 768px) {
+    #legal {
+        padding: 110px 6% 80px;
+    }
+
+    #legal h1 {
+        font-size: 1.8rem;
+    }
+
+    .legal-lead {
+        font-size: 0.95rem;
+    }
+
+    .legal-body h2 {
+        font-size: 1.15rem;
+    }
+
+    .legal-body p,
+    .legal-body li {
+        font-size: 0.95rem;
+    }
+}

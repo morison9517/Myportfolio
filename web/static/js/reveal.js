@@ -91,16 +91,12 @@
 
     let timelineNext = 0;
 
-    /* 前の項目の revealLead 後に出す。まとめて入ってきても必ず上から順になる。 */
+    /* 1件目は待たずに出し、2件目からは前の項目の revealLead 後に出す。
+       まとめて入ってきても必ず上から順になる。 */
     const queueTimelineItem = (item) => {
         setMarkProgress(item);
 
         const now = performance.now();
-
-        if (timelineNext === 0) {
-            timelineNext = now + revealLead * 2;
-        }
-
         const start = Math.max(now, timelineNext);
 
         item.style.setProperty(

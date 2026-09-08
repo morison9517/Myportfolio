@@ -60,6 +60,11 @@ html.reveal :where(#about, #skills, #products, #experience, #contact) h2 {
     --reveal-delay: var(--reveal-lead);
 }
 
+/* 年表だけは待たずに出す(線を引く動きがあるぶん、間が空いて見えるため)。 */
+html.reveal #experience h2 {
+    --reveal-delay: 0s;
+}
+
 /* 本文・カード類は下から上へ。#welcome の文字と同じ動き。 */
 html.reveal :where(
     .about-text,

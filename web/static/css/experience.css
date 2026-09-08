@@ -100,12 +100,45 @@
 
 /* ★下の余白を margin ではなく padding にしている理由
      margin にすると項目と項目の間に隙間ができ、そこで縦線が途切れる。
-     padding なら border が下まで伸びるので、線が1本につながる。 */
+     padding なら線が下まで伸びるので、線が1本につながる。 */
 .timeline-body {
-    border-left: 2px solid rgba(249, 250, 251, 0.5);
+    /* ★線そのものは下の ::after が引く。ここの border は場所取り専用で透明。
+
+         border を残しているのは、線のぶんの幅(2px)を今までどおり
+         レイアウトに含めるため。太さを変えるときは
+         ここと ::after の width の両方を直すこと。 */
+    border-left: 2px solid transparent;
     padding: 0 0 var(--gap-bottom) 1.75rem;
 
     position: relative;
+}
+
+/* 縦線の本体。
+   ★border ではなく要素として描いている理由
+     border は「途中まで引く」ができない。要素にしておくと、
+     見えている範囲を clip-path で変えられるので、
+     スクロールに合わせて上から下へ引く動きが作れる(reveal.css)。
+
+   ★left: -2px … 透明にした border の位置にぴったり重ねる。
+     絶対配置の基準は .timeline-body の padding の外枠なので、
+     そこから2px 左に出すと border と同じ場所になる。
+
+   ★z-index: 0 … 丸(::before)より後ろに置く。
+     ::after は ::before より後に描かれるので、
+     指定しないと線が丸の真ん中を横切ってしまう。 */
+.timeline-body::after {
+    content: "";
+
+    position: absolute;
+    left: -2px;
+    top: 0;
+
+    width: 2px;
+    height: 100%;
+
+    background-color: rgba(249, 250, 251, 0.5);
+
+    z-index: 0;
 }
 
 /* 縦線の上に載せる丸。タイトル＋説明の中央に置く。 */
@@ -124,18 +157,17 @@
     background-color: var(--accent-color);
     border: 2px solid #f9fafb;
     box-sizing: border-box;
+
+    /* ★線(::after)より前に出す。指定が無いと線が丸の真ん中を横切る。 */
+    z-index: 1;
 }
 
-/* ★borderは色を1色しか持てず、途中から薄くできない。
-     そこで破断線と同じ手法で、borderは透明にして消し、
-     線をグラデーションとして背景に描いている。 */
-.timeline-item:last-child .timeline-body {
-    border-left-color: transparent;
-
-    background-origin: border-box;
-    background-repeat: no-repeat;
-    background-size: 2px 100%;
-    background-position: 0 0;
+/* ★単色は色を1色しか持てず、途中から薄くできない。
+     そこで破断線と同じ手法で、線をグラデーションに差し替えている。
+     グラデーションの 100% は線(::after)自身の高さなので、
+     項目の高さが変わっても末端の薄れ方は変わらない。 */
+.timeline-item:last-child .timeline-body::after {
+    background-color: transparent;
 
     background-image: linear-gradient(
         to bottom,
@@ -159,26 +191,20 @@
       ～      ← 破断マーク(ここで省略している)
        │      ← 下の線
 
-   ▼ ★なぜ border ではなく背景のグラデーションで線を引くか
+   ▼ ★なぜ単色ではなくグラデーションで線を引くか
 
-     border-left は1本しか引けず、途中で切ることができない。
-     そこで border は透明にして消し、
-     「線の色 → 途中だけ透明 → 線の色」というグラデーションで描いている。
+     単色の線は途中で切ることができない。
+     そこで「線の色 → 途中だけ透明 → 線の色」というグラデーションで描いている。
      色の切り替え位置を指定できるので、狙った場所でちょうど切れる。
 
-   ▼ ★なぜ波だけ疑似要素なのか
+   ▼ ★なぜ波だけ別の疑似要素なのか
 
      背景は要素の外にはみ出せない。
-     波は線より幅が広く左右にはみ出すので、
+     線(::after)は幅2pxしかなく、波は左右にはみ出すので、
      はみ出せる ::before(絶対配置)で描いている。 */
-.timeline-gap .timeline-body {
-    /* 一直線のborderを消す(幅は残るので左右のズレは出ない) */
-    border-left-color: transparent;
-
-    background-origin: border-box;
-    background-repeat: no-repeat;
-    background-size: 2px 100%;
-    background-position: 0 0;
+.timeline-gap .timeline-body::after {
+    /* 一直線の線を消して、切れ目のあるグラデーションに差し替える。 */
+    background-color: transparent;
 
     /* 破断マーク(高さ12px)の上下に4pxずつ余裕を持たせ、
        中央 ±10px の範囲を透明にして線を切っている。 */
@@ -233,7 +259,11 @@
     font-size: 1.05rem;
     line-height: 1.8;
 
-    opacity: 0.85;
+    /* 少しだけ控えめにして、見出し(h3)との差をつける。
+       ★opacity ではなく色の透明度で薄くしている。
+         opacity はスクロールで出すときのふわっと(reveal.css)が使っているので、
+         ここで指定すると打ち消し合い、出たあとに薄くならない。 */
+    color: rgba(249, 250, 251, 0.85);
 }
 
 /* 年表の中に置くリンク(インターン先など)。

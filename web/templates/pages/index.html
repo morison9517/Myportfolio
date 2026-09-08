@@ -1,3 +1,54 @@
+{{/* ==========================================================================
+     このページだけで使うCSSとスクリプト。base.html の head_extra の穴に入る。
+
+     ▼ ★スクロールで順に出す仕掛け(reveal)の入口
+
+       出すかどうかの判断はここでしている。判断の結果を <html> の印にして、
+       見た目は reveal.css、合図は reveal.js が担当する。
+
+       ★<head> に直接書くこと。
+         別ファイルにすると、読み込みを待つ間に本文が一度そのまま表示され、
+         あとから隠れてちらつく。
+     ========================================================================== */}}
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/reveal.css">
+
+    <script>
+      (function () {
+        var html = document.documentElement;
+
+        /* ★ハンバーガーメニューなどから /#about へ直接来た人には動きを付けない。
+
+             見たいところが隠れた状態で始まってしまうため。
+             「#」だけ付いている場合は行き先が無いので、トップ扱いにする。 */
+        var hash = window.location.hash;
+
+        if (hash !== "" && hash !== "#") {
+          return;
+        }
+
+        /* ★OSで「視差効果を減らす」を選んでいる人にも動きを付けない。
+             大きく動く画面は、めまいや乗り物酔いの原因になることがある。
+             (base.css の font-fade と同じ扱い) */
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          return;
+        }
+
+        html.classList.add("reveal");
+
+        /* ★保険。reveal.js を読み込めなかったときのため。
+
+             印を付けた時点で対象は透明になっている。合図を出す係が
+             来なければ、そのまま何も見えないページになってしまう。
+             5秒経っても連絡が無ければ印を外し、全部そのまま出す。
+             (Adobe Fonts の scriptTimeout と同じ考え方) */
+        window.revealFallbackTimer = setTimeout(function () {
+          html.classList.remove("reveal");
+        }, 5000);
+      })();
+    </script>
+{{ end }}
+
 {{ define "content" }}
         {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
              出る順番は welcome.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
@@ -579,4 +630,9 @@
     {{ end }}
 
     <script src="/static/js/contact.js"></script>
+
+    {{/* reveal.js = スクロールで画面に入ってきた要素を出す係。
+         ★<head> で <html> に reveal の印が付いたときだけ働く。
+           印が無いときは何もしない(全部そのまま表示される)。 */}}
+    <script src="/static/js/reveal.js"></script>
 {{ end }}

@@ -98,7 +98,13 @@ docker compose -f compose.prod.yml ps
 
 ---
 
-## 3. コードを直したとき
+## 3. 公開後にサイトを直したとき
+
+### 流れ
+
+1. **手元(自分のPC)で直す**
+2. **コミットして push する**
+3. **サーバーに入って、下の2行を打つ**
 
 ```bash
 git pull
@@ -106,6 +112,79 @@ docker compose -f compose.prod.yml up -d --build
 ```
 
 **この2行だけです。** DBの表づくりは起動時に自動で走ります。
+
+> ★手元で直しただけでは反映されません。**push を忘れると `git pull` で何も落ちてきません。**
+
+---
+
+### 直した場所によって、必要な操作が違う
+
+| 直した場所 | 中身 | 必要な操作 |
+| --- | --- | --- |
+| `web/static/` | CSS・JS・画像 | **`git pull` だけ**(build 不要) |
+| `web/templates/` | HTML | `git pull` + **build し直し** |
+| `internal/` `cmd/` | Goのプログラム | `git pull` + **build し直し** |
+| `.env` | 設定・パスワード | サーバー上で直接編集 + `up -d`(build 不要) |
+
+**CSSと画像だけが特別扱いです。**
+`compose.prod.yml` で Nginx がサーバー上のフォルダを直接見ているため
+(`./web/static:/var/www/static:ro`)、`git pull` した瞬間に新しいものが配られます。
+
+一方 HTML は Dockerfile の `COPY web ./web` で箱の中に焼き込まれるので、
+build し直さないと古いままです。
+
+> ★迷ったら `up -d --build` を打って構いません。
+> 必要のないときでも、無駄になるだけで害はありません。
+
+---
+
+### よく直す場所の早見表
+
+| やりたいこと | 直すファイル | build |
+| --- | --- | --- |
+| 作品(Products)を追加・修正 | `internal/models/product.go` | 要 |
+| 経歴・自己紹介・スキル | `web/templates/pages/index.html` | 要 |
+| プライバシーポリシー・利用規約 | `web/templates/pages/privacy.html` `terms.html` | 要 |
+| タブに出るサイト名 | `internal/view/page.go` の `SiteName` | 要 |
+| 色・余白・アニメーションの速さ | `web/static/css/` の各ファイル | 不要 |
+| 作品やスキルの画像を差し替え | `web/static/images/` | 不要 |
+
+---
+
+### ★CSSを直したときの落とし穴(キャッシュ)
+
+`docker/nginx/prod.conf` に `expires 30d` があるため、
+**一度サイトを見た人のブラウザは、最大30日間 古いCSSを使い続けます。**
+
+自分で確認するときは `Ctrl + F5`(スーパーリロード)で最新が見られますが、
+**すでに見た人には届きません。**
+
+確実に配りたいときは、`web/templates/layouts/base.html` の読み込みに
+バージョンを付けて、直すたびに数字を上げます。
+
+```html
+<link rel="stylesheet" href="/static/css/base.css?v=2">
+```
+
+別のファイル扱いになるので、全員に新しいものが届きます。
+(この場合はHTMLの変更なので build が要ります)
+
+---
+
+### 反映されたか確かめる
+
+```bash
+docker compose -f compose.prod.yml ps            # db / web / nginx が running か
+docker compose -f compose.prod.yml logs -f web   # 起動時のエラーが出ていないか
+```
+
+ブラウザで開くときは、**必ず `Ctrl + F5`** で開いてください。
+普通の再読み込みだと、手元のブラウザが古いCSSを使い、
+「直したのに変わらない」と勘違いします。
+
+---
+
+### DBの列を増やしたとき
 
 > ★GORMの `AutoMigrate` は、列を**増やす**ことはできますが、
 > 型を変えたり列を消したりはしません。
@@ -158,6 +237,7 @@ HTTPSでない経路でも送られてしまいます。**
 | やりたいこと | コマンド |
 | --- | --- |
 | 起動 | `docker compose -f compose.prod.yml up -d --build` |
+| 直したものを反映(→ 3章) | `git pull` してから同じコマンド |
 | 停止 | `docker compose -f compose.prod.yml down` |
 | 状態を見る | `docker compose -f compose.prod.yml ps` |
 | ログを見る | `docker compose -f compose.prod.yml logs -f web` |

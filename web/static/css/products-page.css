@@ -1,0 +1,105 @@
+/* ===========================================================================
+   products-page = 作品の一覧ページ(/products)
+   ===========================================================================
+
+   ★カードの見た目そのものは products.css です。
+     あちらは base.html から全ページ共通で読み込まれているので、
+     ここでは「このページだけの事情」だけを書いています。
+
+       ・ヘッダーのぶんの上余白
+       ・見出し(h1)の大きさ
+       ・戻るリンク
+
+   ★このCSSは head_extra から読み込まれるので mediaqueries.css より後になる。
+     画面幅の調整もこのファイルの末尾に書くこと
+     (error.css・legal.css と同じ事情)。
+   =========================================================================== */
+
+/* 一覧・詳細に共通の外枠。
+   ★上だけ余白が大きいのは、ヘッダーが position: fixed で
+     ページの高さを取らないため(legal.css と同じ)。 */
+.sub-page {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    /* 画面が短いときでもフッターが上に来ないよう、最低限の高さを持たせる。 */
+    min-height: 100vh;
+    box-sizing: border-box;
+
+    padding: 140px 10% 100px;
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
+}
+
+/* ★#products の指定を打ち消す。
+     一覧ページはトップの Products セクションと同じ id を使って
+     カードのCSSをそのまま借りているが、余白まで借りると
+     ヘッダーの下に潜ってしまう。 */
+#products.sub-page {
+    padding: 140px 10% 100px;
+}
+
+.sub-page .container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ページの題名。トップの h2(3rem)より一段小さくして、
+   下層ページであることを見た目でも分かるようにする。 */
+.sub-page h1 {
+    margin: 0 0 3rem;
+
+    font-size: 2.5rem;
+    text-align: center;
+
+    --fade-delay: 0.15s;
+}
+
+/* ---------- 一覧ページ ---------- */
+
+/* ★カードを1枚ずつずらして出すのはトップページだけ(reveal.css)。
+     こちらは一覧なので、まとめて1回で出す。 */
+.sub-page .products-grid {
+    margin-top: 0;
+
+    --fade-delay: 0.3s;
+}
+
+/* ---------- 戻るリンク ----------
+
+   ★見た目は Products セクションの「Read More」(.products-more)と同じ。
+     大きさ・太さ・色・中央ぞろえを、あちらに合わせてある。
+     片方だけ直すと見た目がずれるので、変えるときは両方そろえること。 */
+.sub-page-more {
+    margin-top: 3rem;
+    text-align: center;
+
+    --fade-delay: 0.45s;
+}
+
+.sub-page-more a,
+.sub-page-more a:visited {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2997ff;
+
+    transition: color 0.15s ease;
+}
+
+.sub-page-more a:hover {
+    color: var(--hover-color);
+}
+
+/* ---------- スマホ用 ---------- */
+@media (max-width: 768px) {
+    .sub-page,
+    #products.sub-page {
+        padding: 110px 6% 80px;
+    }
+
+    .sub-page h1 {
+        font-size: 1.8rem;
+    }
+}

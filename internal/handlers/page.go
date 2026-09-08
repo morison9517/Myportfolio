@@ -27,6 +27,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"case_gin/internal/models"
 	"case_gin/internal/view"
 )
 
@@ -38,6 +39,7 @@ import (
 //  3. その関数を下に書く
 func RegisterPageRoutes(r *gin.Engine) {
 	r.GET("/", index)
+	r.GET("/products", products)
 	r.GET("/privacy", privacy)
 	r.GET("/terms", terms)
 	r.GET("/health", health)
@@ -55,7 +57,25 @@ func RegisterPageRoutes(r *gin.Engine) {
 //	  元サイトと同じ「mrrn.jp」のままにするため、あえて空にしている。
 //	  下層ページを作るときは "Title": "Products" のように渡す。
 func index(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", view.Page(c, nil))
+	c.HTML(http.StatusOK, "index.html", view.Page(c, gin.H{
+		// 作品の一覧。中身は internal/models/product.go にまとめてある。
+		"Products": models.Products,
+	}))
+}
+
+// products = 作品の一覧ページ(/products)。
+//
+//	トップページの Products セクションと同じ内容を、
+//	同じ順番で並べるだけの画面。読んでいるデータも同じ。
+//
+//	★作品ごとの詳細ページ(/products/Chorus など)はまだ作っていない。
+//	  登録していないURLなので、開かれたら404の画面になる
+//	  (受け皿は error.go の NoRoute)。
+func products(c *gin.Context) {
+	c.HTML(http.StatusOK, "products.html", view.Page(c, gin.H{
+		"Title":    "Products",
+		"Products": models.Products,
+	}))
 }
 
 // privacy = プライバシーポリシー。

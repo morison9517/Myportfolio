@@ -228,7 +228,7 @@
 
     /* 年表は項目の途中(丸の高さ)から文字が出るので、他と同じ判定だと
        出はじめが画面の下に寄りすぎる。判定線をその分だけ上げる。 */
-    const timelineObserver = makeObserver("-45%");
+    const timelineObserver = makeObserver("-50%");
 
     /* 一覧が無ければ合図の出しようがないので、そのときだけ単独で見張る。 */
     if (!productsGrid) {

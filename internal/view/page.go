@@ -56,7 +56,7 @@ func Page(c *gin.Context, data gin.H) gin.H {
 	}
 
 	// ★サイト名はここ1か所(全ページのタイトルとヘッダーに反映される)。
-	data["SiteName"] = "mrrn.jp"
+	data["SiteName"] = "Kota's Portfolio"
 
 	data["CSRFToken"] = middleware.CSRFToken(c)
 	data["Flashes"] = middleware.TakeFlashes(c)

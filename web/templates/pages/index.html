@@ -266,62 +266,38 @@
 
                        置き場所は web/static/images/products/
 
-                     ★中身は仮置きです。実際の作品に書き換えてください。
-                       href="#" もダミーなので、公開URLかGitHubに差し替える。 */}}
+                     ★並びも内容も internal/models/product.go に書いた順・
+                       書いた内容がそのまま出る。
+
+                     ★1件ずつ手で書かないこと。
+                     中身は internal/models/product.go の Products から来ている。
+                     作品を足す・直すときはあちらだけを触れば、
+                     ここと /products と詳細ページの3つに同時に反映される。
+
+                     ★range の中ではドットの意味が「今の1件」に変わる。
+                       .Name や .Date はその1件の項目。 */}}
                 <ul class="products-grid">
-
+                    {{ range .Products }}
                     <li class="product-card">
-                        <a href="#">
-                            <img src="/static/images/products/placeholder1.svg" alt="">
-                            <h3>作品名1</h3>
+                        <a href="/products/{{ .Slug }}">
+                            <img src="/static/images/products/{{ .Image }}" alt="">
+                            <h3>{{ .Name }}</h3>
                         </a>
-                        <p class="product-date">2024年8月</p>
+                        <p class="product-date">{{ .Date }}</p>
                         <p class="product-event">
-                            〇〇ハッカソン
-                            <span class="product-award">最優秀賞</span>
+                            {{ .Event }}
+                            {{/* ★賞が無い作品では span ごと出さない。
+                                 空のspanを残すと余白だけ空く。 */}}
+                            {{ if .Award }}<span class="product-award">{{ .Award }}</span>{{ end }}
                         </p>
                     </li>
-
-                    <li class="product-card">
-                        <a href="#">
-                            <img src="/static/images/products/placeholder2.svg" alt="">
-                            <h3>作品名2</h3>
-                        </a>
-                        <p class="product-date">2025年3月</p>
-                        <p class="product-event">
-                            △△コンテスト
-                        </p>
-                    </li>
-
-                    <li class="product-card">
-                        <a href="#">
-                            <img src="/static/images/products/placeholder3.svg" alt="">
-                            <h3>作品名3</h3>
-                        </a>
-                        <p class="product-date">2025年9月</p>
-                        <p class="product-event">
-                            □□ハッカソン
-                            <span class="product-award">技術賞</span>
-                        </p>
-                    </li>
-
-                    <li class="product-card">
-                        <a href="#">
-                            <img src="/static/images/products/placeholder4.svg" alt="">
-                            <h3>作品名4</h3>
-                        </a>
-                        <p class="product-date">2026年2月</p>
-                        <p class="product-event">
-                            個人開発
-                        </p>
-                    </li>
-
+                    {{ end }}
                 </ul>
 
                 {{/* skills と同じ「Read More」。
-                     ★リンク先の products.html はまだ無い(skills.html と同じ状態)。 */}}
+                     リンク先は一覧ページ(/products)。中身はここと同じ Products。 */}}
                 <div class="products-more">
-                    <a href="products.html">
+                    <a href="/products">
                         Read More &gt;&gt;
                     </a>
                 </div>

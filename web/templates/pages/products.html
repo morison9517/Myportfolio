@@ -1,0 +1,52 @@
+{{/* ==========================================================================
+     products.html = 作品の一覧ページ(/products)
+
+     ★カード1枚の中身はトップページと同じです。
+       CSSも同じ products.css を使っているので、見た目もそろいます。
+       このページだけで使うのは「上の余白」と「戻るリンク」だけ(products-page.css)。
+
+     ▼ 渡ってくる値
+
+       {{ .Products }} … 作品の一覧(internal/models/product.go)
+
+     ★作品を足すときにこのファイルを触る必要はありません。
+       product.go に1件足せば、ここにも自動で出ます。
+     ========================================================================== */}}
+
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/products-page.css">
+{{ end }}
+
+{{ define "content" }}
+        {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
+             出る順番は products-page.css の --fade-delay で決めている。 */}}
+        <section id="products" class="sub-page">
+            <div class="container">
+                <h1 class="font-fade">Products</h1>
+
+                <ul class="products-grid font-fade">
+                    {{ range .Products }}
+                    <li class="product-card">
+                        <a href="/products/{{ .Slug }}">
+                            <img src="/static/images/products/{{ .Image }}" alt="">
+                            <h3>{{ .Name }}</h3>
+                        </a>
+                        <p class="product-date">{{ .Date }}</p>
+                        <p class="product-event">
+                            {{ .Event }}
+                            {{ if .Award }}<span class="product-award">{{ .Award }}</span>{{ end }}
+                        </p>
+                    </li>
+                    {{ end }}
+                </ul>
+
+                {{/* Products セクションの「Read More」と同じ形。
+                     行き先が戻る方向なので矢印だけ左向きにしてある。 */}}
+                <div class="sub-page-more font-fade">
+                    <a href="/">
+                        ホームへ戻る
+                    </a>
+                </div>
+            </div>
+        </section>
+{{ end }}

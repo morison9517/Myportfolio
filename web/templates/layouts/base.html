@@ -37,6 +37,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}</title>
 
+    {{/* 検索結果に出る説明文。中身は internal/view/page.go の Description。 */}}
+    <meta name="description" content="{{ .Description }}">
+
+    {{/* ★同じ内容が複数のURLで開ける場合に、どれが正式かを検索エンジンに伝える。 */}}
+    <link rel="canonical" href="{{ .CanonicalURL }}">
+
+    {{/* ▼ SNSに貼ったときの見え方(OGP)
+
+         ★og:image は絶対URLでないと無視される。
+           SiteURL はアクセスされたURLから組み立てているので、
+           ドメインを変えてもここを直す必要はない。 */}}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ .SiteName }}">
+    <meta property="og:title" content="{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}">
+    <meta property="og:description" content="{{ .Description }}">
+    <meta property="og:url" content="{{ .CanonicalURL }}">
+    <meta property="og:image" content="{{ .SiteURL }}/static/images/ogp.jpg">
+    <meta property="og:locale" content="ja_JP">
+
+    {{/* summary_large_image = 画像を大きく出す形式。 */}}
+    <meta name="twitter:card" content="summary_large_image">
+
     {{/* JavaScriptから送信するときにも整理券(CSRFトークン)が必要なので、
          ここに置いてJS側から読み取れるようにしている(仕掛けは main.js)。
          画面には出ません。 */}}

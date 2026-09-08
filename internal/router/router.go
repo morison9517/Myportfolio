@@ -95,6 +95,11 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	//   ここで応答しておくと、どのURLでもタブにアイコンが出る。
 	r.StaticFile("/favicon.ico", staticDir+"/tabicon.png")
 
+	// --- サイト直下の /robots.txt ---
+	// ★検索エンジンはサイト直下しか見に来ない。
+	//   /static/robots.txt に置いてあっても読まれないので、ここで配る。
+	r.StaticFile("/robots.txt", staticDir+"/robots.txt")
+
 	// --- 利用者が上げたファイル(プロフィールアイコンなど) ---
 	// ★開発モードのときだけ、Ginが自分で画像を配る。
 	//   本番ではNginxが配るので登録しない(compose.prod.yml 参照)。

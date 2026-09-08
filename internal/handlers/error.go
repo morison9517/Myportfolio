@@ -97,7 +97,7 @@ func ShowError(c *gin.Context, status int) {
 	}
 
 	c.HTML(status, "error.html", view.Page(c, gin.H{
-		// ★Title を渡すと <title> が「404 | mrrn.jp」になる。
+		// ★Title を渡すと <title> が「404 | サイト名」になる。
 		"Title": strconv.Itoa(status),
 
 		"ErrorCode":    status,

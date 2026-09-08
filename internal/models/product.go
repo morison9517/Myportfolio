@@ -54,7 +54,7 @@ var Products = []Product{
 		Name:  "Kota's Portfolio",
 		Date:  "2026年9月",
 		Event: "個人開発",
-		Image: "smile.png",
+		Image: "smile.jpg",
 		Body: []string{
 			"説明はまだ書いていません。",
 		},

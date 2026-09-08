@@ -34,6 +34,28 @@ import (
 //	mailer と同じように起動時に1つ預かるほうが変更が小さい。
 var cfg *config.Config
 
+// defaultDescription = 説明文を渡さなかったページで使われる文章。
+//
+// ★120文字前後に収めること。長いと検索結果で途中から切られる。
+const defaultDescription = "Webエンジニアを目指す専門学生 Kota Morito のポートフォリオです。" +
+	"Go言語を中心としたバックエンド開発の作品と経歴を掲載しています。"
+
+// siteURL = 「https://ドメイン」までを組み立てる。
+//
+// ★Nginx を通すと通信は中で http に戻るため、r.TLS だけでは判定できない。
+//
+//	本物の入口が https だったかは X-Forwarded-Proto に入っている
+//	(Nginx が付けている。設定は docker/nginx/prod.conf)。
+func siteURL(c *gin.Context) string {
+	scheme := "http"
+
+	if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+		scheme = "https"
+	}
+
+	return scheme + "://" + c.Request.Host
+}
+
 // Setup = テンプレートを準備する。router.go から呼ばれる。
 func Setup(c *config.Config, templateDir string) (*Renderer, error) {
 	cfg = c
@@ -47,6 +69,9 @@ func Setup(c *config.Config, templateDir string) (*Renderer, error) {
 // 画面から使える共通の値:
 //
 //	{{ .SiteName }}          … サイトの表示名
+//	{{ .Description }}       … 検索結果やSNSに出る説明文
+//	{{ .SiteURL }}           … https://example.com(末尾スラッシュ無し)
+//	{{ .CanonicalURL }}      … 今開いているページの正式なURL
 //	{{ .CSRFToken }}         … フォームに入れる整理券
 //	{{ .Flashes }}           … 「保存しました」などのメッセージ
 //	{{ .RecaptchaSiteKey }}  … スパム対策の鍵(未設定なら空)
@@ -57,6 +82,20 @@ func Page(c *gin.Context, data gin.H) gin.H {
 
 	// ★サイト名はここ1か所(全ページのタイトルとヘッダーに反映される)。
 	data["SiteName"] = "Kota's Portfolio"
+
+	// 検索結果やSNSに出る説明文。
+	// ★ページごとに変えたいときは、ハンドラ側で "Description" を渡す。
+	if _, ok := data["Description"]; !ok {
+		data["Description"] = defaultDescription
+	}
+
+	// SNSに貼ったときの画像やURLは、相対パスでは伝わらない。
+	// ★ドメインを設定に持たず、アクセスされたURLから組み立てている。
+	//   こうしておくと、ドメインを変えても直す場所が無い。
+	base := siteURL(c)
+
+	data["SiteURL"] = base
+	data["CanonicalURL"] = base + c.Request.URL.Path
 
 	data["CSRFToken"] = middleware.CSRFToken(c)
 	data["Flashes"] = middleware.TakeFlashes(c)

@@ -53,9 +53,9 @@ func RegisterPageRoutes(r *gin.Engine) {
 //	"index.html" は web/templates/pages/index.html のこと。
 //
 //	★ここでは Title を渡していない。
-//	  渡すと <title> が「ホーム | mrrn.jp」になってしまうので、
-//	  元サイトと同じ「mrrn.jp」のままにするため、あえて空にしている。
-//	  下層ページを作るときは "Title": "Products" のように渡す。
+//	  渡すと <title> が「ホーム | サイト名」になってしまうので、
+//	  トップはサイト名だけにするため、あえて空にしている。
+//	  下層ページでは "Title": "Products" のように渡す。
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", view.Page(c, gin.H{
 		"Products": models.Products,
@@ -68,8 +68,9 @@ func index(c *gin.Context) {
 //	  登録していないURLなので、開かれたら404になる(受け皿は error.go の NoRoute)。
 func products(c *gin.Context) {
 	c.HTML(http.StatusOK, "products.html", view.Page(c, gin.H{
-		"Title":    "Products",
-		"Products": models.Products,
+		"Title":       "Products",
+		"Description": "これまでに制作した作品の一覧です。ハッカソンやインターンで開発したものを掲載しています。",
+		"Products":    models.Products,
 	}))
 }
 
@@ -78,14 +79,16 @@ func products(c *gin.Context) {
 //	★下層ページは Title を渡す。<title> が「プライバシーポリシー | サイト名」になる。
 func privacy(c *gin.Context) {
 	c.HTML(http.StatusOK, "privacy.html", view.Page(c, gin.H{
-		"Title": "プライバシーポリシー",
+		"Title":       "プライバシーポリシー",
+		"Description": "本サイトにおける個人情報の取り扱いについて定めています。",
 	}))
 }
 
 // terms = 利用規約。作りは privacy と同じ。
 func terms(c *gin.Context) {
 	c.HTML(http.StatusOK, "terms.html", view.Page(c, gin.H{
-		"Title": "利用規約",
+		"Title":       "利用規約",
+		"Description": "本サイトの利用条件を定めています。",
 	}))
 }
 

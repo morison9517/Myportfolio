@@ -50,6 +50,26 @@ services:
     #   (開発用の unless-stopped は「自分で止めたなら戻さない」の意味)
     restart: always
 
+    # ▼ ★メモリの少ないサーバー(1GB)で動かすための設定
+    #
+    #   MySQL 8 は既定のままだと 800MB 近く使い、1GBの機械では
+    #   問い合わせの送信中などにOSに強制終了させられます(OOM)。
+    #   症状は「たまにDBが落ちて502になる」で、原因が分かりにくい。
+    #
+    #     performance-schema … 統計を取る仕組み。既定で 200〜400MB 使う。
+    #                          個人サイトでは使わないので切る。
+    #     innodb-buffer-pool … データを載せておく領域。既定128MBだが
+    #                          明示しておくと将来の既定値変更に振り回されない。
+    #     max-connections    … 同時接続の上限。1接続ごとにメモリを確保するので、
+    #                          Ginの箱1つしか繋がない構成では絞ってよい。
+    #
+    #   ★メモリに余裕のあるサーバー(2GB以上)に移したら、この4行は消してよい。
+    command: >
+      --performance-schema=OFF
+      --innodb-buffer-pool-size=128M
+      --max-connections=30
+      --table-open-cache=200
+
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}

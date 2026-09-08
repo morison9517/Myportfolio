@@ -24,9 +24,123 @@
 
 ---
 
+## 0. AWS EC2 にサーバーを立てる(初回だけ)
+
+> このプロジェクトは **AWS EC2 の無料枠(1GB)** で動かす前提で書いています。
+> 別のサーバーを使う場合、この章は飛ばして1章から読んでください。
+
+### ★先に知っておく費用のこと
+
+| | 無料か |
+| --- | --- |
+| インスタンスの稼働時間(t2.micro / t3.micro 750時間/月) | **無料枠あり** |
+| EBS(ディスク)30GBまで | **無料枠あり** |
+| **パブリック IPv4 アドレス** | **有料(1つ 月$3.6前後)** |
+| 通信量(外向き) | 一定量まで無料、超えると従量 |
+
+**「完全に0円」にはなりません。** 2024年2月から、IPv4アドレスは
+インスタンスに付けていても課金対象です。
+
+> ★**請求アラートを必ず設定してください。**
+> AWSコンソールの「Billing」→「Budgets」で、月$5などの上限を決めて
+> メール通知を設定します。無料枠切れに気づかず数万円、という事故が最も多い。
+>
+> ★2025年以降に作ったアカウントは、無料枠の内容が以前と変わっている
+> 場合があります。自分のアカウントがどの条件かは請求ダッシュボードで確認を。
+
+### ① インスタンスを作る
+
+EC2 →「インスタンスを起動」で次のように選びます。
+
+| 項目 | 選ぶもの | 理由 |
+| --- | --- | --- |
+| AMI | **Ubuntu Server 24.04 LTS** | `docker compose` が公式手順でそのまま入る |
+| インスタンスタイプ | **t2.micro** または **t3.micro** | 無料枠の対象(どちらが対象かはリージョンによる) |
+| キーペア | 新規作成して**必ずダウンロード** | 無くすとログインできなくなる |
+| ストレージ | **20GB** gp3 | 既定の8GBだとDockerのイメージで埋まる |
+
+### ② セキュリティグループ(通信の許可)
+
+| ポート | 許可する相手 | 用途 |
+| --- | --- | --- |
+| 22 | **自分のIPのみ** | SSHログイン |
+| 80 | すべて(0.0.0.0/0) | HTTP |
+| 443 | すべて(0.0.0.0/0) | HTTPS |
+
+> ★**3306(MySQL)は絶対に開けないこと。**
+> 開けた瞬間から、世界中から総当たりでログインを試されます。
+
+### ③ Elastic IP を割り当てる
+
+そのままだと、インスタンスを停止して起動するたびにIPが変わり、
+ドメインの設定が毎回ずれます。Elastic IP を取って固定します。
+
+> ★使っていない Elastic IP は割高に課金されます。
+> **インスタンスを消すときは Elastic IP も解放してください。**
+
+### ④ ドメインを向ける
+
+ドメインの管理画面(お名前.comなど)でDNSレコードを設定します。
+
+| 種類 | ホスト名 | 値 |
+| --- | --- | --- |
+| A | `@`(またはmrrn.jp) | Elastic IP のアドレス |
+| A | `www` | Elastic IP のアドレス |
+
+反映には数分〜数時間かかります。確認は次のコマンドで。
+
+```bash
+nslookup mrrn.jp
+```
+
+### ⑤ ★スワップを作る(1GBのサーバーでは必須)
+
+メモリが1GBしかないので、これが無いとビルド中やMySQLの起動時に
+プロセスが強制終了されます。**症状は「原因不明で落ちる」なので、先に作ります。**
+
+```bash
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+確認します。`Swap:` が 2.0Gi になっていれば成功です。
+
+```bash
+free -h
+```
+
+> ★MySQL側の節約設定は `compose.prod.yml` に入れてあります
+> (`performance-schema=OFF` など)。2GB以上のサーバーに移したら消して構いません。
+
+---
+
 ## 1. 準備(初回だけ)
 
 ### ① サーバーに Docker を入れる
+
+Ubuntu 24.04 の場合、まだ入っていないので入れます。
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+`sudo` 無しで使えるようにします。**一度ログアウトして入り直すまで反映されません。**
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+入り直したら確認します。
 
 ```bash
 docker version
@@ -114,6 +228,31 @@ docker compose -f compose.prod.yml up -d --build
 **この2行だけです。** DBの表づくりは起動時に自動で走ります。
 
 > ★手元で直しただけでは反映されません。**push を忘れると `git pull` で何も落ちてきません。**
+
+### ★メモリ1GBのサーバーでは、先に止めてから build する
+
+build のとき、サーバーの上でGoのコンパイルが走ります。
+動いているMySQLと同時だとメモリが足りず、スワップに逃げて非常に遅くなります。
+
+**Go やHTMLを直したときは、先に止めてください。**
+
+```bash
+git pull
+docker compose -f compose.prod.yml down
+docker compose -f compose.prod.yml up -d --build
+```
+
+止まっている数分だけサイトが見られなくなりますが、
+1GBの機械ではこちらのほうが速く終わります。
+
+> ★CSS・画像だけの変更なら build 自体が不要なので、止める必要もありません。
+
+古いイメージがディスクを埋めるので、たまに掃除します。
+
+```bash
+docker image prune -f
+docker builder prune -f
+```
 
 ---
 

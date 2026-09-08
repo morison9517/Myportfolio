@@ -1,36 +1,24 @@
 /*legal page(プライバシーポリシー / 利用規約 共通)*/
-/* ★このCSSはこの2枚でしか使わないので、base.html には書かず
-     pages/privacy.html と pages/terms.html の head_extra から読み込んでいる。
-     (error.css と同じ扱い)
+/* 2枚で1つのファイルを共有している。別々に書くと片方だけ直して食い違うため。
+   base.html には書かず、各ページの head_extra から読み込む(error.css と同じ)。 */
 
-   ★2枚で1つのファイルを共有している。
-     見出しの大きさも余白も同じものにしたいので、
-     別々に書くと片方だけ直して食い違う事故が起きる。 */
+/* ★上だけ余白が大きいのは、ヘッダーが position: fixed でページの高さを取らないため。 */
 #legal {
     background-color: var(--bg-color);
 
-    /* ★上だけ余白が大きい理由
-         ヘッダーは position: fixed で画面に貼り付いており、
-         ページの高さを取らない。100px にすると見出しがヘッダーの下に潜る。 */
     padding: 140px 10% 100px;
 
     transition: background-color var(--theme-fade);
 }
 
-/* 本文の幅。1行が長すぎると目が次の行の頭に戻れなくなるので、
-   画面が広くても 800px で止めて中央に置く。 */
+/* 1行が長すぎると目が次の行の頭に戻れないので、800px で止めて中央に置く。 */
 #legal .container {
     max-width: 800px;
     margin: 0 auto;
 }
 
-/* ★以下の --fade-delay が、上から順に出すときの待ち時間。
-     数字を大きくするほど後に出る。仕掛け(font-fade)は base.css。
-
-   ★本文(.legal-body)は段落ごとに分けず、まとめて1つで出している。
-     条文の数だけずらすと、最後の条が出るまで何秒も待つことになる。 */
-
-/* ページの題名(「プライバシーポリシー」など)。 */
+/* --fade-delay = 上から順に出すときの待ち時間(仕掛けは base.css の font-fade)。
+   ★本文は条ごとに分けず1つで出す。条の数だけずらすと最後まで何秒も待つことになる。 */
 #legal h1 {
     margin: 0;
 
@@ -40,7 +28,6 @@
     --fade-delay: 0.1s;
 }
 
-/* 題名のすぐ下に置く前書き。 */
 .legal-lead {
     margin: 1.5rem 0 0;
 
@@ -49,20 +36,16 @@
     --fade-delay: 0.3s;
 }
 
-/* 条文の本体。 */
 .legal-body {
     margin-top: 3rem;
 
-    /* 章番号を数える入れ物を用意する。下の h2 で1つずつ増やす。 */
     counter-reset: legal-section;
 
     --fade-delay: 0.45s;
 }
 
-/* 各条の見出し。
-   ★番号は手で書かず counter で振っている。
-     手で「1.」「2.」と書くと、後から条を1つ足したり順番を入れ替えたときに
-     以降の番号を全部書き直すことになり、必ずどこかがずれる。 */
+/* ★条番号は手で書かず counter で振る。
+     手で書くと、条を足したり順番を入れ替えたときに以降を全部書き直すことになる。 */
 .legal-body h2 {
     counter-increment: legal-section;
 
@@ -70,8 +53,6 @@
 
     font-size: 1.3rem;
 
-    /* 見出しと本文の切れ目をはっきりさせるための下線。
-         色は文字色から作るので、ライト/ダークどちらでも薄い線になる。 */
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--field-border);
 
@@ -82,7 +63,7 @@
     content: counter(legal-section) ". ";
 }
 
-/* 条の中に小見出しを置きたいとき用(番号は振らない)。 */
+/* 条の中に置く小見出し(番号は振らない)。 */
 .legal-body h3 {
     margin: 1.8rem 0 0.5rem;
     font-size: 1.05rem;
@@ -93,7 +74,6 @@
     line-height: 1.9;
 }
 
-/* 箇条書き。行間は本文と同じにして、まとまって見えるようにする。 */
 .legal-body ul {
     margin: 0 0 1rem;
     padding-left: 1.4rem;
@@ -104,7 +84,6 @@
     line-height: 1.9;
 }
 
-/* 本文中のリンク。色は #about の外部リンクと同じ。 */
 .legal-body a,
 .legal-body a:visited {
     color: #2997ff;
@@ -118,16 +97,13 @@
     color: var(--hover-color);
 }
 
-/* 外部サイトへ出ることを示すアイコン(フッターのクレジットと同じ使い方)。 */
 .legal-body .external-link-icon {
     font-size: 0.7rem;
     margin-left: 3px;
 }
 
-/* 制定日。本文より小さく、少し薄くして添え書きに見せる。
-   ★opacity ではなく color の透明度で薄くする。
-     opacity は font-fade(表示するときのふわっと)が使っているので、
-     ここで指定すると打ち消し合ってしまう(error.css の .error-message と同じ)。 */
+/* 制定日。★opacity ではなく色の透明度で薄くする。
+   opacity は font-fade が使っているので、指定すると打ち消し合う。 */
 .legal-date {
     margin: 3rem 0 0;
 
@@ -137,12 +113,10 @@
     color: color-mix(in srgb, var(--text-color) 65%, transparent);
 }
 
-/* ホームへ戻るリンク。エラーページと同じ役割なので見た目もそろえてある。 */
+/* 見た目はエラーページの .error-home とそろえてある。
+   ★inline-block にすること。font-fade のずらす動きは inline の要素に効かない。 */
 .legal-home,
 .legal-home:visited {
-    /* ★inline-block にすること。
-         font-fade の「下から20pxずらして出す」は transform で行っているが、
-         transform は inline の要素には効かない(error.css の .error-home と同じ)。 */
     display: inline-block;
 
     margin: 3rem 0 0;
@@ -159,10 +133,8 @@
 }
 
 /* ---------- スマホ用 ---------- */
-/* ★★このページの画面幅の調整だけは mediaqueries.css ではなくここに書く。
-     legal.css は head_extra から読み込まれるので mediaqueries.css より後になり、
-     あちらに #legal を書いても、こちらの指定に打ち消されてしまうため
-     (error.css と同じ事情)。 */
+/* ★★画面幅の調整もここに書く。legal.css は head_extra から読み込まれるので
+     mediaqueries.css より後になり、あちらに書いても打ち消される。 */
 @media (max-width: 768px) {
     #legal {
         padding: 110px 6% 80px;

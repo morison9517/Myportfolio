@@ -1,15 +1,9 @@
-{{/* ==========================================================================
-     このページだけで使うCSSとスクリプト。base.html の head_extra の穴に入る。
+{{/* スクロールで順に出す仕掛け(reveal)の入口。
+     ここで出すかどうかを判断し、結果を <html> の印にする。
+     見た目は reveal.css、合図は reveal.js が担当する。
 
-     ▼ ★スクロールで順に出す仕掛け(reveal)の入口
-
-       出すかどうかの判断はここでしている。判断の結果を <html> の印にして、
-       見た目は reveal.css、合図は reveal.js が担当する。
-
-       ★<head> に直接書くこと。
-         別ファイルにすると、読み込みを待つ間に本文が一度そのまま表示され、
-         あとから隠れてちらつく。
-     ========================================================================== */}}
+     ★<head> に直接書くこと。別ファイルにすると、読み込みを待つ間に
+       本文が一度そのまま表示され、あとから隠れてちらつく。 */}}
 {{ define "head_extra" }}
     <link rel="stylesheet" href="/static/css/reveal.css">
 
@@ -17,31 +11,22 @@
       (function () {
         var html = document.documentElement;
 
-        /* ★ハンバーガーメニューなどから /#about へ直接来た人には動きを付けない。
-
-             見たいところが隠れた状態で始まってしまうため。
-             「#」だけ付いている場合は行き先が無いので、トップ扱いにする。 */
+        /* /#about へ直接来た人には動きを付けない(見たい場所が隠れるため)。 */
         var hash = window.location.hash;
 
         if (hash !== "" && hash !== "#") {
           return;
         }
 
-        /* ★OSで「視差効果を減らす」を選んでいる人にも動きを付けない。
-             大きく動く画面は、めまいや乗り物酔いの原因になることがある。
-             (base.css の font-fade と同じ扱い) */
+        /* 「視差効果を減らす」を選んでいる人にも付けない(base.css の font-fade と同じ)。 */
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           return;
         }
 
         html.classList.add("reveal");
 
-        /* ★保険。reveal.js を読み込めなかったときのため。
-
-             印を付けた時点で対象は透明になっている。合図を出す係が
-             来なければ、そのまま何も見えないページになってしまう。
-             5秒経っても連絡が無ければ印を外し、全部そのまま出す。
-             (Adobe Fonts の scriptTimeout と同じ考え方) */
+        /* ★保険。印を付けた時点で対象は透明なので、reveal.js が読み込めないと
+             何も見えないページになる。5秒待って連絡が無ければ印を外す。 */
         window.revealFallbackTimer = setTimeout(function () {
           html.classList.remove("reveal");
         }, 5000);
@@ -266,16 +251,12 @@
 
                        置き場所は web/static/images/products/
 
-                     ★並びも内容も internal/models/product.go に書いた順・
-                       書いた内容がそのまま出る。
+                     ★1件ずつ手で書かないこと。並びも内容も
+                       internal/models/product.go の Products がそのまま出る。
+                       作品を足す・直すときはあちらだけを触れば、
+                       ここと /products の両方に反映される。
 
-                     ★1件ずつ手で書かないこと。
-                     中身は internal/models/product.go の Products から来ている。
-                     作品を足す・直すときはあちらだけを触れば、
-                     ここと /products と詳細ページの3つに同時に反映される。
-
-                     ★range の中ではドットの意味が「今の1件」に変わる。
-                       .Name や .Date はその1件の項目。 */}}
+                     ★range の中ではドットの意味が「今の1件」に変わる。 */}}
                 <ul class="products-grid">
                     {{ range .Products }}
                     <li class="product-card">
@@ -286,8 +267,6 @@
                         <p class="product-date">{{ .Date }}</p>
                         <p class="product-event">
                             {{ .Event }}
-                            {{/* ★賞が無い作品では span ごと出さない。
-                                 空のspanを残すと余白だけ空く。 */}}
                             {{ if .Award }}<span class="product-award">{{ .Award }}</span>{{ end }}
                         </p>
                     </li>
@@ -607,8 +586,6 @@
 
     <script src="/static/js/contact.js"></script>
 
-    {{/* reveal.js = スクロールで画面に入ってきた要素を出す係。
-         ★<head> で <html> に reveal の印が付いたときだけ働く。
-           印が無いときは何もしない(全部そのまま表示される)。 */}}
+    {{/* ★<head> で reveal の印が付いたときだけ働く。無いときは何もしない。 */}}
     <script src="/static/js/reveal.js"></script>
 {{ end }}

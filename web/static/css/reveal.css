@@ -1,48 +1,18 @@
-/* ===========================================================================
-   reveal = スクロールで画面に入ってきたときに出す仕掛け(トップページ専用)
-   ===========================================================================
+/* reveal = スクロールで画面に入ってきたときに出す仕掛け(トップページ専用)
 
-   ▼ ★動くのは「トップページを / で開いたとき」だけ
+   <html> に reveal の印が付いているときだけ効く。付けるのは index.html の <head>。
+     / または /#         → 印を付ける
+     /#about など        → 付けない(見たい場所が隠れていては困るため)
+     視差効果を減らす設定 → 付けない
 
-     <html> に reveal という印が付いているときだけ、下の指定が効く。
-     印を付けるかどうかを決めているのは index.html の <head> のスクリプト。
-
-       / または /#        → 印を付ける(スクロールで順に出す)
-       /#about など        → 印を付けない(全部そのまま出す)
-       視差効果を減らす設定 → 印を付けない
-
-     ハンバーガーメニューから /#about へ直接来た人は、
-     見たいところが隠れていては困るので、動きを一切付けない。
-
-   ▼ 出し方の流れ
-
-     1. ここで「出る前の状態」(透明・少しずらす)にしておく
-     2. reveal.js が画面に入ったものに is-visible を付ける
-     3. その瞬間に元の位置・濃さへ戻る(transition)
-
-   ▼ ★:where() を使っている理由(重要)
-
-     出す側(.is-visible)の指定が勝たないと、要素は隠れたままになる。
-     ところが下の一覧には #about h2 のように id を含むものがあり、
-     普通に書くと「隠す側」のほうが強くなってしまう。
-
-     :where() は「中に何を書いても強さを0として数える」という書き方。
-     これで隠す側を最弱にでき、出す側が必ず勝つ。
-
-   ▼ ★JavaScript が動かない場合
-
-     印を付けるのがそのスクリプトなので、動かなければ印も付かず、
-     ここの指定は1つも効かない = 今までどおり全部表示される。
-     さらに reveal.js 自体が読み込めなかったときのために、
-     index.html 側で5秒後に印を外す保険を入れてある。
-   =========================================================================== */
+   ★:where() は「中に何を書いても強さを0として数える」書き方。
+     隠す側に id が入っているので、これが無いと出す側(.is-visible)が負けて
+     要素が隠れたままになる。 */
 
 html.reveal {
-    /* 濃さ・位置が変わるのにかける時間。 */
     --reveal-fade: 0.6s;
     --reveal-move: 0.5s;
 
-    /* 出るときにずらす距離。縦(下から)と横(左右から)。 */
     --reveal-shift-y: 20px;
     --reveal-shift-x: 30px;
 
@@ -53,12 +23,8 @@ html.reveal {
 }
 
 /* ---------- 1. 出る前の状態 ----------
-
-   ★ここに並べたものが「スクロールで出てくる」対象。
-     セクションを増やしたときは、この一覧と、下の「向き」に足す。
-
-   ★ヘッダー・フッター・#welcome・#about の写真は入れないこと。
-     最初から出しておく約束になっている。 */
+   ★ここに並べたものが対象。セクションを増やすときは、この一覧と下の「向き」に足す。
+   ★ヘッダー・フッター・#welcome・#about の写真は入れないこと(最初から出す約束)。 */
 html.reveal :where(
     #about h2,
     #about .about-text,
@@ -79,22 +45,16 @@ html.reveal :where(
     #contact .contact-form
 ) {
     opacity: 0;
-
-    /* ★どの向きへずらすかは --reveal-x / --reveal-y で決める(下の「2」)。
-         指定が無ければ 0px = ずれずに濃さだけ変わる。 */
     transform: translate(var(--reveal-x, 0px), var(--reveal-y, 0px));
 
-    /* ★待ち時間(--reveal-delay)は要素ごとに変わる。
-         Skills・Products … 何番目かに応じてずらす(--reveal-step は reveal.js)
-         年表           … 線がその項目のマークに届くまでの時間(下の「4」) */
     transition:
         opacity var(--reveal-fade) ease var(--reveal-delay, 0s),
         transform var(--reveal-move) ease var(--reveal-delay, 0s);
 }
 
-/* ---------- 2. どの向きから出すか ---------- */
+/* ---------- 2. どの向きから、いつ出すか ---------- */
 
-/* 各セクションの見出しは、左から右へ流れ込む。 */
+/* 見出しは左から右へ。セクションの1つ目なので --reveal-lead だけ待つ。 */
 html.reveal :where(#about, #skills, #products, #experience, #contact) h2 {
     --reveal-x: calc(var(--reveal-shift-x) * -1);
     --reveal-delay: var(--reveal-lead);
@@ -112,6 +72,7 @@ html.reveal :where(
     --reveal-y: var(--reveal-shift-y);
 }
 
+/* 見出しの次に出るものは、その --reveal-lead 後。 */
 html.reveal :where(
     .about-text,
     .skills-more,
@@ -120,17 +81,13 @@ html.reveal :where(
     --reveal-delay: calc(var(--reveal-lead) * 2);
 }
 
+/* --reveal-step(何番目か)は reveal.js が入れる。 */
 html.reveal :where(.skill-card, .product-card, .products-more) {
     --reveal-delay: calc(var(--reveal-lead) * 2 + var(--reveal-step, 0s));
 }
 
 /* ---------- 3. 出たあとの状態 ----------
-
-   ★2行目がある理由
-     reveal.js が is-visible を付けるのは「画面に入ったかを見ている要素」。
-     Skills・Products はカード1枚ずつではなく一覧(グリッド)を見ていて、
-     年表も項目(<li>)を見ている。
-     つまり印が付くのは親のほうなので、その中身も一緒に出す。 */
+   ★2行目 … is-visible が付くのは一覧や項目(<li>)のほうなので、中身も一緒に出す。 */
 html.reveal .is-visible,
 html.reveal .is-visible :where(
     .skill-card,
@@ -144,17 +101,10 @@ html.reveal .is-visible :where(
 
 /* ---------- 4. 年表(#experience) ----------
 
-   ▼ 出る順番
+   縦線が伸びる → 線がマークに届いたらマークが出る → 同時に文字が線から離れる向きへ。
 
-     1. 縦線が上から下へ伸びる
-     2. 線が丸(または破断マーク ～)の高さに届いたら、そのマークが出る
-     3. 同時に、年と内容が線から離れる向きへ流れ出る
-
-   ★2 と 3 の待ち時間は --mark-progress で決まる。
-     これは「項目の高さのうち、マークが何割の位置にあるか」という数字で、
-     項目ごとに高さが違うので reveal.js が実測して入れている。
-     線を引く時間に掛ければ、線がマークに届く瞬間になる。 */
-
+   ★--mark-progress は「項目の高さのうちマークが何割の位置か」。
+     項目ごとに高さが違うので reveal.js が実測して入れている。 */
 html.reveal .timeline-item {
     --line-delay: 0s;
     --reveal-delay: calc(
@@ -162,20 +112,11 @@ html.reveal .timeline-item {
     );
 }
 
-/* 縦線。clip-path で「見えている範囲」を上から下へ広げていく。
-
-   ★inset(上 右 下 左) は「その分だけ内側を切り取る」指定。
-     下を100%切り取る = 何も見えない状態から始まり、
-     0まで戻すと全部見える = 上から下へ引かれたように見える。
-
-   ★線そのものの指定(色・位置・グラデーション)は experience.css。
-     ここでは見せ方だけを足している。 */
+/* 縦線。clip-path で見えている範囲を上から下へ広げる。
+   線そのものの指定(色・位置・グラデーション)は experience.css。
+   ★linear にすること。ease にすると引く速さが変わり、マークが出る時刻とずれる。 */
 html.reveal .timeline-body::after {
     clip-path: inset(0 0 100% 0);
-
-    /* ★linear(等速)にすること。
-         ease にすると引く速さが途中で変わり、
-         マークが出る瞬間(--mark-progress で計算した時刻)と線がずれる。 */
     transition: clip-path var(--line-duration) linear var(--line-delay);
 }
 
@@ -193,12 +134,7 @@ html.reveal .timeline-item.is-visible .timeline-body::before {
     opacity: 1;
 }
 
-/* 年と内容は、線から離れていく向きへ流す。
-
-     年   … 線は右にあるので、右から左へ
-     内容 … 線は左にあるので、左から右へ
-
-   ★線を中心に左右へ広がって見えるので、線を引く動きとつながる。 */
+/* 年は線の右から左へ、内容は線の左から右へ。線を中心に左右へ広がって見える。 */
 html.reveal .timeline-year {
     --reveal-x: var(--reveal-shift-x);
 }
@@ -207,28 +143,18 @@ html.reveal .timeline-body > * {
     --reveal-x: calc(var(--reveal-shift-x) * -1);
 }
 
-/* ---------- 5. 印が付いていないときの #welcome ----------
-
-   セクションを直接指定して来た人には、
-   #welcome のフォント待ちのふわっと(font-fade)も止めて最初から出す。
-   「全部そのまま出す」という約束を、このページの中でそろえるため。
-
-   ★:not() を3つ重ねて、base.css の指定より強さを上げている。
-     順番だけでは勝てない(あちらのほうが強く書かれている)。 */
+/* 印が付いていないときは、#welcome の font-fade も止めて最初から出す。
+   ★:not() を3つ重ねているのは base.css より強さを上げるため。 */
 html:not(.reveal):not(.wf-loading):not(.fade-hold) .font-fade {
     animation: none;
     opacity: 1;
 }
 
 /* ---------- スマホ用 ----------
-   ★★このページの画面幅の調整もここに書く。
-     reveal.css は head_extra から読み込まれるので mediaqueries.css より後になり、
-     あちらに書いても、こちらの指定に打ち消されてしまうため
-     (error.css・legal.css と同じ事情)。 */
+   ★★画面幅の調整もここに書く。reveal.css は head_extra から読み込まれるので
+     mediaqueries.css より後になり、あちらに書いても打ち消される。 */
 @media (max-width: 768px) {
-    /* 横方向にずらす距離を短くする。
-       ★年の列はスマホだと 3.2rem(約51px)しかない(mediaqueries.css)。
-         30px のままだと、年が線の上まで乗り出してから戻ってくる。 */
+    /* 年の列がスマホでは 3.2rem しかないので、30px だと線の上まで乗り出す。 */
     html.reveal {
         --reveal-shift-x: 20px;
     }

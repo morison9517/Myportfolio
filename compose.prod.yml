@@ -145,9 +145,10 @@ services:
     restart: always
 
     ports:
-      # 外から来るのはここだけ。
-      # ★HTTPSにするときは 443 を足して、証明書を読ませます(docs/DEPLOY.md)。
+      # 外から来るのはこの2つだけ。
+      # 80番は「HTTPSへの案内」と「証明書の更新確認」にだけ使う。
       - "80:80"
+      - "443:443"
 
     volumes:
       # 設定ファイル。:ro = 読むだけ(箱の中から書き換えられない)。
@@ -158,6 +159,11 @@ services:
       - ./web/static:/var/www/static:ro
       # 利用者が上げた画像。web と同じ保管庫を共有する。
       - media_files:/var/www/media:ro
+      # Let's Encrypt の証明書。certbot が書き、Nginx は読むだけ。
+      - certbot_conf:/etc/letsencrypt:ro
+      # 更新のときに certbot が置く確認用ファイルの受け渡し場所。
+      # ★:ro を付けないこと。certbot 側がここに書き込む。
+      - certbot_www:/var/www/certbot
 
     depends_on:
       - web
@@ -171,3 +177,7 @@ services:
 volumes:
   db_data:
   media_files:
+
+  # ★certbot_conf を消すと証明書が消えます。取り直しには回数制限があるので注意。
+  certbot_conf:
+  certbot_www:

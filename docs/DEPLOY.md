@@ -345,18 +345,111 @@ docker compose -f compose.prod.yml logs -f web   # 起動時のエラーが出�
 
 やり方は2つあります。
 
-### ① サーバーの中で証明書を取る(Let's Encrypt)
+このプロジェクトは **Let's Encrypt(無料)** を使う前提で、
+`docker/nginx/prod.conf` と `compose.prod.yml` の設定を用意してあります。
 
-無料です。90日ごとの更新が必要ですが、自動化できます。
-サーバー1台の構成ならこちらが安く、設定も少なくて済みます。
+### ★順番が重要
 
-### ② AWSのロードバランサーに任せる
+**証明書が無い状態で Nginx を起動すると、設定を読めずに落ちます。**
+必ず「証明書を取る → Nginx を起動」の順で進めてください。
+
+### ① 最新のコードを取る(まだ Nginx は再起動しない)
+
+```bash
+cd ~/Myportfolio
+git pull
+```
+
+> `git pull` しただけでは Nginx は古い設定のまま動き続けます。
+> 再起動するまで反映されないので、この時点では問題ありません。
+
+### ② Nginx を止めて、証明書を取る
+
+80番を certbot に明け渡す必要があるので、一時的に止めます。
+
+```bash
+docker compose -f compose.prod.yml stop nginx
+
+docker run --rm -p 80:80   -v case_gin_prod_certbot_conf:/etc/letsencrypt   certbot/certbot certonly --standalone   -d mrrn.jp -d www.mrrn.jp   --email 自分のメールアドレス --agree-tos --no-eff-email
+```
+
+`Successfully received certificate` と出れば成功です。
+
+> ★`--email` は証明書の期限切れを知らせるために使われます。実際に受け取れる
+> アドレスを入れてください。
+>
+> ★**失敗を繰り返さないこと。** Let's Encrypt には
+> 「同じドメインで1週間に5回まで」といった回数制限があります。
+> DNSが未反映のまま試すと、その回数を無駄に消費します。
+> 先に `nslookup mrrn.jp` でIPが返ることを確認してください。
+
+### ③ Nginx を起動する
+
+```bash
+docker compose -f compose.prod.yml up -d nginx
+docker compose -f compose.prod.yml logs nginx | tail -20
+```
+
+エラーが出ていなければ、`https://mrrn.jp/` が開きます。
+`http://` で開いても、自動でHTTPSに切り替わります。
+
+### ④ ★`.env` を直して web を作り直す
+
+```
+SECURE_COOKIES=true
+```
+
+HTTPで動かすために `false` にしていたはずなので、`true` に戻します。
+
+```bash
+nano .env
+docker compose -f compose.prod.yml up -d web
+```
+
+> ★`restart` ではなく `up -d` を使うこと。
+> `restart` では `.env` を読み直しません。
+
+### ⑤ 自動更新を仕掛ける
+
+証明書は90日で切れます。放置するとサイトが開けなくなるので、
+月に一度、更新を試すようにしておきます。
+
+```bash
+crontab -e
+```
+
+開いたファイルの末尾に、次の1行を足します。
+
+```
+0 4 1 * * cd ~/Myportfolio && docker run --rm -v case_gin_prod_certbot_conf:/etc/letsencrypt -v case_gin_prod_certbot_www:/var/www/certbot certbot/certbot renew --webroot -w /var/www/certbot --quiet && docker compose -f compose.prod.yml exec nginx nginx -s reload
+```
+
+毎月1日の午前4時に更新を試し、成功したら Nginx に設定を読み直させます。
+期限が近くないときは certbot が何もせずに終わるので、毎月動かして構いません。
+
+> ★更新は `--standalone` ではなく `--webroot` を使っています。
+> Nginx を止めずに済むため、更新のたびにサイトが落ちません。
+> `prod.conf` の 80番に置いた `/.well-known/acme-challenge/` がこのためのものです。
+
+### ⑥ 動作を確認したら HSTS を有効にする
+
+`docker/nginx/prod.conf` の443ブロックにある次の行のコメントを外します。
+
+```
+add_header Strict-Transport-Security "max-age=31536000" always;
+```
+
+「今後このサイトはHTTPSでしか開くな」とブラウザに覚えさせる指定です。
+
+> ★**一度覚えさせると、期間中(1年)は取り消せません。**
+> 証明書が切れるとサイトが完全に開けなくなります。
+> HTTPSが数日安定して動くことを確認してから有効にしてください。
+
+### 参考: AWSのロードバランサーに任せる方法
 
 証明書の更新が自動になりますが、**動かしているだけで月20ドル前後かかります。**
 VPC・サブネット2つ・ターゲットグループの設定も必要です。
-
-> どちらの場合も、`docker/nginx/prod.conf` に443番の設定を足し、
-> `compose.prod.yml` の nginx に証明書の置き場所をマウントします。
+サーバー1台の構成では、上のLet's Encryptのほうが安く簡単です。
 
 ### ★HTTPSにしたら必ず戻すこと
 

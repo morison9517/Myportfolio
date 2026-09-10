@@ -19,13 +19,33 @@
    ★head_extra から読み込まれるので mediaqueries.css より後になる。
      画面幅の調整もこのファイルの末尾に書くこと。 */
 
-/* 見出しの下に置くひとこと。--fade-delay は上から順に出すための待ち時間。 */
+/* 見出しの下に置くひとこと。--fade-delay は上から順に出すための待ち時間。
+
+   ▼ ★★font-fade を付けた要素に opacity を書かないこと
+
+     base.css は、フォントを待っている間 .font-fade { opacity: 0 } で隠している。
+     ところが .font-fade も .skills-lead も詳細度が同じ (0,1,0) なので、
+     あとから読み込まれる側(head_extra のこのファイル)が勝ってしまう。
+
+       base.css:288        .font-fade   { opacity: 0; }
+       skills-page.css     .skills-lead { opacity: 0.75; }  ← こちらが勝つ
+
+     結果、隠す指定が効かなくなり、フォント読み込み中(最大3秒)は
+     この一文だけが薄いまま先に表示される。
+     ★h1 より先に出たのはこのため。h1 は opacity を持たないので正しく隠れていた。
+
+     ★animation の both では防げない。
+       animation が効くのは html:not(.wf-loading):not(.fade-hold) のときだけで、
+       フォント読み込み中はそもそも animation が動いていない。
+
+     ★弱く見せたいときは opacity ではなく font-size で差を付ける
+       (.skill-category-label / .skill-item-body p と同じ方針)。
+       legal.css の .legal-lead も opacity を持っていない。 */
 .skills-lead {
     margin: -1.5rem 0 3rem;
 
     text-align: center;
     line-height: 1.9;
-    opacity: 0.75;
 
     --fade-delay: 0.3s;
 }
@@ -195,31 +215,10 @@
     font-size: 1.3rem;
 }
 
-/* 一言コメント。
-
-   ★ここは opacity で弱めない(以前は 0.75 にしていた)。
-     このページはコメントを読ませるために作ったページなので、
-     いちばん読ませたい文字を薄くするのは筋が悪い。
-     スキル名との差は font-size と font-weight だけで付ける。
-
-       .skill-item-body h3 … 1.25rem・太字
-       ここ                … 1.1rem・並
-
-   ★★0.9 → 0.95 → 1 → 1.1rem と上げてきた。ここから下げないこと。
-     1rem = 16px が本文の基準なので、1.1rem はそれより少し大きい。
-     日本語は同じ px でも英字より線が密で、画数の多い漢字ほど先につぶれる。
-     「機」「験」「築」あたりが読めるかどうかで確かめる。
-
-   ★字を大きくするぶん、箱(padding・ロゴ・行間)は詰めてある。
-     箱を膨らませても字は大きくならないので、
-     読みにくいときに触るのは必ずこちら側。
-
-   ▼ ★line-height はカードの高さに一番効く
-
-     高さに乗るのは「1.1rem × line-height × 行数」なので、
-     0.1 動かすだけで1枚あたり数pxずつ変わる。
-     ただし日本語で 1.6 を下回ると行同士がくっついて読みにくくなるので、
-     高さを詰めたいときも 1.6 が下限。 */
+/*　高さに乗るのは「1.1rem × line-height × 行数」なので、
+    0.1 動かすだけで1枚あたり数pxずつ変わる。
+    ただし日本語で 1.6 を下回ると行同士がくっついて読みにくくなるので、
+    高さを詰めたいときも 1.6 が下限。 */
 .skill-item-body p {
     margin: 0.35rem 0 0;
 
@@ -243,11 +242,6 @@
         margin-bottom: 1.4rem;
         font-size: 1.3rem;
     }
-
-    /* ★列数はここで指定しない。
-         minmax(min(360px, 100%), 1fr) が幅を見て勝手に1列にしてくれる。
-         書くと二重管理になり、片方だけ直したときに食い違う。
-         ここで変えるのは隙間だけ。 */
     .skill-list {
         gap: 1rem;
     }
@@ -256,10 +250,4 @@
         width: 48px;
         height: 48px;
     }
-
-    /* ★.skill-item の gap と padding はここで上書きしない。
-         PC側を詰めた結果、スマホ用に書きたい値と同じになった。
-         同じ値を2か所に書くと、片方だけ直したときに食い違う。
-
-       ★文字の大きさ(1.1rem)も下げないこと。つぶれる原因そのものなので。 */
 }

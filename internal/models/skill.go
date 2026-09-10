@@ -62,7 +62,7 @@ type SkillCategory struct {
 // ★上に書いたカテゴリが画面でも上に出る。
 var SkillCategories = []SkillCategory{
 	{
-		Name:  "Frontend",
+		Name: "Frontend",
 		Label: "フロントエンド",
 		Skills: []Skill{
 			{
@@ -76,15 +76,15 @@ var SkillCategories = []SkillCategory{
 				Note: "HTMLと共に開発に使用しています。フレームワークは使用していません。",
 			},
 			{
-				Name:      "Java Script",
-				Icon:      "js.png",
-				Note:      "ページのアニメーション、APIのfetchによく使用しています。",
+				Name: "Java Script",
+				Icon: "js.png",
+				Note: "ページのアニメーション、APIのfetchによく使用しています。",
 				HideOnTop: true,
 			},
 		},
 	},
 	{
-		Name:  "Backend",
+		Name: "Backend",
 		Label: "バックエンド",
 		Skills: []Skill{
 			{
@@ -110,7 +110,7 @@ var SkillCategories = []SkillCategory{
 		},
 	},
 	{
-		Name:  "Framework",
+		Name: "Framework",
 		Label: "フレームワーク",
 		Skills: []Skill{
 			{
@@ -131,13 +131,13 @@ var SkillCategories = []SkillCategory{
 		},
 	},
 	{
-		Name:  "Database",
+		Name: "Database",
 		Label: "データベース",
 		Skills: []Skill{
 			{
-				Name:      "SQLite",
-				Icon:      "sqlite.png",
-				Note:      "Kloudハッカソン#4のDjangoデフォルトにて使用しました。",
+				Name: "SQLite",
+				Icon: "sqlite.png",
+				Note: "Kloudハッカソン#4のDjangoデフォルトにて使用しました。",
 				HideOnTop: true,
 			},
 			{
@@ -146,15 +146,15 @@ var SkillCategories = []SkillCategory{
 				Note: "学校の授業でのテーブル設計などで使用。本ポートフォリオでも使用しています。",
 			},
 			{
-				Name:      "PostgreSQL",
-				Icon:      "postgre.png",
-				Note:      "TwoGate Dev Camp 2024 Summerにて使用しました。",
+				Name: "PostgreSQL",
+				Icon: "postgre.png",
+				Note: "TwoGate Dev Camp 2024 Summerにて使用しました。",
 				HideOnTop: true,
 			},
 		},
 	},
 	{
-		Name:  "Infrastructure",
+		Name: "Infrastructure",
 		Label: "インフラ",
 		Skills: []Skill{
 			{
@@ -163,29 +163,27 @@ var SkillCategories = []SkillCategory{
 				Note: "現在はAWSを主に使用しています。本サイトも EC2 上に Docker で公開しています。",
 			},
 			{
-				Name:      "Azure",
-				Icon:      "azure.png",
-				Note:      "学生向けクレジットが付与されるので、使ったことがあるインフラストラクチャです。Kloudハッカソン#4にて使用しました。",
+				Name: "Azure",
+				Icon: "azure.png",
+				Note: "学生向けクレジットが付与されるので、使ったことがあるインフラストラクチャです。Kloudハッカソン#4にて使用しました。",
 				HideOnTop: true,
 			},
 			{
-				// ★HideOnTop はロゴ待ちではなく、トップを12個に保つため。
-				Name:      "Nginx",
-				Icon:      "nginx.png",
-				Note:      "本番でリバースプロキシと HTTPS の終端を担当。画像や CSS の配信もこちらからやります。",
+				Name: "Nginx",
+				Icon: "nginx.png",
+				Note: "本番でリバースプロキシと HTTPS の終端を担当。画像や CSS の配信もこちらからやります。",
 				HideOnTop: true,
 			},
 		},
 	},
 	{
-		Name:  "Git",
+		Name: "Git",
 		Label: "バージョン管理",
 		Skills: []Skill{
 			{
-				// ★HideOnTop はロゴ待ちではなく、トップを12個に保つため。
-				Name:      "Git",
-				Icon:      "git.png",
-				Note:      "作業ごとにブランチを切って進めています。コミットは目的ひとつ分で区切るよう意識中です。",
+				Name: "Git",
+				Icon: "git.png",
+				Note: "作業ごとにブランチを切って進めています。コミットは目的ひとつ分で区切るよう意識中です。",
 				HideOnTop: true,
 			},
 			{
@@ -196,19 +194,19 @@ var SkillCategories = []SkillCategory{
 		},
 	},
 	{
-		Name:  "OS",
+		Name: "OS",
 		Label: "オペレーティングシステム",
 		Skills: []Skill{
 			{
-				Name:      "Ubuntu",
-				Icon:      "ubuntu.png",
-				Note:      "本サイトを公開しているサーバーのOSとして使用しています。コマンド操作での環境構築もこのタイミングで改めて学びました。",
+				Name: "Ubuntu",
+				Icon: "ubuntu.png",
+				Note: "本サイトを公開しているサーバーのOSとして使用しています。コマンド操作での環境構築もこのタイミングで改めて学びました。",
 				HideOnTop: true,
 			},
 		},
 	},
 	{
-		Name:  "Tools",
+		Name: "Tools",
 		Label: "ツール",
 		Skills: []Skill{
 			{

@@ -39,6 +39,7 @@ import (
 //  3. その関数を下に書く
 func RegisterPageRoutes(r *gin.Engine) {
 	r.GET("/", index)
+	r.GET("/skills", skills)
 	r.GET("/products", products)
 	r.GET("/privacy", privacy)
 	r.GET("/terms", terms)
@@ -58,7 +59,23 @@ func RegisterPageRoutes(r *gin.Engine) {
 //	  下層ページでは "Title": "Products" のように渡す。
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", view.Page(c, gin.H{
+		// ★カテゴリの区切りを外した1本の並び。
+		//   トップの一覧はアイコンを6列で並べるだけなので、区切りは要らない。
+		//   ★全部ではない。ロゴ待ちのものなどは skill.go の HideOnTop で外している。
+		"Skills":   models.TopSkills(),
 		"Products": models.Products,
+	}))
+}
+
+// skills = 使える技術の一覧ページ(/skills)。
+//
+//	トップページの Skills はアイコンだけの一覧だが、こちらはカテゴリで区切り、
+//	1つずつに一言コメントを付ける。中身の出どころは models/skill.go で共通。
+func skills(c *gin.Context) {
+	c.HTML(http.StatusOK, "skills.html", view.Page(c, gin.H{
+		"Title":           "Skills",
+		"Description":     "これまでに学んできた技術の一覧です。フロントエンド・バックエンド・フレームワーク・データベース・インフラの分野ごとにまとめています。",
+		"SkillCategories": models.SkillCategories,
 	}))
 }
 

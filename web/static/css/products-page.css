@@ -1,46 +1,17 @@
-/* products-page = 作品の一覧ページ(/products)
+/* products-page = 作品の一覧ページ(/products)固有の部分
 
+   ページの外枠(余白・見出し・戻るリンク)は sub-page.css にまとめてある。
    カードの見た目そのものは products.css(base.html から全ページ共通で読み込み)。
-   ここは上余白・見出し・戻るリンクだけ。
+   ここに残るのは「トップと同じ id を使ったせいで要る打ち消し」と、一覧の出る順番だけ。
 
-   ★head_extra から読み込まれるので mediaqueries.css より後になる。
-     画面幅の調整もこのファイルの末尾に書くこと(error.css・legal.css と同じ)。 */
+   ★読み込む順番は sub-page.css → products-page.css(products.html の head_extra)。 */
 
-/* ★上だけ余白が大きいのは、ヘッダーが position: fixed でページの高さを取らないため。 */
-.sub-page {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-
-    min-height: 100vh;
-    box-sizing: border-box;
-
-    padding: 140px 10% 100px;
-
-    transition:
-        background-color var(--theme-fade),
-        color var(--theme-fade);
-}
-
-/* ★#products の余白を打ち消す。
+/* ★#products の余白(products.css の 80px 10%)を打ち消す。
      トップと同じ id を使ってカードのCSSを借りているので、
-     打ち消さないと見出しがヘッダーの下に潜る。 */
+     打ち消さないと見出しがヘッダーの下に潜る。
+     ★値は sub-page.css の .sub-page と同じにすること。 */
 #products.sub-page {
     padding: 140px 10% 100px;
-}
-
-.sub-page .container {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-/* トップの h2(3rem)より一段小さくして、下層ページであることを見た目で示す。 */
-.sub-page h1 {
-    margin: 0 0 3rem;
-
-    font-size: 2.5rem;
-    text-align: center;
-
-    --fade-delay: 0.15s;
 }
 
 /* ★1枚ずつずらして出すのはトップページだけ(reveal.css)。ここはまとめて出す。 */
@@ -50,36 +21,9 @@
     --fade-delay: 0.3s;
 }
 
-/* ★見た目は Products セクションの「Read More」(.products-more)と同じ。
-     片方だけ直すとずれるので、変えるときは両方そろえること。 */
-.sub-page-more {
-    margin-top: 3rem;
-    text-align: center;
-
-    --fade-delay: 0.45s;
-}
-
-.sub-page-more a,
-.sub-page-more a:visited {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2997ff;
-
-    transition: color 0.15s ease;
-}
-
-.sub-page-more a:hover {
-    color: var(--hover-color);
-}
-
 /* ---------- スマホ用 ---------- */
 @media (max-width: 768px) {
-    .sub-page,
     #products.sub-page {
         padding: 110px 6% 80px;
-    }
-
-    .sub-page h1 {
-        font-size: 1.8rem;
     }
 }

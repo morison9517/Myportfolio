@@ -5,7 +5,11 @@
      {{ .Products }} … 作品の一覧(internal/models/product.go)
      ★作品を足すときにこのファイルを触る必要はない。product.go に足せば出る。 */}}
 
+{{/* ★読み込む順番に意味がある。
+     sub-page.css が下層ページ共通の型、products-page.css がこのページ固有の
+     打ち消し。逆に書くと打ち消し側が先に来て効かなくなる。 */}}
 {{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/sub-page.css">
     <link rel="stylesheet" href="/static/css/products-page.css">
 {{ end }}
 

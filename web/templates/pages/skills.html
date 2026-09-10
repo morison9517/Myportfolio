@@ -1,0 +1,74 @@
+{{/* skills.html = 技術の一覧ページ(/skills)
+
+     カテゴリ(フロントエンド / バックエンド / …)ごとに区切り、
+     1つずつに一言コメントを付ける。トップの Skills はアイコンだけの一覧。
+
+     {{ .SkillCategories }} … スキルの一覧(internal/models/skill.go)
+     ★スキルを足すときにこのファイルを触る必要はない。skill.go に足せば出る。
+
+     ★見た目は skills-page.css。トップの Skills(skills.css)とは
+       わざと id を分けている(理由は skills-page.css の先頭)。 */}}
+
+{{/* ★読み込む順番に意味がある。
+     sub-page.css が下層ページ共通の型、skills-page.css がこのページ固有の部分。
+     逆に書くと、共通の型があとから上書きしてしまう。 */}}
+{{ define "head_extra" }}
+    <link rel="stylesheet" href="/static/css/sub-page.css">
+    <link rel="stylesheet" href="/static/css/skills-page.css">
+{{ end }}
+
+{{ define "content" }}
+        {{/* font-fade の出る順番は skills-page.css の --fade-delay。 */}}
+        <section id="skills-page" class="sub-page">
+            <div class="container">
+                <h1 class="font-fade">Skills</h1>
+
+                <p class="skills-lead font-fade">
+                    これまでに学んできた技術を、分野ごとにまとめています。
+                </p>
+
+                {{/* ★font-fade はカテゴリ1つずつではなく、この箱に1つだけ付ける。
+                     カテゴリの数だけずらすと、下のほうが出るまで何秒も待つことになる。 */}}
+                <div class="skill-categories font-fade">
+                    {{ range .SkillCategories }}
+                    <section class="skill-category">
+                        {{/* ★英語名の下に日本語を「改行して」置かないこと。
+                             <br> を挟むと下線までの高さがカテゴリごとに変わり、
+                             見出しの位置がそろわなくなる。横に並べている。 */}}
+                        <h2>
+                            {{ .Name }}
+                            <span class="skill-category-label">{{ .Label }}</span>
+                        </h2>
+
+                        <ul class="skill-list">
+                            {{/* ★この中のドットは「スキル1つ」を指す。
+                                 カテゴリ名を使いたくなったら $ ではなく、
+                                 range に入る前に変数へ取っておくこと。 */}}
+                            {{ range .Skills }}
+                            <li class="skill-item">
+                                {{/* alt を空にしているのは、すぐ右に同じ名前が
+                                     文字で出ているため(読み上げが二重になる)。 */}}
+                                <div class="skill-icon">
+                                    <img src="/static/images/skills/{{ .Icon }}" alt="">
+                                </div>
+
+                                <div class="skill-item-body">
+                                    <h3>{{ .Name }}</h3>
+                                    <p>{{ .Note }}</p>
+                                </div>
+                            </li>
+                            {{ end }}
+                        </ul>
+                    </section>
+                    {{ end }}
+                </div>
+
+                {{/* 見た目は /products の「ホームへ戻る」と同じ(sub-page.css)。 */}}
+                <div class="sub-page-more font-fade">
+                    <a href="/">
+                        ホームへ戻る
+                    </a>
+                </div>
+            </div>
+        </section>
+{{ end }}

@@ -113,97 +113,31 @@
                 <h2>Skills</h2>
 
                 {{/* 6列×2行。スマホ(768px以下)では3列×4行になる(mediaqueries.css)。
-                     アイコンは web/static/images/skills/ に置く。 */}}
+
+                     {{ .Skills }} … スキルの一覧(internal/models/skill.go)を
+                     カテゴリの区切りを外して1本にしたもの(models.TopSkills)。
+                     ★スキルを足すときにこのファイルを触る必要はない。skill.go に足せば出る。
+                       ロゴは web/static/images/skills/ に置く。
+
+                     ★ここに出るのは一覧の全部ではない。
+                       skill.go で HideOnTop: true を付けたものは出ない
+                       (ロゴがまだ無いものなど)。全部出るのは /skills のほう。
+
+                     ★ここでは Note(一言コメント)を出さない。
+                       コメント付きの一覧は下層ページ(/skills)のほう。 */}}
                 <ul class="skills-grid">
-
+                    {{ range .Skills }}
                     <li class="skill-card">
                         <div class="skill-icon">
-                            <img src="/static/images/skills/go.png" alt="">
+                            <img src="/static/images/skills/{{ .Icon }}" alt="">
                         </div>
-                        <span class="skill-name">Go</span>
+                        <span class="skill-name">{{ .Name }}</span>
                     </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/python.png" alt="">
-                        </div>
-                        <span class="skill-name">Python</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/java.png" alt="">
-                        </div>
-                        <span class="skill-name">Java</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/php.png" alt="">
-                        </div>
-                        <span class="skill-name">PHP</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/html5.png" alt="">
-                        </div>
-                        <span class="skill-name">HTML5</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/css3.png" alt="">
-                        </div>
-                        <span class="skill-name">CSS3</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/gin.png" alt="">
-                        </div>
-                        <span class="skill-name">Gin</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/django.png" alt="">
-                        </div>
-                        <span class="skill-name">Django</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/flask.png" alt="">
-                        </div>
-                        <span class="skill-name">Flask</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/github.png" alt="">
-                        </div>
-                        <span class="skill-name">GitHub</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/mysql.png" alt="">
-                        </div>
-                        <span class="skill-name">MySQL</span>
-                    </li>
-
-                    <li class="skill-card">
-                        <div class="skill-icon">
-                            <img src="/static/images/skills/aws.png" alt="">
-                        </div>
-                        <span class="skill-name">AWS</span>
-                    </li>
-
+                    {{ end }}
                 </ul>
 
                 <div class="skills-more">
-                    <a href="skills.html">
+                    <a href="/skills">
                         Read More &gt;&gt;
                     </a>
                 </div>

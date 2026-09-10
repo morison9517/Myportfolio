@@ -1,0 +1,265 @@
+/* skills-page = 技術の一覧ページ(/skills)
+
+   ページの外枠(余白・見出し・戻るリンク)は sub-page.css。
+   ここはカテゴリの見出しと、スキル1つ分のカードだけ。
+
+   ▼ ★トップの Skills(skills.css)とは作りを分けている
+
+     トップ … 背景が濃い緑。アイコンと名前だけを6列でびっしり並べる。
+     ここ  … 背景がページの地色。1つずつにコメントが付くので横並びのカード。
+
+     同じ id(#skills)を使い回すと、トップ用の「緑背景・白文字」を
+     全部打ち消すことになり、打ち消し漏れでライトモードだけ
+     白地に白文字…という事故が起きる。そこで id は #skills-page にして、
+     skills.css とは当たらないようにしてある。
+
+   ★ただしロゴを載せる白い角丸(.skill-icon)だけは skills.css のものを借りる。
+     id が付いていないクラスなので、そのまま効く。大きさだけ下で上書きしている。
+
+   ★head_extra から読み込まれるので mediaqueries.css より後になる。
+     画面幅の調整もこのファイルの末尾に書くこと。 */
+
+/* 見出しの下に置くひとこと。--fade-delay は上から順に出すための待ち時間。 */
+.skills-lead {
+    margin: -1.5rem 0 3rem;
+
+    text-align: center;
+    line-height: 1.9;
+    opacity: 0.75;
+
+    --fade-delay: 0.3s;
+}
+
+/* ★カテゴリを1つずつずらして出さない(まとめて1回で出す)。
+     カテゴリの数だけずらすと、最後のカテゴリが出るまで何秒も待つことになる。
+     legal.css の本文と同じ考え方。 */
+.skill-categories {
+    --fade-delay: 0.45s;
+}
+
+/* カテゴリ同士の間隔。★最初の1つには付けないので + で書く。 */
+.skill-category + .skill-category {
+    margin-top: 3.5rem;
+}
+
+/* カテゴリ見出し。下線の色は legal.css の h2 とそろえてある。
+
+   ★baseline ぞろえにするのは、英語名と日本語が別の大きさだから。
+     center にすると日本語のほうが浮いて見える。 */
+.skill-category h2 {
+    margin: 0 0 1.8rem;
+    padding-bottom: 0.6rem;
+
+    font-size: 1.6rem;
+
+    border-bottom: 1px solid var(--field-border);
+
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+
+    transition: border-color var(--theme-fade);
+}
+
+/* 英語名の横に添える日本語。
+
+   ★★opacity で弱めない。
+     0.6 → 0.78 と上げてもまだ読みにくかったので、やめた。
+
+       opacity 0.6  … ライト 4.65 : 1
+       opacity 0.78 … ライト 8.67 : 1
+       指定なし     … ライト 16.12 : 1  ← 今
+
+     ここは 0.95rem の日本語で、英語名(1.6rem)の半分ほどの大きさしかない。
+     小さい日本語は線が密なので、英字と同じ感覚で薄くすると先につぶれる。
+
+   ★弱く見せる役は font-size に任せる。
+     1.6rem と 0.95rem という差が付いていれば、
+     色を落とさなくても「添え物」だとちゃんと読み取れる。 */
+.skill-category-label {
+    font-size: 1.1rem;
+
+    /* ★700(h2から継承)のままだと英語名と同じ強さに見えるので、ここで戻す。
+         400 まで落とさず 500 にしているのは、小さい日本語の輪郭を保つため。 */
+    font-weight: 600;
+}
+
+/* カードを並べる。入るときは2列、狭くなったら自動で1列。
+
+   ▼ ★repeat(2, 1fr) をやめた理由
+
+     2列に固定すると、画面幅が中途半端なとき(900px前後)に
+     1枚あたり350px程度まで痩せる。ロゴと余白を引くと
+     文字が置ける幅は200pxほどしか残らず、
+     コメントが1行10文字ちょっとで折り返して読みにくくなる。
+
+   ▼ auto-fill と minmax の読み方
+
+       minmax(360px, 1fr) … 1枚は最低360px。余った幅は等分して広げる
+       auto-fill          … 360pxが何枚入るか、ブラウザが幅を見て決める
+
+     結果、720px ほど確保できるときだけ2列になり、
+     足りなければ勝手に1列になる。★何pxで折り返すかを書かなくてよい。
+
+   ▼ ★min(360px, 100%) が要る
+
+     minmax の下限は「そこまでしか縮まない」なので、
+     360px と書くと、それより狭いスマホでは
+     カードが画面からはみ出して横スクロールが出る。
+     min(..., 100%) にすると、狭いときは親の幅まで下がってくれる。
+
+   ★auto-fit ではなく auto-fill。
+     auto-fit は空いた列を潰すので、カードが1枚しかないカテゴリ
+     (Database の MySQL、Tools の VS Code)だけ横幅いっぱいに伸び、
+     他のカテゴリと大きさが揃わなくなる。 */
+.skill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+    gap: 1.2rem;
+}
+
+/* スキル1つ分。ロゴを左、名前とコメントを右に置く。
+
+   ★align-items は flex-start。center にすると、コメントが2行のカードと
+     1行のカードでロゴの高さがそろわず、並びががたつく。 */
+.skill-item {
+    display: flex;
+    align-items: flex-start;
+
+    /* ★ここと padding は「箱の大きさ」の側。
+         読みにくさを直すときに触るのは文字の側(font-size)で、
+         箱を膨らませても字は大きくならない。
+         余白を詰めて字を上げるほうが、同じ面積でよく読める。 */
+    gap: 0.9rem;
+
+    padding: 1rem;
+    box-sizing: border-box;
+
+    border-radius: 14px;
+    background-color: var(--card-color);
+
+    /* ★枠が要る理由(ライトモードの話)
+
+         カードの色 #f3f4f6 と ページの地色 #fffef2 の contrast は 1.09 で、
+         ほぼ見分けがつかない(ダークモードは 1.21 でこちらもぎりぎり)。
+         背景だけに頼るとカードの切れ目が消え、
+         中の文字だけが宙に浮いて並んでいるように見える。
+
+       ★base.css が入力欄に --field-border を用意しているのと同じ理由。
+         あちらのコメントにも同じ「背景だけに頼らない」と書いてある。 */
+    border: 1px solid var(--field-border);
+
+    transition:
+        background-color var(--theme-fade),
+        border-color var(--theme-fade);
+}
+
+/* ロゴの白い角丸。大きさはトップ(73px)より小さくする。
+
+   ★flex-shrink: 0 が要る。付けないと、コメントが長いカードで
+     ロゴのほうが押しつぶされて縦長になる。
+
+   ★枠線が要る理由
+     この白い角丸は、もともと濃い緑の上に置く前提の色(#f6f7f8)。
+     ここはカードの色(ライトモードだと #f3f4f6)の上なので、
+     枠が無いと境目が見えず、ロゴが宙に浮いて見える。 */
+#skills-page .skill-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+
+    border: 1px solid var(--field-border);
+    border-radius: 12px;
+
+    transition: border-color var(--theme-fade);
+}
+
+.skill-item-body {
+    /* ★min-width: 0 が要る。
+         flex の中身は既定で「中身より狭くならない」ので、
+         長い英単語やURLがあるとカードごと横に膨らんで列が崩れる。 */
+    min-width: 0;
+}
+
+/* ★margin-top を 0 にしてある。
+     ロゴ(52px)と行の頭をそろえるための微調整だったが、
+     カードの高さにそのまま乗るので外した。
+     ずれが気になるなら 0.1rem 程度まで。 */
+.skill-item-body h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+/* 一言コメント。
+
+   ★ここは opacity で弱めない(以前は 0.75 にしていた)。
+     このページはコメントを読ませるために作ったページなので、
+     いちばん読ませたい文字を薄くするのは筋が悪い。
+     スキル名との差は font-size と font-weight だけで付ける。
+
+       .skill-item-body h3 … 1.25rem・太字
+       ここ                … 1.1rem・並
+
+   ★★0.9 → 0.95 → 1 → 1.1rem と上げてきた。ここから下げないこと。
+     1rem = 16px が本文の基準なので、1.1rem はそれより少し大きい。
+     日本語は同じ px でも英字より線が密で、画数の多い漢字ほど先につぶれる。
+     「機」「験」「築」あたりが読めるかどうかで確かめる。
+
+   ★字を大きくするぶん、箱(padding・ロゴ・行間)は詰めてある。
+     箱を膨らませても字は大きくならないので、
+     読みにくいときに触るのは必ずこちら側。
+
+   ▼ ★line-height はカードの高さに一番効く
+
+     高さに乗るのは「1.1rem × line-height × 行数」なので、
+     0.1 動かすだけで1枚あたり数pxずつ変わる。
+     ただし日本語で 1.6 を下回ると行同士がくっついて読みにくくなるので、
+     高さを詰めたいときも 1.6 が下限。 */
+.skill-item-body p {
+    margin: 0.35rem 0 0;
+
+    font-size: 1.05rem;
+    line-height: 1.45;
+}
+
+/* ---------- スマホ用 ---------- */
+@media (max-width: 768px) {
+    .skills-lead {
+        margin: -1rem 0 2.5rem;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .skill-category + .skill-category {
+        margin-top: 2.5rem;
+    }
+
+    .skill-category h2 {
+        margin-bottom: 1.4rem;
+        font-size: 1.3rem;
+    }
+
+    /* ★列数はここで指定しない。
+         minmax(min(360px, 100%), 1fr) が幅を見て勝手に1列にしてくれる。
+         書くと二重管理になり、片方だけ直したときに食い違う。
+         ここで変えるのは隙間だけ。 */
+    .skill-list {
+        gap: 1rem;
+    }
+
+    #skills-page .skill-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* ★.skill-item の gap と padding はここで上書きしない。
+         PC側を詰めた結果、スマホ用に書きたい値と同じになった。
+         同じ値を2か所に書くと、片方だけ直したときに食い違う。
+
+       ★文字の大きさ(1.1rem)も下げないこと。つぶれる原因そのものなので。 */
+}

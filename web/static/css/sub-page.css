@@ -1,0 +1,79 @@
+/* sub-page = 下層ページ(/products ・ /skills)共通の外枠
+
+   トップページのようにセクションを縦に並べるのではなく、
+   「見出し1つ + 中身 + ホームへ戻る」だけの1枚もの。その型をここに置いている。
+
+     .sub-page        … ページ全体の余白と背景
+     .sub-page h1     … ページの見出し
+     .sub-page-more   … 下端の「ホームへ戻る」
+
+   ★中身の見た目はここに書かない。
+     作品カードなら products-page.css、スキル一覧なら skills-page.css。
+     ここに書くと、片方のページを直しただけでもう片方が動く。
+
+   ★base.html には書かず、各ページの head_extra から読み込む(legal.css と同じ)。
+     読み込む順番は sub-page.css → そのページ用のCSS。逆にすると打ち消される。
+
+   ★head_extra から読み込まれるので mediaqueries.css より後になる。
+     画面幅の調整もこのファイルの末尾に書くこと。 */
+
+/* ★上だけ余白が大きいのは、ヘッダーが position: fixed でページの高さを取らないため。 */
+.sub-page {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    min-height: 100vh;
+    box-sizing: border-box;
+
+    padding: 140px 10% 100px;
+
+    transition:
+        background-color var(--theme-fade),
+        color var(--theme-fade);
+}
+
+.sub-page .container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* トップの h2(3rem)より一段小さくして、下層ページであることを見た目で示す。 */
+.sub-page h1 {
+    margin: 0 0 3rem;
+
+    font-size: 2.5rem;
+    text-align: center;
+
+    --fade-delay: 0.15s;
+}
+
+/* ★見た目は Products セクションの「Read More」(.products-more)と同じ。
+     片方だけ直すとずれるので、変えるときは両方そろえること。 */
+.sub-page-more {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.sub-page-more a,
+.sub-page-more a:visited {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2997ff;
+
+    transition: color 0.15s ease;
+}
+
+.sub-page-more a:hover {
+    color: var(--hover-color);
+}
+
+/* ---------- スマホ用 ---------- */
+@media (max-width: 768px) {
+    .sub-page {
+        padding: 110px 6% 80px;
+    }
+
+    .sub-page h1 {
+        font-size: 1.8rem;
+    }
+}

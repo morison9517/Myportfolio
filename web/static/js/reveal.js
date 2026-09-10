@@ -189,7 +189,7 @@
             rootMargin: `9999px 0px ${bottom} 0px`,
         });
 
-    const observer = makeObserver("-25%");
+    const observer = makeObserver("-5%");
 
     /* 年表は項目の途中から文字が出るので、判定線をその分だけ上げる。 */
     const timelineObserver = makeObserver("-45%");

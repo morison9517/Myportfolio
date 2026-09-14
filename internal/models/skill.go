@@ -223,6 +223,18 @@ var SkillCategories = []SkillCategory{
 				Note: "開発も本番も同じ構成をコンテナで動かしています。Compose で DB と Web をまとめて起動。",
 				HideOnTop: true,
 			},
+			{
+				Name: "Eclipse",
+				Icon: "eclipse.png",
+				Note: "授業で使用。Java、MySQLを使用したミニアプリを課題で制作しました。",
+				HideOnTop: true,
+			},
+			{
+				Name: "IntelliJ IDEA Community",
+				Icon: "IntelliJ.png",
+				Note: "授業で使用。Javaの基本的な文法を学ぶために使用しました。",
+				HideOnTop: true,
+			},
 		},
 	},
 }

@@ -1,6 +1,6 @@
-MIT License
+MIT License (source code only / ソースコードのみ)
 
-Copyright (c) 2026 Kota Morito
+Copyright (c) 2026 morison9517
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+================================================================================
+Scope of this license / 適用範囲
+================================================================================
+
+In this file, "the Software" means the source code of this repository only,
+namely the *.go, *.html, *.css, *.js files and the build / deployment
+configuration files.
+
+上記 MIT License は、本リポジトリの **ソースコード** (*.go / *.html / *.css /
+*.js およびビルド・デプロイ用の設定ファイル) にのみ適用されます。
+
+The following are NOT covered by the MIT License:
+以下は MIT License の対象外です。
+
+  * web/static/images/skills/
+        Logos and trademarks of third parties (AWS, Microsoft Azure, Docker,
+        Go, Java, Python, GitHub and others). All rights belong to their
+        respective owners, and their use is subject to each owner's own
+        trademark and brand guidelines. No rights to these files are granted
+        by this license.
+
+        各社のロゴ・商標です。権利は各権利者に帰属し、利用は各社のガイドラインに
+        従う必要があります。本ライセンスはこれらについて何の権利も許諾しません。
+
+  * All other files under web/static/images/
+        Photographs and graphics. Copyright (c) 2026 morison9517.
+        All rights reserved.
+
+        写真および画像。著作権は著作者に帰属します。無断での使用・複製・改変・
+        再配布を禁じます。
+
+  * The content published on the site
+        Text, profile information, product / work descriptions and the related
+        data embedded in the source. Copyright (c) 2026 morison9517.
+        All rights reserved.
+
+        サイトに掲載している文章・プロフィール・作品情報、およびソース内に
+        記述された当該データ。無断転載を禁じます。

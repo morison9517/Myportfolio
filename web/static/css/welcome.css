@@ -2,12 +2,10 @@
 #welcome {
     min-height: 100vh;
 
-    background-image: url("../images/background.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    background-attachment: fixed;
+    /* ★背景画像は持たない。
+         ページ全体で1枚の板(.page-bg / background.css)を奥に敷いてあり、
+         ここに背景を置かないことで、その画像が透けて見える。
+         下の ::before(黒い膜)は板より手前なので、そのまま効く。 */
 
     display: flex;
     justify-content: center;

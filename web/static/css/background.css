@@ -1,0 +1,59 @@
+/* ページ全体の背景画像レイヤー(トップページ専用)
+
+   ▼ 何をするものか
+
+     画面いっぱいの背景画像を1枚だけ、ページのいちばん奥に敷いておく。
+     その手前に各セクションが重なり、背景を持たない #welcome と #experience
+     のところだけ、奥の画像が透けて見える。
+
+       ［奥］  .page-bg … 画面に貼り付いた背景画像(このファイル)
+               #welcome     背景なし → 画像が見える
+               #about       不透明   → 画像が隠れる
+               #skills      不透明   → 画像が隠れる
+               #products    不透明   → 画像が隠れる
+               #experience  背景なし → 画像が見える
+               #contact     不透明   → 画像が隠れる
+       ［手前］文章・年表
+
+     2つのセクションが1枚を共有しているので、離れていても
+     「ずっと奥に同じ景色がある」ように見える。
+     板を置くのは index.html(<div class="page-bg">)。
+
+   ▼ ★以前の作り(セクションごとに background-image + background-attachment: fixed)
+       をやめた理由
+
+     1つめ。background-attachment: fixed はスマホ(特にiOS)で描画が崩れる。
+
+     2つめ。background-size: cover は「その要素の高さ」に合わせて画像を伸ばす。
+     #welcome は高さが画面1つぶん(100vh)なのでちょうど収まるが、
+     年表で縦に長くなる #experience では画像が何倍にも拡大され、
+     スクロールに合わせて画面内を流れていくように見えてしまっていた。
+
+     要素の背景ではなく「画面に貼り付いた板」を1枚置けば、どちらも起きない。
+     画面の大きさで画像を切るので拡大されず、
+     position: fixed は要素そのものに対する指定なので iOS でも素直に効く。 */
+.page-bg {
+    position: fixed;
+    inset: 0;
+
+    /* ★z-index: -1 … すべてのセクションより奥へ下げる。
+         これで #about などの不透明な背景には隠れ、
+         背景を持たない #welcome と #experience でだけ顔を出す。
+
+       ★下げても消えはしない。body の背景色(base.css)は
+         ページの地としていちばん先に塗られるので、板はその手前に残る。
+
+       ★この指定が効くのは、間に「重なりの基準」が無いから。
+         <main> や <body> に position + z-index / transform / filter などを
+         足すと、そこが新しい基準になって板がセクションの手前に出てしまう。 */
+    z-index: -1;
+
+    background-image: url("../images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* ★奥にあるとはいえ、ページ全体を覆う板なので、
+         クリックやタップは素通りさせておく。 */
+    pointer-events: none;
+}

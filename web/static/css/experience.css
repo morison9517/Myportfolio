@@ -1,15 +1,12 @@
 /*experience section*/
-/* 背景画像の使い方は #welcome と同じ。
-   画像の上に黒い膜(::before)を敷いて、その上に白文字を載せる。 */
+/* 背景の出し方は #welcome と同じ。
+   ★このセクションも自前の背景画像は持たない。
+     ページ全体で1枚の板(.page-bg / background.css)を奥に敷いてあり、
+     背景を置かないことで、そこから同じ画像が透けて見える。
+     #welcome と同じ1枚なので、離れていても同じ景色として続いて見える。
+   その画像の上に黒い膜(::before)を敷いて、さらに上へ白文字を載せる。 */
 #experience {
     padding: 100px 10%;
-
-    background-image: url("../images/background.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    background-attachment: fixed;
 
     position: relative;
 

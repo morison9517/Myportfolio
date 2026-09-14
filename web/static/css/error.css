@@ -124,7 +124,11 @@
      あちらに #error を書いても、こちらの指定に打ち消されてしまうため。 */
 @media (max-width: 768px) {
     /* ★background-attachment: fixed はスマホ(特にiOS)で描画がおかしくなるため、
-         #welcome・#experience と同じく scroll に戻す。 */
+         scroll に戻す。
+       ★このページは #welcome と同じく高さが画面1つぶん(100vh)なので、
+         cover で画像が拡大されることはなく、これで足りる。
+         トップページの #welcome・#experience は縦に長い #experience の都合で、
+         ページ全体に1枚の板を敷くやり方(background.css)に変えてある。 */
     #error {
         background-attachment: scroll;
         padding: 80px 6%;

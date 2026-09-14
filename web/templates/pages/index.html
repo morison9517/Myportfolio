@@ -35,6 +35,11 @@
 {{ end }}
 
 {{ define "content" }}
+        {{/* ページ全体の背景画像レイヤー。
+             #welcome と #experience は背景を持たず、ここから透けて見える。
+             仕掛けは background.css。 */}}
+        <div class="page-bg"></div>
+
         {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
              出る順番は welcome.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
         <section id="welcome">

@@ -43,10 +43,6 @@
         display: flex;
     }
 
-    #experience {
-        margin-top: 2rem;
-    }
-
     section {
         height: fit-content;
         margin: 0;
@@ -95,10 +91,6 @@
 }
 
 @media (max-width: 768px) {
-    #welcome {
-        background-attachment: scroll;
-    }
-
     /* ▼ Welcome の見出し
        ★4rem のままだと「Welcome to My Portfolio!」がスマホ幅で必ず折り返す。
 
@@ -223,10 +215,10 @@
     }
 
     /* Experience
-       ★background-attachment: fixed はスマホ(特にiOS)で描画がおかしくなるため、
-         #welcome と同じく scroll に戻す。 */
+       ★背景画像はページ全体の板(.page-bg / background.css)が描くので、
+         ここで背景について直すことは無い。画面の大きさで切られた1枚が
+         奥に貼り付いたままなので、スマホでも拡大されず、動きもしない。 */
     #experience {
-        background-attachment: scroll;
         padding: 80px 6%;
     }
 

@@ -35,6 +35,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{/* ▼ アクセス解析(Google Analytics 4)
+
+         ★測定IDが設定されているときだけ出す。
+           IDは .env の GA_MEASUREMENT_ID から来る(internal/config/config.go)。
+           開発中の .env には書かないこと。書くと自分の表示確認が
+           そのまま訪問者数に足され、本番の数字が狂う。
+
+         ★できるだけ <head> の上のほうに置くこと。
+           下に置くと、読み込みの途中で閉じられたページを取りこぼす。
+
+         async … この読み込みを待たずに先へ進む指定。
+                 付けないと、解析タグが遅いときに本文の表示まで止まる。 */}}
+    {{ if .GAMeasurementID }}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ .GAMeasurementID }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ .GAMeasurementID }}');
+    </script>
+    {{ end }}
     <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}</title>
 
     {{/* 検索結果に出る説明文。中身は internal/view/page.go の Description。 */}}

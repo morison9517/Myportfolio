@@ -132,6 +132,16 @@ type Config struct {
 	//	★上げすぎると普通の利用者まで弾く。
 	//	  実際に弾かれた記録([contact] ログの点数)を見てから動かすこと。
 	RecaptchaMinScore float64
+
+	// ▼ アクセス解析(Google Analytics 4)
+	//
+	//	GAMeasurementID … 「G-」で始まる測定ID。
+	//	                  画面に埋めるので人に見えてよい。
+	//
+	//	★空のときは計測タグを一切出さない(base.html 側で {{ if }} している)。
+	//	  開発中の .env には書かないこと。書くと自分の表示確認が
+	//	  そのまま訪問者数に足され、本番の数字が狂う。
+	GAMeasurementID string
 }
 
 // Load = .env を読んで Config を組み立てて返す。起動時に1回だけ呼ぶ。
@@ -179,6 +189,8 @@ func Load() *Config {
 		RecaptchaSiteKey:   env("RECAPTCHA_SITE_KEY", ""),
 		RecaptchaSecretKey: env("RECAPTCHA_SECRET_KEY", ""),
 		RecaptchaMinScore:  envFloat("RECAPTCHA_MIN_SCORE", 0.5),
+
+		GAMeasurementID: env("GA_MEASUREMENT_ID", ""),
 	}
 
 	// ★本番で割り印が初期値のままだと、メモの中身を偽造される。

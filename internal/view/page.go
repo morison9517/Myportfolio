@@ -74,6 +74,7 @@ func Setup(c *config.Config, templateDir string) (*Renderer, error) {
 //	{{ .CSRFToken }}         … フォームに入れる整理券
 //	{{ .Flashes }}           … 「保存しました」などのメッセージ
 //	{{ .RecaptchaSiteKey }}  … スパム対策の鍵(未設定なら空)
+//	{{ .GAMeasurementID }}   … アクセス解析の測定ID(未設定なら空)
 func Page(c *gin.Context, data gin.H) gin.H {
 	if data == nil {
 		data = gin.H{}
@@ -104,6 +105,10 @@ func Page(c *gin.Context, data gin.H) gin.H {
 	//   未設定なら空文字が入り、画面側は {{ if }} で読み込みを飛ばす。
 	if cfg != nil {
 		data["RecaptchaSiteKey"] = cfg.RecaptchaSiteKey
+
+		// ★アクセス解析の測定ID。未設定なら空文字が入り、
+		//   base.html 側が {{ if }} で計測タグごと飛ばす。
+		data["GAMeasurementID"] = cfg.GAMeasurementID
 	}
 
 	return data

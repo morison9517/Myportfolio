@@ -237,6 +237,26 @@ var SkillCategories = []SkillCategory{
 			},
 		},
 	},
+	{
+		Name: "AI",
+		Label: "生成AI",
+		Skills: []Skill{
+			{
+				// ★HideOnTop はロゴ待ちではなく、トップを12個に保つため。
+				Name: "Claude Code",
+				Icon: "claude-code.png",
+				Note: "本ポートフォリオサイトの開発で使用しました。コーディングやコードの見直しなどに使っています。",
+				HideOnTop: true,
+			},
+			{
+				// ★HideOnTop はロゴ待ちではなく、トップを12個に保つため。
+				Name: "ChatGPT",
+				Icon: "chatGPT.png",
+				Note: "本サイト以外の開発で使用しました。コーディングやエラーの原因調べなどに使っています。",
+				HideOnTop: true,
+			},
+		},
+	},
 }
 
 // TopSkills = トップページのアイコン一覧に出すぶんだけを、
@@ -244,10 +264,6 @@ var SkillCategories = []SkillCategory{
 //
 //	HideOnTop: true のものは飛ばす。
 //	カテゴリの順・その中の順のまま並ぶので、トップもカテゴリごとにまとまって見える。
-//
-// ★一覧を別に持たず毎回組み立てているのは、SkillCategories を直したときに
-// こちらを直し忘れて食い違うのを防ぐため。
-// 一覧は十数件なので、作り直しても負担にならない。
 func TopSkills() []Skill {
 	skills := []Skill{}
 

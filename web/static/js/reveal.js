@@ -17,16 +17,21 @@
         return;
     }
 
-    const revealLead = (() => {
-        const raw = getComputedStyle(html).getPropertyValue("--reveal-lead").trim();
+    /* CSS に書いた時間(0.7s / 700ms)をミリ秒で読む。
+       ★待ち時間の値はCSS側だけに置くこと。両方に書くとずれる。 */
+    const readTime = (name, fallback) => {
+        const raw = getComputedStyle(html).getPropertyValue(name).trim();
         const value = parseFloat(raw);
 
         if (!value) {
-            return 200;
+            return fallback;
         }
 
         return raw.endsWith("ms") ? value : value * 1000;
-    })();
+    };
+
+    /* 年表の線を1項目ぶん引くのにかかる時間。次の項目を待たせる長さになる。 */
+    const lineDuration = readTime("--line-duration", 700);
 
     /* ---------- カードを順番に出すセクション ----------
        Skills と Products は作りが同じなので、1つの表で扱う。
@@ -104,7 +109,10 @@
 
     let timelineNext = 0;
 
-    /* 1件目は待たずに出し、2件目からは前の項目の revealLead 後に出す。
+    /* 1件目は待たずに出し、2件目からは「前の項目の線を引き終わった時刻」に出す。
+       ★ここを lineDuration より短くしないこと。
+         短くすると次の線が前の線より先に走り出し、
+         線がまだ届いていないのに次の点(丸・破断マーク)が出てしまう。
        まとめて入ってきても必ず上から順になる。 */
     const queueTimelineItem = (item) => {
         setMarkProgress(item);
@@ -117,7 +125,7 @@
             `${((start - now) / 1000).toFixed(2)}s`
         );
 
-        timelineNext = start + revealLead;
+        timelineNext = start + lineDuration;
     };
 
     /* ★ここに書くのは「画面に入ったかを見る単位」。

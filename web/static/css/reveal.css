@@ -17,7 +17,7 @@ html.reveal {
     --reveal-shift-x: 30px;
 
     /* 年表の縦線を、項目1つぶん引くのにかける時間。 */
-    --line-duration: 0.7s;
+    --line-duration: 0.55s;
 
     --reveal-lead: 0.3s;
 }

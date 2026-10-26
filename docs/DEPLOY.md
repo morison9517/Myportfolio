@@ -412,7 +412,7 @@ docker compose -f compose.prod.yml up -d web
 ### ⑤ 自動更新を仕掛ける
 
 証明書は90日で切れます。放置するとサイトが開けなくなるので、
-月に一度、更新を試すようにしておきます。
+毎日、更新を試すようにしておきます。
 
 ```bash
 crontab -e
@@ -421,11 +421,23 @@ crontab -e
 開いたファイルの末尾に、次の1行を足します。
 
 ```
-0 4 1 * * cd ~/Myportfolio && docker run --rm -v case_gin_prod_certbot_conf:/etc/letsencrypt -v case_gin_prod_certbot_www:/var/www/certbot certbot/certbot renew --webroot -w /var/www/certbot --quiet && docker compose -f compose.prod.yml exec nginx nginx -s reload
+0 4 * * * cd ~/Myportfolio && docker run --rm -v case_gin_prod_certbot_conf:/etc/letsencrypt -v case_gin_prod_certbot_www:/var/www/certbot certbot/certbot renew --webroot -w /var/www/certbot --quiet && docker compose -f compose.prod.yml exec -T nginx nginx -s reload
 ```
 
-毎月1日の午前4時に更新を試し、成功したら Nginx に設定を読み直させます。
-期限が近くないときは certbot が何もせずに終わるので、毎月動かして構いません。
+毎日午前4時に更新を試し、成功したら Nginx に設定を読み直させます。
+期限まで30日を切るまでは certbot が何もせずに終わるので、毎日動かして構いません
+(料金も変わりません)。
+
+> ★**月1回にしないこと。** 30日を切ってから試せる回数が1〜2回しかなく、
+> 1度失敗すると期限切れに間に合わないことがある。
+> Let's Encrypt は期限切れのお知らせメールをもう送らないので、この cron が唯一の安全網。
+>
+> ★**`exec -T` の `-T` を消さないこと。** cron には画面(TTY)が無いため、
+> `-T` が無いと reload がエラーで止まり、新しい証明書が読み込まれない。
+>
+> ★仕掛けたら、一度この1行を手で打って動くことを確かめる。
+> 期限がまだ遠いときに取り直したいなら `renew` の後ろに `--force-renewal` を足す
+> (サイトは止まらない)。
 
 > ★更新は `--standalone` ではなく `--webroot` を使っています。
 > Nginx を止めずに済むため、更新のたびにサイトが落ちません。

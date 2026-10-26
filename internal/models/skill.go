@@ -68,7 +68,7 @@ var SkillCategories = []SkillCategory{
 			{
 				Name: "HTML5",
 				Icon: "html5.png",
-				Note: "授業の中から個人開発、ハッカソンまで幅広くお世話になっています。構造を意識した開発を行っています。",
+				Note: "個人開発からハッカソンまで幅広くお世話になっています。構造を意識した開発をしています。",
 			},
 			{
 				Name: "CSS3",
@@ -100,7 +100,7 @@ var SkillCategories = []SkillCategory{
 			{
 				Name: "Java",
 				Icon: "java.png",
-				Note: "主に授業で学習しています。オブジェクト指向の考え方は、ほかの言語を読むときの土台になっています。",
+				Note: "授業で学習しています。オブジェクト指向の考え方は、多言語に触れる際にも役立っています。",
 			},
 			{
 				Name: "PHP",
@@ -220,7 +220,7 @@ var SkillCategories = []SkillCategory{
 				// ★HideOnTop はロゴ待ちではなく、トップを12個に保つため。
 				Name: "Docker",
 				Icon: "docker.png",
-				Note: "開発も本番も同じ構成をコンテナで動かしています。Compose で DB と Web をまとめて起動。",
+				Note: "個人開発からハッカソンまでのインフラで使用。本ページもDockerで動かしています。",
 				HideOnTop: true,
 			},
 			{

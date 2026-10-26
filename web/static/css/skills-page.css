@@ -1,12 +1,12 @@
 /* skills-page = 技術の一覧ページ(/skills)
 
    ページの外枠(余白・見出し・戻るリンク)は sub-page.css。
-   ここはカテゴリの見出しと、スキル1つ分のカードだけ。
+   ここはカテゴリの見出しと、スキル1つ分の並びだけ。
 
    ▼ ★トップの Skills(skills.css)とは作りを分けている
 
      トップ … 背景が濃い緑。アイコンと名前だけを6列でびっしり並べる。
-     ここ  … 背景がページの地色。1つずつにコメントが付くので横並びのカード。
+     ここ  … 背景がページの地色。1つずつにコメントが付くので、ロゴの横に文字を置く。
 
      同じ id(#skills)を使い回すと、トップ用の「緑背景・白文字」を
      全部打ち消すことになり、打ち消し漏れでライトモードだけ
@@ -140,53 +140,34 @@
 
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
-    gap: 1.2rem;
+
+    /* ★箱が無いので、間隔だけで1つずつの切れ目を見せる。
+         縦 1.2rem だと上下のコメントがくっついて読めたので広げた。 */
+    gap: 1.8rem 2.4rem;
 }
 
 /* スキル1つ分。ロゴを左、名前とコメントを右に置く。
 
-   ★align-items は flex-start。center にすると、コメントが2行のカードと
-     1行のカードでロゴの高さがそろわず、並びががたつく。 */
+   ★align-items は flex-start。center にすると、コメントが2行のものと
+     1行のものでロゴの高さがそろわず、並びががたつく。
+
+   ★背景・枠・角丸の箱はやめた(見た目をシンプルにするため)。
+     区切りは .skill-list の gap だけで付けている。
+     箱を戻すなら padding も一緒に戻すこと。 */
 .skill-item {
     display: flex;
     align-items: flex-start;
-
-    /* ★ここと padding は「箱の大きさ」の側。
-         読みにくさを直すときに触るのは文字の側(font-size)で、
-         箱を膨らませても字は大きくならない。
-         余白を詰めて字を上げるほうが、同じ面積でよく読める。 */
     gap: 0.9rem;
-
-    padding: 1rem;
-    box-sizing: border-box;
-
-    border-radius: 14px;
-    background-color: var(--card-color);
-
-    /* ★枠が要る理由(ライトモードの話)
-
-         カードの色 #f3f4f6 と ページの地色 #fffef2 の contrast は 1.09 で、
-         ほぼ見分けがつかない(ダークモードは 1.21 でこちらもぎりぎり)。
-         背景だけに頼るとカードの切れ目が消え、
-         中の文字だけが宙に浮いて並んでいるように見える。
-
-       ★base.css が入力欄に --field-border を用意しているのと同じ理由。
-         あちらのコメントにも同じ「背景だけに頼らない」と書いてある。 */
-    border: 1px solid var(--field-border);
-
-    transition:
-        background-color var(--theme-fade),
-        border-color var(--theme-fade);
 }
 
 /* ロゴの白い角丸。大きさはトップ(73px)より小さくする。
 
-   ★flex-shrink: 0 が要る。付けないと、コメントが長いカードで
+   ★flex-shrink: 0 が要る。付けないと、コメントが長いものほど
      ロゴのほうが押しつぶされて縦長になる。
 
    ★枠線が要る理由
      この白い角丸は、もともと濃い緑の上に置く前提の色(#f6f7f8)。
-     ここはカードの色(ライトモードだと #f3f4f6)の上なので、
+     ここはページの地色(ライトモードだと #fffef2)の上なので、
      枠が無いと境目が見えず、ロゴが宙に浮いて見える。 */
 #skills-page .skill-icon {
     width: 52px;
@@ -243,7 +224,7 @@
         font-size: 1.3rem;
     }
     .skill-list {
-        gap: 1rem;
+        gap: 1.5rem;
     }
 
     #skills-page .skill-icon {

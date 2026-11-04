@@ -112,5 +112,27 @@ html:not(.wf-loading):not(.fade-hold) .scroll-indicator.font-fade {
 
     background-color: #f9fafb;
 
-    animation: scroll-line 1.4s ease-in-out infinite;
+    /* WCAG 2.2.2: 動きが5秒を超えるなら止める手段が要るので、3回で止める。
+       止めたあとは線を出したまま、次の動きで静かに戻す。 */
+    animation:
+        scroll-line 1.4s ease-in-out 3,
+        scroll-line-settle 0.5s ease-out 4.2s forwards;
+}
+
+@keyframes scroll-line-settle {
+    from {
+        transform: scaleY(0);
+        transform-origin: top;
+    }
+
+    to {
+        transform: scaleY(1);
+        transform-origin: top;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-indicator::after {
+        animation: none;
+    }
 }

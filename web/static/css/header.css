@@ -44,8 +44,22 @@ nav a{
     position: relative;
 }
 
+/* display: none にするとキーボードで選べず、読み上げにも伝わらない。
+   見た目だけ隠して、操作できる状態で残す。 */
 .theme-switch__input{
-    display: none;
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    margin: 0;
+
+    opacity: 0;
+}
+
+.theme-switch__input:focus-visible + .theme-switch__label{
+    outline: 2px solid var(--text-color);
+    outline-offset: 2px;
 }
 
 .theme-switch__label{
@@ -60,6 +74,9 @@ nav a{
 
     /* ライトモード時のトラック(溝)の色。ダークは下の :checked 側。 */
     background-color: #FFEF6C;
+
+    /* 黄色のトラックは明るい背景に溶けるので、スイッチの形が分かるよう線を引く。 */
+    box-shadow: inset 0 0 0 1px #92400e;
 
     cursor: pointer;
 
@@ -164,6 +181,7 @@ nav a{
 .theme-switch__input:checked
 + .theme-switch__label{
     background-color: #64748b;
+    box-shadow: none;
 }
 
 .theme-switch__input:checked
@@ -172,19 +190,39 @@ nav a{
 }
 
 /*ヘッダー：ハンバーガーメニュー*/
+/* 押せる範囲は44px四方。負のマージンで、ヘッダーの高さと線の位置は元のまま保つ。 */
 .hamburger-icon {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 15px;
 
-    width: 40px;
+    width: 44px;
+    height: 44px;
+    margin: -5px -2px;
+    padding: 0;
+
+    border: 0;
+    border-radius: 4px;
+    background: none;
+
     cursor: pointer;
     position: relative;
     z-index: 1001;
 }
 
+.hamburger-icon:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 2px;
+}
+
+.hamburger-icon.open:focus-visible {
+    outline-color: white;
+}
+
 .hamburger-icon span {
-    width: 100%;
+    width: 40px;
     height: 2px;
     background-color: var(--text-color);
     transition:
@@ -215,7 +253,16 @@ nav a{
     left: 0;
 
     width: 320px;
+
+    /* 100vh はスマホのアドレスバーぶん余るので、対応ブラウザでは 100dvh を使う。 */
     height: 100vh;
+    height: 100dvh;
+
+    /* 横向きや拡大時は項目が入りきらないので、メニューの中をスクロールできるようにする。
+       border-box が無いと padding のぶん下端が画面外に出て、最後まで届かない。 */
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 
     background-color: #737272;
 
@@ -236,7 +283,7 @@ nav a{
     padding-top: 50px;
 }
 
-.menu-links h1,
+.menu-title,
 .menu-links li {
     opacity: 0;
     transform: translateY(20px);
@@ -246,15 +293,16 @@ nav a{
         transform 0.4s ease;
 }
 
-.menu-links.open h1,
+.menu-links.open .menu-title,
 .menu-links.open li {
     opacity: 1;
     transform: translateY(0);
 }
 
-.menu-links h1 {
+.menu-title {
     color: #f9fafb;
     font-size: 3.5rem;
+    font-weight: 700;
     margin-top: 50px;
     margin-bottom: 40px;
 }
@@ -268,6 +316,9 @@ nav a{
 }
 
 .menu-links a {
+    display: inline-block;
+    padding: 4px 12px;
+
     font-size: 1.5rem;
     color: #f9fafb;
     text-decoration: none;
@@ -287,7 +338,7 @@ nav a{
         visibility 0s linear 0s;
 }
 
-.menu-links.open h1 {
+.menu-links.open .menu-title {
     transition-delay: 0s;
 }
 

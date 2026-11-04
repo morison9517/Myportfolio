@@ -71,8 +71,9 @@
     padding-bottom: 0.6rem;
 
     font-size: 1.6rem;
+    font-size: clamp(1.3rem, 3.2cqi, 1.6rem);
 
-    border-bottom: 1px solid var(--field-border);
+    border-bottom: 1px solid var(--divider-color);
 
     display: flex;
     align-items: baseline;
@@ -172,9 +173,11 @@
 #skills-page .skill-icon {
     width: 52px;
     height: 52px;
+    width: clamp(48px, 9cqi, 52px);
+    height: clamp(48px, 9cqi, 52px);
     flex-shrink: 0;
 
-    border: 1px solid var(--field-border);
+    border: 1px solid var(--divider-color);
     border-radius: 12px;
 
     transition: border-color var(--theme-fade);
@@ -221,14 +224,8 @@
 
     .skill-category h2 {
         margin-bottom: 1.4rem;
-        font-size: 1.3rem;
     }
     .skill-list {
         gap: 1.5rem;
-    }
-
-    #skills-page .skill-icon {
-        width: 48px;
-        height: 48px;
     }
 }

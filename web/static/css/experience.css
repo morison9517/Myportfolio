@@ -6,7 +6,7 @@
      #welcome と同じ1枚なので、離れていても同じ景色として続いて見える。
    その画像の上に黒い膜(::before)を敷いて、さらに上へ白文字を載せる。 */
 #experience {
-    padding: 100px 10%;
+    padding: var(--section-pad-y) var(--section-gutter);
 
     position: relative;
 
@@ -99,6 +99,10 @@
      margin にすると項目と項目の間に隙間ができ、そこで縦線が途切れる。
      padding なら線が下まで伸びるので、線が1本につながる。 */
 .timeline-body {
+    /* ★文字を大きくしている人でも、長い単語で列が画面の外へ押し出されないようにする。 */
+    min-width: 0;
+    overflow-wrap: anywhere;
+
     /* ★線は下の ::after が引く。この border は幅(2px)を確保するためだけの透明。
          太さを変えるときは、ここと ::after の width の両方を直すこと。 */
     border-left: 2px solid transparent;
@@ -270,11 +274,12 @@
 
 .timeline-links a,
 .timeline-links a:visited {
-    color: #2997ff;
+    color: var(--link-on-dark);
 
     transition: 0.15s ease;
 }
 
 .timeline-links a:hover {
-    color: var(--hover-color);
+    color: #ffffff;
+    text-decoration: underline;
 }

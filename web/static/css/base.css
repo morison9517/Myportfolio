@@ -18,7 +18,29 @@
          入力欄の背景(--card-color #f3f4f6)とページの背景(--bg-color #fffef2)は
          ライトモードだとほとんど同じ明るさで、枠が無いとどこが入力欄か分からない。
          背景だけに頼らず、はっきりした線を引くための色。 */
-    --field-border: #d1d5db;
+    --field-border: #858b94;
+
+    /* 区切り線など、見えなくても操作に困らない線の色。入力欄の枠とは分けてある。
+       入力欄の枠は WCAG 1.4.11 で背景に対して 3:1 以上が必要なので濃い。 */
+    --divider-color: #d1d5db;
+
+    /* リンクの色。WCAG 1.4.3 で背景に対して 4.5:1 以上が必要。 */
+    --link-color: #0b62b8;
+
+    /* セクションの余白。画面幅に比例させて、幅を変えても段差が出ないようにする。
+       左右は 640px で 6%、1024px で 10% になるよう傾きを決めてある。 */
+    --section-gutter: clamp(6%, 16.67vw - 68px, 10%);
+    --section-pad-y: clamp(80px, 5.2vw + 47px, 100px);
+
+    /* 下層ページの上下の余白(上はヘッダーのぶん大きい)。 */
+    --sub-page-pad-top: clamp(110px, 7.8vw + 60px, 140px);
+    --sub-page-pad-bottom: clamp(80px, 5.2vw + 47px, 100px);
+
+    /* 緑の帯や写真など、テーマに関係なく背景が濃い場所のリンク。 */
+    --link-on-dark: #cfe8ff;
+
+    /* 必須の印や入力エラーの色。 */
+    --danger-color: #b91c1c;
 
     /* ★ダーク/ライト切り替えのフェード時間。
          テーマ色を持つ要素は必ずこの変数を使う。
@@ -93,7 +115,14 @@ body.dark{
 
     --header-bg: rgba(17,24,39,0.65);
 
-    --field-border: #4b5563;
+    --field-border: #7b8494;
+    --divider-color: #4b5563;
+
+    --link-color: #2997ff;
+    --danger-color: #fca5a5;
+
+    /* ライトの #353535 のままだと、ホバーした文字が暗い背景に沈む。 */
+    --hover-color: #d1d5db;
 }
 
 body{
@@ -127,6 +156,47 @@ body{
          font-weight なら見出し側の指定がそのまま勝つ。 */
     font-weight: 600;
     font-style: normal;
+}
+
+/* キーボード操作で最初に現れる「本文へ移動」。普段は画面の外に置いておく。 */
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+
+    z-index: 1100;
+
+    padding: 0.75rem 1rem;
+
+    border-radius: 8px;
+
+    background-color: var(--text-color);
+    color: var(--bg-color);
+
+    transform: translateY(-200%);
+}
+
+.skip-link:visited {
+    color: var(--bg-color);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* 移動先の本文全体に枠が出ないようにする。中の部品の枠はそのまま出る。 */
+main:focus {
+    outline: none;
+}
+
+/* キーボードで移動したとき、固定ヘッダー(高さ75px)の裏に部品が隠れないようにする。
+   セクション見出しへのジャンプには影響しない。 */
+a[href],
+button,
+input,
+textarea,
+select {
+    scroll-margin-block: 90px;
 }
 
 /* フッターのアイコンのみfooter.cssに独立させている。 */

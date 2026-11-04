@@ -4,7 +4,7 @@
    ライトモードで黒になって読めなくなる。 */
 #skills {
     background-color: var(--accent-color);
-    padding: 80px 10%;
+    padding: 80px var(--section-gutter);
 }
 
 /* 見出しは #about h2 と同じ大きさ・余白にそろえてある */
@@ -88,13 +88,13 @@
 .skills-more a:visited {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #83c3ff;
+    color: var(--link-on-dark);
 
     transition: color 0.15s ease;
 }
 
-/* ホバー時の色は他セクション(.about-details a / .product-card a h3)と同じ
-   var(--hover-color) を使う */
+/* 緑の背景では var(--hover-color) が沈むので、白と下線で示す。 */
 .skills-more a:hover {
-    color: var(--hover-color);
+    color: #ffffff;
+    text-decoration: underline;
 }

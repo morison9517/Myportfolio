@@ -70,7 +70,7 @@
 
                     <div class="about-text">
                         <h3>Kota Morito</h3>
-                        <h5>森藤 滉太</h5>
+                        <p class="about-name-ja">森藤 滉太</p>
 
                         <p>
                             Webエンジニアを目指している専門学生です。<br>
@@ -118,7 +118,7 @@
             <div class="container">
                 <h2>Skills</h2>
 
-                {{/* 6列×2行。スマホ(768px以下)では3列×4行になる(mediaqueries.css)。
+                {{/* 6列×2行。.container の幅が狭いと3列×4行になる(mediaqueries.css)。
 
                      {{ .Skills }} … スキルの一覧(internal/models/skill.go)を
                      カテゴリの区切りを外して1本にしたもの(models.TopSkills)。
@@ -157,11 +157,8 @@
 
                 {{/* 上から時系列順(古い→新しい)に並べてある。
 
-                     並び方は画面幅で3段階に変わる(指定は mediaqueries.css)。
-
-                       PC全画面(1536px〜)        4列×1行(横1行に4枚)
-                       PC半画面・タブレット       2列×2行
-                       スマホ(〜768px)           1列×4行(縦積み)
+                     既定は2列×2行。.container の幅が狭いと1列×4行になる
+                     (指定は mediaqueries.css の @container)。
 
                      1件 = <li class="product-card"> 1つ。中身は3段。
 
@@ -178,13 +175,8 @@
                        それを横長の窓から覗く形で使い、はみ出す上下を
                        object-fit: cover が切り落とす。
 
-                       窓の幅はカードの幅で決まってしまうので、
-                       切り取る帯の厚みを揃えるために、
-                       列数が変わる段階ごとに比率を作り直している。
-
-                         2列(基準)   16:5  カード434px → 帯136px
-                         4列(広い)   12:5  カード326px → 帯136px
-                         1列(スマホ) 5:2   カード343px → 帯137px
+                       切り取る帯の厚みは .container の幅に比例して
+                       136px〜182px の間で変わる(指定は mediaqueries.css)。
 
                        ★上下が切られる前提なので、ロゴは正方形の中央に置くこと。
                          端に寄せると広い画面で見切れる。

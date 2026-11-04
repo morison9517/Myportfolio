@@ -3,7 +3,7 @@
    ★テーマ切り替えのフェードも同じ var(--theme-fade) にそろえる。
      付け忘れるとここだけ先に色が変わって見える(base.css の説明を参照)。 */
 #contact {
-    padding: 100px 10%;
+    padding: var(--section-pad-y) var(--section-gutter);
 
     /* ▼ フッターと合わせて画面ちょうど1枚分になる高さにする。
 
@@ -78,11 +78,11 @@
 }
 
 /* 必須の印。3項目とも必須なので全部に付く。
-   ★色は .flash-error と同じ赤にそろえてある。 */
+   ★暗い背景では赤が沈むので、テーマごとの var(--danger-color) を使う。 */
 .required-mark {
     margin-left: 0.3rem;
 
-    color: #b91c1c;
+    color: var(--danger-color);
 
     /* ★* は文字の上のほうに描かれるので、少し大きくしないと目立たない。 */
     font-size: 1.2rem;
@@ -149,7 +149,7 @@
      対応していないブラウザでは、この指定が無視されるだけ。 */
 .contact-form input:user-invalid,
 .contact-form textarea:user-invalid {
-    border-color: #b91c1c;
+    border-color: var(--danger-color);
 }
 
 /* ★ブラウザの自動入力(オートフィル)対策。

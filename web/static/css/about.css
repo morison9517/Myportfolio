@@ -1,7 +1,7 @@
 /*about section*/
 #about {
     background-color: var(--bg-color);
-    padding: 80px 10%;
+    padding: 80px var(--section-gutter);
 
     transition: background-color var(--theme-fade);
 }
@@ -41,14 +41,19 @@
     margin-bottom: 0.1rem;
 }
 
-.about-text h5 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
 .about-text p {
     line-height: 1.6;
     margin-bottom: 1rem;
+}
+
+/* 日本語の名前。見出しではないので p だが、見た目は見出しに合わせる。 */
+.about-text .about-name-ja {
+    margin-top: 1.67em;
+    margin-bottom: 1.5rem;
+
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: normal;
 }
 
 .about-details {
@@ -65,7 +70,7 @@
 
 .about-details a,
 .about-details a:visited{
-    color: #2997ff;
+    color: var(--link-color);
 
     transition: 0.15s ease;
 }

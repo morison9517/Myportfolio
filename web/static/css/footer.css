@@ -57,14 +57,15 @@ footer {
 
 footer a,
 footer a:visited {
-    color: #83c3ff;
+    color: var(--link-on-dark);
 
     transition: color 0.15s ease;
 }
 
-/* ホバーの色は他セクションと同じ var(--hover-color) にそろえてある */
+/* 緑の背景では var(--hover-color) が沈むので、白と下線で示す。 */
 footer a:hover {
-    color: var(--hover-color);
+    color: #ffffff;
+    text-decoration: underline;
 }
 
 .footer-copyright {
@@ -72,13 +73,12 @@ footer a:hover {
     font-size: 0.85rem;
 }
 
-/* ロゴのクレジット。opacity で薄くしている。
-   色を別に指定していないので、白のまま濃さだけが下がる。 */
+/* ロゴのクレジット。
+   ★opacity で薄くしないこと。緑の背景でコントラスト 4.5:1 を切る。 */
 .footer-credits {
     margin: 0.8rem 0 0;
     font-size: 0.7rem;
     line-height: 1.7;
-    opacity: 0.7;
 }
 
 .footer-credits a,

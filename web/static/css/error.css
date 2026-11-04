@@ -10,7 +10,7 @@
          これが無いと min-height の 100vh に padding が足されて、
          中身が短いのに縦スクロールが出てしまう。 */
     min-height: 100vh;
-    padding: 100px 10%;
+    padding: var(--section-pad-y) var(--section-gutter);
     box-sizing: border-box;
 
     display: flex;
@@ -56,7 +56,8 @@
 #error h1 {
     margin: 0;
 
-    font-size: 13rem;
+    /* 画面幅に比例させる。3桁の数字が狭い画面からはみ出さない大きさにしてある。 */
+    font-size: clamp(5rem, 28.7vw, 13rem);
     line-height: 1;
 
     /* 数字なので字間を少し空けたほうが読みやすい */
@@ -107,7 +108,7 @@
 
     /* 色とホバーは #experience のリンクと同じ。
        背景(写真+黒い膜)の作りが同じなのでそろえてある。 */
-    color: #2997ff;
+    color: var(--link-on-dark);
 
     transition: color 0.15s ease;
 
@@ -115,7 +116,8 @@
 }
 
 .error-home:hover {
-    color: var(--hover-color);
+    color: #ffffff;
+    text-decoration: underline;
 }
 
 /* ---------- スマホ用 ---------- */
@@ -131,12 +133,6 @@
          ページ全体に1枚の板を敷くやり方(background.css)に変えてある。 */
     #error {
         background-attachment: scroll;
-        padding: 80px 6%;
-    }
-
-    /* 8remのままだと3桁の数字が画面からはみ出す */
-    #error h1 {
-        font-size: 7rem;
     }
 
     .error-name {

@@ -99,8 +99,9 @@ function showMessage(text, category = "message") {
   if (!list) {
     list = document.createElement("ul");
     list.className = "flash-list";
-    const header = document.querySelector(".site-header");
-    header?.insertAdjacentElement("afterend", list);
+    // ★読み上げ用の枠(base.html の #flash-live)の中に作ること。
+    //   枠の外に出すと読み上げられない。
+    document.getElementById("flash-live")?.appendChild(list);
   }
 
   const item = document.createElement("li");
@@ -109,7 +110,7 @@ function showMessage(text, category = "message") {
   item.textContent = text;
   list.appendChild(item);
 
-  setTimeout(() => item.remove(), 4000);
+  setTimeout(() => item.remove(), 8000);
 }
 
 /**

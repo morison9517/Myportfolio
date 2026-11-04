@@ -6,7 +6,7 @@
 #legal {
     background-color: var(--bg-color);
 
-    padding: 140px 10% 100px;
+    padding: var(--sub-page-pad-top) var(--section-gutter) var(--sub-page-pad-bottom);
 
     transition: background-color var(--theme-fade);
 }
@@ -54,7 +54,7 @@
     font-size: 1.3rem;
 
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--field-border);
+    border-bottom: 1px solid var(--divider-color);
 
     transition: border-color var(--theme-fade);
 }
@@ -86,7 +86,7 @@
 
 .legal-body a,
 .legal-body a:visited {
-    color: #2997ff;
+    color: var(--link-color);
 
     text-decoration: underline;
 
@@ -121,7 +121,7 @@
 
     margin: 3rem 0 0;
 
-    color: #2997ff;
+    color: var(--link-color);
 
     transition: color 0.15s ease;
 
@@ -136,10 +136,6 @@
 /* ★★画面幅の調整もここに書く。legal.css は head_extra から読み込まれるので
      mediaqueries.css より後になり、あちらに書いても打ち消される。 */
 @media (max-width: 768px) {
-    #legal {
-        padding: 110px 6% 80px;
-    }
-
     #legal h1 {
         font-size: 1.8rem;
     }

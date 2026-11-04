@@ -11,7 +11,7 @@ themeSwitch.addEventListener("change", () => {
      こちらはHTMLとして届くので、何もしないと画面に貼り付いたまま残る。
      見た目は base.css の .flash-list。 */
 document.querySelectorAll(".flash-list .flash").forEach((item) => {
-    setTimeout(() => item.remove(), 4000);
+    setTimeout(() => item.remove(), 8000);
 });
 
 /* フッターの高さを測って、CSSから使えるようにする。
@@ -64,13 +64,36 @@ if (siteFooter) {
     new ResizeObserver(updateFooterHeight).observe(siteFooter);
 }
 
-function toggleMenu() {
-    const menu = document.querySelector(".menu-links");
-    const icon = document.querySelector(".hamburger-icon");
+const menuToggle = document.getElementById("menuToggle");
+const menuPanel = document.getElementById("site-menu");
 
-    menu.classList.toggle("open");
-    icon.classList.toggle("open");
+function toggleMenu() {
+    const isOpen = menuPanel.classList.toggle("open");
+
+    menuToggle.classList.toggle("open", isOpen);
+
+    /* 開閉の状態と、次に押すと何が起きるかを読み上げに伝える。 */
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "メニューを閉じる" : "メニューを開く");
 }
+
+/* Esc で閉じて、開いたボタンにフォーカスを戻す。 */
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuPanel.classList.contains("open")) {
+        toggleMenu();
+        menuToggle.focus();
+    }
+});
+
+/* Tab でメニューの外へ出たら閉じる。開いたままだと、次の部品がメニューの裏に隠れる。
+   ★relatedTarget が空のとき(マウスで余白を押したときなど)は閉じない。 */
+document.getElementById("hamburger-nav").addEventListener("focusout", (event) => {
+    const next = event.relatedTarget;
+
+    if (next && !event.currentTarget.contains(next) && menuPanel.classList.contains("open")) {
+        toggleMenu();
+    }
+});
 
 function applyTheme() {
     const savedTheme = localStorage.getItem("theme");

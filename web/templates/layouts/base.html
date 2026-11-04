@@ -206,23 +206,34 @@
 {{/* theme-loading … 読み込み直後のフェードを止めるための印。
      script.js がテーマを決めた直後に外す(仕掛けは base.css)。 */}}
 <body class="theme-loading">
-    {{/* ★site-header というクラスが要る。
-         main.js の showMessage() が「メッセージをどこに出すか」を
-         この名前で探しているので、外すとJSからのメッセージが出なくなる。 */}}
+    {{/* キーボードで最初に止まる部品。Tab を押すまでは見えない(base.css)。 */}}
+    <a class="skip-link" href="#main-content">本文へ移動</a>
+
     <header class="site-header">
-        <nav id="hamburger-nav">
+        <nav id="hamburger-nav" aria-label="メインメニュー">
             <div class="hamburger-menu">
-                <div class="hamburger-icon" onclick="toggleMenu()">
+                {{/* ★button にしておくこと。div だとキーボードで操作できない。
+                     aria-* の開閉状態は script.js の toggleMenu が切り替える。 */}}
+                <button
+                    type="button"
+                    id="menuToggle"
+                    class="hamburger-icon"
+                    aria-label="メニューを開く"
+                    aria-expanded="false"
+                    aria-controls="site-menu"
+                    onclick="toggleMenu()"
+                >
                     <span></span>
                     <span></span>
-                </div>
+                </button>
                 {{/* ★リンク先を "#about" ではなく "/#about" にしている。
                      "#about" は「今開いているページの中の #about」という意味なので、
                      エラーページ(/hoge など)から押しても何も起きない。
                      "/" を付けるとトップページの #about へ移動できる。
                      トップページで押したときの動き(なめらかスクロール)は変わらない。 */}}
-                <div class="menu-links">
-                    <h1>Menu</h1>
+                <div class="menu-links" id="site-menu">
+                    {{/* ★h1 にしないこと。ページの h1 は各ページの見出しの1つだけにする。 */}}
+                    <p class="menu-title">Menu</p>
                     <ul>
                         <li><a href="/#about" onclick="toggleMenu()">About me</a></li>
                         <li><a href="/skills" onclick="toggleMenu()">Skills</a></li>
@@ -239,6 +250,8 @@
                 type="checkbox"
                 id="themeSwitch"
                 class="theme-switch__input"
+                role="switch"
+                aria-label="ダークモード"
             >
             <label
                 for="themeSwitch"
@@ -262,16 +275,21 @@
          ★range の中なので、ドットは「今の1件」を指している。
            .Category / .Message は FlashMessage の項目名
            (internal/middleware/session.go で決めている)。 */}}
-    {{ if .Flashes }}
-    <ul class="flash-list">
-        {{ range .Flashes }}
-        <li class="flash flash-{{ .Category }}">{{ .Message }}</li>
+    {{/* ★この枠は中身が無くても常に出しておくこと。読み上げソフトは、
+         最初からある枠の中身が変わったときだけ読む(WCAG 4.1.3)。
+         main.js の showMessage() もここへメッセージを入れる。 */}}
+    <div id="flash-live" role="status" aria-live="polite">
+        {{ if .Flashes }}
+        <ul class="flash-list">
+            {{ range .Flashes }}
+            <li class="flash flash-{{ .Category }}">{{ .Message }}</li>
+            {{ end }}
+        </ul>
         {{ end }}
-    </ul>
-    {{ end }}
+    </div>
 
     {{/* 各ページの中身がここに入る */}}
-    <main>{{ block "content" . }}{{ end }}</main>
+    <main id="main-content" tabindex="-1">{{ block "content" . }}{{ end }}</main>
 
     <footer>
         {{/* reCAPTCHA のバッジの置き場所。
@@ -307,6 +325,9 @@
 
     {{/* script.js = 元サイトのダークモード切り替えとハンバーガーメニュー */}}
     <script src="/static/js/script.js"></script>
+
+    {{/* layout-motion.js = 画面幅が変わって並びが切り替わるときの動き */}}
+    <script src="/static/js/layout-motion.js"></script>
 
     {{/* そのページだけで使うJSを足したいとき用の穴 */}}
     {{ block "scripts" . }}{{ end }}

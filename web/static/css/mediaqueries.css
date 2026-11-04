@@ -1,41 +1,12 @@
-/* ★ここだけ min-width(「〇〇px以上のとき」)。
-     他は max-width(狭いとき)なので、条件の向きが逆になっている。
+/* mediaqueries = 画面幅による調整。★必ず最後に読み込む。
 
-   Skills:6列×2行 → 12列×1行。PCで全画面表示にしたときだけ横一列に並べる。
+   ▼ 3つの仕組みを使い分けている
 
-   ▼ ★1536px という数字の出どころ
+     clamp() + cqi / vw … 余白や文字の大きさ。幅に比例して連続的に変わるので段差が出ない
+     @container         … 列数など、途中の値が無い切り替え。置かれた場所の幅で決める
+     @media             … メニューやポップアップなど、画面全体を基準にするもの
 
-     12列の合計幅 = 72px × 12 + 横の隙間 × 11
-     隙間を 1.75rem(28px) にすると 864 + 308 = 1172px 必要。
-     #skills の左右padding(10%)を引いた表示領域は 画面幅 × 0.8 なので、
-     1536px なら 1228px 使えて収まる(1920pxを125%表示にした幅がこれ)。
-
-     ★隙間を広げるとこの計算が変わる。
-       広げるなら、入りきる画面幅も一緒に上げること。
-       はみ出すと justify-content: center のせいで左側が画面外に出てしまう。 */
-@media (min-width: 1536px) {
-    .skills-grid {
-        grid-template-columns: repeat(12, 72px);
-        gap: 1.75rem;
-    }
-
-    /* Products:2列×2行のまま、1枚を大きくする。
-
-       ★4列×1行にしないこと。
-         横1行に4枚並べるとカード幅が326pxまで痩せ、
-         画像(ロゴ)が小さくて何か分からなくなる。
-         広い画面では列を増やさず、1枚を大きくするほうを選ぶ。
-
-       ★1200px で止めているのは、ウルトラワイドで
-         際限なく間延びさせないため。
-
-         カード幅  584px … max-width 1200px から
-                           横の隙間 2rem(32px) を引いて2等分
-         584 × 5 / 16 = 182px  ← 基準(136px)の約1.3倍 */
-    .products-grid {
-        max-width: 1200px;
-    }
-}
+   ★列数の切り替えそのものは一瞬なので、layout-motion.js が移動を補間している。 */
 
 @media screen and (max-width: 1200px) {
 
@@ -74,50 +45,30 @@
     }
 }
 
-/* ★6列のままだと画面からはみ出す幅を塞ぐための中間指定
+/* ▼ Welcome の見出し。画面幅に比例させる(#welcome は .container を持たないので vw)。
 
-   6列の合計幅 = 72px × 6 + 横の隙間 × 5
-   横の隙間が 2.5rem(40px) のとき 632px 必要だが、
-   #skills の左右padding(10%)を引いた表示領域は 画面幅 × 0.8 しかない。
-   つまり画面幅が 790px を下回ると入りきらない。
-   下の 768px の指定が効き始めるまでの間、横の隙間だけ詰めて6列を保つ。
+     この文は24文字。この書体だと1文字あたり約0.55em なので、
+     必要な横幅は文字サイズの約13倍。6.4vw なら幅が変わっても1行に収まる。
+     ★文言を長くするときはこの数字も下げること。上げると折り返す。 */
+.hero {
+    box-sizing: border-box;
+    max-width: 100%;
+    padding-inline: 1rem;
+}
 
-   ★はみ出すと justify-content: center のせいで左側が画面外に出て
-     戻せなくなるので、ただの見た目の問題では済まない。 */
-@media (max-width: 900px) {
-    .skills-grid {
-        gap: 1.75rem 3.5rem;
-    }
+.hero h1 {
+    font-size: clamp(1.5rem, 6.4vw, 4rem);
+
+    /* 通常は1行に収まる。文字サイズを大きくしている人には折り返して全文を見せる。
+       ★nowrap にすると左右が画面の外に切れて、スクロールしても読めなくなる。 */
+    text-wrap: balance;
+}
+
+.hero p {
+    font-size: clamp(1.15rem, 4vw, 2rem);
 }
 
 @media (max-width: 768px) {
-    /* ▼ Welcome の見出し
-       ★4rem のままだと「Welcome to My Portfolio!」がスマホ幅で必ず折り返す。
-
-         clamp(最小, 画面幅に連動, 最大)
-
-         真ん中を vw(画面幅の割合)にすると、画面が狭いほど字も小さくなるので、
-         幅が変わっても1行の長さがだいたい一定に保たれる。
-
-       ★6.4vw の出どころ
-         この文は24文字。この書体だと1文字あたり約0.55em なので、
-         必要な横幅は文字サイズの約13倍。
-           390px の端末 … 6.4vw = 25px → 25 × 13 = 325px(画面内に収まる)
-           320px の端末 … 6.4vw = 20px → 20 × 13 = 266px(同上)
-         ★文言を長くするときはこの数字も下げること。上げると折り返す。
-
-       ★上限 2.6rem は、768px 付近で間延びさせないための頭打ち。 */
-    .hero h1 {
-        font-size: clamp(1.5rem, 6.4vw, 2.6rem);
-
-        /* 上の計算どおりなら折り返さないが、念のため1行に固定する。 */
-        white-space: nowrap;
-    }
-
-    .hero p {
-        font-size: clamp(1.15rem, 4vw, 1.6rem);
-    }
-
     /* ▼ ハンバーガーメニュー
        ★320px 固定だと、幅390pxのスマホでは画面の8割を覆ってしまう。
          画面幅に対する割合で決めて、後ろのページが見える余地を残す。 */
@@ -126,7 +77,7 @@
         padding-top: 80px;
     }
 
-    .menu-links h1 {
+    .menu-title {
         font-size: 2rem;
         margin-top: 30px;
         margin-bottom: 24px;
@@ -138,137 +89,6 @@
 
     .menu-links li {
         margin: 14px 0;
-    }
-
-    /* ▼ 各セクションの見出し(PCでは 3rem)。
-         スマホ幅では 3rem だと画面の横幅をほぼ埋めてしまうので下げる。
-         ★#contact h2 もこのファイルの下のほうで同じ値にそろえてある。 */
-    #about h2,
-    #skills h2,
-    #products h2,
-    #experience h2 {
-        font-size: 2.2rem;
-    }
-
-    .about-content {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .about-text {
-        max-width: 100%;
-    }
-
-    .about-image {
-        align-self: center;
-    }
-
-    .about-image img {
-        width: 250px;
-        height: 250px;
-    }
-
-    /* Skills:6列×2行 → 3列×4行 */
-    #skills {
-        padding: 80px 6%;
-    }
-
-    .skills-grid {
-        grid-template-columns: repeat(3, 72px);
-        gap: 2.0rem 1.5rem;
-    }
-
-    .skill-icon {
-        width: 58px;
-        height: 58px;
-        border-radius: 11px;
-        padding: 9px;
-    }
-
-    /* Read More >> の文字の大きさ */
-    .skills-more a,
-    .skills-more a:visited,
-    .products-more a,
-    .products-more a:visited {
-        font-size: 1.1rem;
-    }
-
-    /* Products:2列×2行 → 1列×4行
-       ★2列のまま縮めるとカード幅が150px前後になり、
-         画像もタイトルも読めなくなる。 */
-    #products {
-        padding: 80px 6%;
-    }
-
-    .products-grid {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-    }
-
-    /* スマホ(幅390px前後)ではカードが約343pxまで狭まる。
-       16:5 のままだと帯が107pxしか残らずロゴが潰れるので、
-       基準の厚みに戻す方向で比率を立てる。
-
-         343 ÷ 2.5 = 137px  ← 基準の約136pxとほぼ同じ */
-    .product-card img {
-        aspect-ratio: 5 / 2;
-    }
-
-    /* Experience
-       ★背景画像はページ全体の板(.page-bg / background.css)が描くので、
-         ここで背景について直すことは無い。画面の大きさで切られた1枚が
-         奥に貼り付いたままなので、スマホでも拡大されず、動きもしない。 */
-    #experience {
-        padding: 80px 6%;
-    }
-
-    /* 年の列を狭めて、内容に幅を回す */
-    .timeline-item {
-        grid-template-columns: 3.2rem 1fr;
-        gap: 1rem;
-    }
-
-    .timeline-body {
-        padding-left: 1.25rem;
-    }
-
-    .timeline-year {
-        font-size: 0.85rem;
-    }
-
-    /* 「2006~2020」など長い年。上を下げたぶん、こちらも同じ比率で下げる。 */
-    .timeline-gap .timeline-year {
-        font-size: 0.7rem;
-    }
-
-    /* 年表の中身。PCの 1.5rem / 1.05rem は狭い画面だと詰まって見える。 */
-    .timeline-body h3 {
-        font-size: 1.15rem;
-    }
-
-    .timeline-body p {
-        font-size: 0.9rem;
-        line-height: 1.7;
-    }
-
-    .timeline-links {
-        font-size: 0.85rem;
-    }
-
-    /* Contact */
-    #contact {
-        padding: 80px 6%;
-    }
-
-    /* ★上の #about h2 などと同じ値。片方だけ変えるとセクションごとに
-         見出しの大きさが揃わなくなる。 */
-    #contact h2 {
-        font-size: 2.2rem;
-    }
-
-    /* ★狭い画面では押しやすさを優先して横幅いっぱいにする。 */
-    .contact-submit {
-        width: 100%;
     }
 
     /* ポップアップ
@@ -284,5 +104,286 @@
     .modal-send,
     .modal-danger {
         width: 100%;
+    }
+}
+
+/* ===========================================================================
+   コンテナクエリに対応したブラウザ用
+   =========================================================================== */
+@supports (container-type: inline-size) {
+    /* ★各セクションの .container だけを基準にする。
+         container-type を付けた要素は、重なり順と固定配置の基準にもなる。
+         main や body に付けると .page-bg(background.css)がセクションの手前に出る。 */
+    #about .container,
+    #skills .container,
+    #products .container,
+    #experience .container,
+    #contact .container,
+    #skills-page .container {
+        container-type: inline-size;
+    }
+
+    /* ★cqi = .container の幅の1%。以下の clamp は
+         スマホ(幅343px)の値から PC の値まで、なめらかにつなぐよう決めてある。 */
+    #about h2,
+    #skills h2,
+    #products h2,
+    #experience h2,
+    #contact h2 {
+        font-size: clamp(2.2rem, 5cqi + 7px, 3rem);
+
+        /* 文字を大きくしている人の画面でも、長い単語を画面内に収める。 */
+        overflow-wrap: anywhere;
+    }
+
+    /* About */
+    .about-content {
+        gap: clamp(2rem, 8.9cqi, 5rem);
+    }
+
+    .about-image img {
+        width: clamp(250px, 38cqi, 320px);
+        height: clamp(250px, 38cqi, 320px);
+    }
+
+    /* Skills
+       ★横の隙間は「幅 - アイコン6個ぶん」を5等分した値にしてある。
+         6列のとき、どの幅でも必ず収まる。
+         ★最小は px で書くこと。rem だと文字を大きくしている人で6列がはみ出す。 */
+    .skills-grid {
+        column-gap: clamp(24px, calc((100cqi - 432px) / 5), 3rem);
+    }
+
+    .skill-icon {
+        width: clamp(58px, 13cqi, 73px);
+        height: clamp(58px, 13cqi, 73px);
+        border-radius: clamp(11px, 2.7cqi, 15px);
+    }
+
+    .skills-more a,
+    .skills-more a:visited,
+    .products-more a,
+    .products-more a:visited {
+        font-size: clamp(1.1rem, 3.3cqi, 1.3rem);
+    }
+
+    /* Products
+       ★4列×1行にしないこと。カードが細くなり、ロゴが何か分からなくなる。
+         広い画面では列を増やさず1枚を大きくする。上限1200pxで間延びを防ぐ。 */
+    .products-grid {
+        max-width: clamp(900px, calc(900px + (100cqi - 1000px) * 1.316), 1200px);
+    }
+
+    /* ★比率ではなく高さで決める。比率は列数が変わる瞬間に帯の厚みが跳ねる。 */
+    .product-card img {
+        aspect-ratio: auto;
+        height: clamp(136px, 14.8cqi, 182px);
+    }
+
+    /* Experience */
+    .timeline-item {
+        grid-template-columns: clamp(3.2rem, 11.7cqi, 4.5rem) 1fr;
+        gap: clamp(1rem, 3.9cqi, 1.5rem);
+    }
+
+    .timeline-body {
+        padding-left: clamp(1.25rem, 4.6cqi, 1.75rem);
+    }
+
+    .timeline-year {
+        font-size: clamp(0.85rem, 2.9cqi, 1.1rem);
+    }
+
+    .timeline-gap .timeline-year {
+        font-size: clamp(0.7rem, 2.1cqi, 0.8rem);
+    }
+
+    .timeline-body h3 {
+        font-size: clamp(1.15rem, 3.9cqi, 1.5rem);
+    }
+
+    .timeline-body p {
+        font-size: clamp(0.9rem, 2.7cqi, 1.05rem);
+    }
+
+    .timeline-links {
+        font-size: clamp(0.85rem, 2.6cqi, 1rem);
+    }
+
+    /* ▼ 12列×1行。72px × 12 + 隙間28px × 11 = 1172px に余裕を足した幅から。
+       ★隙間を広げるなら、この幅も一緒に上げること。
+         はみ出すと justify-content: center のせいで左側が画面外に出てしまう。 */
+    @container (min-width: 1200px) {
+        .skills-grid {
+            grid-template-columns: repeat(12, 72px);
+            gap: 1.75rem 28px;
+        }
+    }
+
+    /* ▼ 6列のままでは隙間が24pxを切る幅。3列×4行にする。 */
+    @container (max-width: 551.98px) {
+        .skills-grid {
+            grid-template-columns: repeat(3, 72px);
+            row-gap: 2rem;
+        }
+    }
+
+    /* ▼ 横並びでは窮屈になる幅。縦積みにする。 */
+    @container (max-width: 599.98px) {
+        .about-content {
+            flex-direction: column;
+        }
+
+        .about-text {
+            max-width: 100%;
+        }
+
+        .about-image {
+            align-self: center;
+        }
+
+        /* ★2列のまま縮めるとカードが細くなり、画像もタイトルも読めなくなる。 */
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        /* ★押しやすさを優先して横幅いっぱいにする。 */
+        .contact-submit {
+            width: 100%;
+        }
+    }
+}
+
+/* ===========================================================================
+   コンテナクエリに対応していないブラウザ用(画面幅で切り替える)
+   =========================================================================== */
+@supports not (container-type: inline-size) {
+    @media (min-width: 1536px) {
+        .skills-grid {
+            grid-template-columns: repeat(12, 72px);
+            gap: 1.75rem;
+        }
+
+        .products-grid {
+            max-width: 1200px;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .skills-grid {
+            gap: 1.75rem 3.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        #about h2,
+        #skills h2,
+        #products h2,
+        #experience h2,
+        #contact h2 {
+            font-size: 2.2rem;
+        }
+
+        .about-content {
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .about-text {
+            max-width: 100%;
+        }
+
+        .about-image {
+            align-self: center;
+        }
+
+        .about-image img {
+            width: 250px;
+            height: 250px;
+        }
+
+        .skills-grid {
+            grid-template-columns: repeat(3, 72px);
+            gap: 2.0rem 1.5rem;
+        }
+
+        .skill-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 11px;
+            padding: 9px;
+        }
+
+        .skills-more a,
+        .skills-more a:visited,
+        .products-more a,
+        .products-more a:visited {
+            font-size: 1.1rem;
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        .product-card img {
+            aspect-ratio: 5 / 2;
+        }
+
+        .timeline-item {
+            grid-template-columns: 3.2rem 1fr;
+            gap: 1rem;
+        }
+
+        .timeline-body {
+            padding-left: 1.25rem;
+        }
+
+        .timeline-year {
+            font-size: 0.85rem;
+        }
+
+        .timeline-gap .timeline-year {
+            font-size: 0.7rem;
+        }
+
+        .timeline-body h3 {
+            font-size: 1.15rem;
+        }
+
+        .timeline-body p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .timeline-links {
+            font-size: 0.85rem;
+        }
+
+        .contact-submit {
+            width: 100%;
+        }
+    }
+}
+
+/* スマホの横向きなど、高さが足りない画面ではメニューの余白を詰める。
+   ★画面幅の指定より強くしたいので、このファイルの最後に置く。 */
+@media (max-height: 560px) {
+    .menu-links {
+        padding-top: 56px;
+    }
+
+    .menu-title {
+        margin: 0 0 8px;
+
+        font-size: 1.5rem;
+    }
+
+    .menu-links li {
+        margin: 4px 0;
+    }
+
+    .menu-links a {
+        font-size: 1.05rem;
     }
 }

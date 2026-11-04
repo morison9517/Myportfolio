@@ -22,7 +22,7 @@
     /* ボタン1回で何項目先へ送るか。スマホは画面が狭いので少なくする。
        ★768px は他のCSS(reveal.css など)のスマホの境目とそろえてある。 */
     const narrowScreen = window.matchMedia("(max-width: 768px)");
-    const jumpCount = () => (narrowScreen.matches ? 2 : 4);
+    const jumpCount = () => (narrowScreen.matches ? 1 : 4);
 
     const maxScroll = () => scroller.scrollWidth - scroller.clientWidth;
 
@@ -31,6 +31,13 @@
         const max = maxScroll();
 
         controls.hidden = max <= 1;
+
+        /* ボタンを画面全体の中央に置くために、ページのスクロールバーの幅を渡す。 */
+        controls.style.setProperty(
+            "--scrollbar-width",
+            `${window.innerWidth - document.documentElement.clientWidth}px`
+        );
+
         prev.setAttribute("aria-disabled", String(scroller.scrollLeft <= 1));
         next.setAttribute("aria-disabled", String(scroller.scrollLeft >= max - 1));
     };

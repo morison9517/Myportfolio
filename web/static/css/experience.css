@@ -373,6 +373,15 @@
 
     margin-top: 2rem;
     padding-inline: var(--section-gutter);
+
+    /* ★画面全体の中央に置く。セクションの幅はスクロールバーのぶん(base.css の
+         scrollbar-gutter)画面より狭いので、そのまま中央にすると左へ半分ずれる。
+         左の余白にスクロールバーの幅を足すと、中央がその半分だけ右へ動く。
+       ★--scrollbar-width は timeline-scroll.js が実測して入れる。
+         scrollbar-gutter: stable のページでは 100vw がスクロールバーを含まないので、
+         CSSだけでは幅を求められない。
+       ★transform で動かさないこと。右へはみ出して、ページが横にスクロールできてしまう。 */
+    padding-left: calc(var(--section-gutter) + var(--scrollbar-width, 0px));
 }
 
 /* ★display: flex は hidden 属性より強いので、明示して消す。

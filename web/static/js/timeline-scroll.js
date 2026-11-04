@@ -19,8 +19,10 @@
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    /* ボタン1回で何項目先へ送るか。 */
-    const JUMP = 4;
+    /* ボタン1回で何項目先へ送るか。スマホは画面が狭いので少なくする。
+       ★768px は他のCSS(reveal.css など)のスマホの境目とそろえてある。 */
+    const narrowScreen = window.matchMedia("(max-width: 768px)");
+    const jumpCount = () => (narrowScreen.matches ? 2 : 4);
 
     const maxScroll = () => scroller.scrollWidth - scroller.clientWidth;
 
@@ -48,7 +50,7 @@
         const current = scroller.scrollLeft;
         const all = stops();
 
-        /* 進む向きで一番近い項目。ここから JUMP - 1 項目先が行き先になる。 */
+        /* 進む向きで一番近い項目。ここから jumpCount() - 1 項目先が行き先になる。 */
         const nearest = direction > 0
             ? all.findIndex((stop) => stop > current + 1)
             : all.findLastIndex((stop) => stop < current - 1);
@@ -59,7 +61,7 @@
 
         /* ★端を超える場合は端の項目で止める。 */
         const index = Math.min(
-            Math.max(nearest + direction * (JUMP - 1), 0),
+            Math.max(nearest + direction * (jumpCount() - 1), 0),
             all.length - 1
         );
 

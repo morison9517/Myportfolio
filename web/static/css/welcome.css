@@ -38,20 +38,31 @@
     align-items: center;
 }
 
-/* ★ここから3つの --fade-delay が、上から順に出す待ち時間。
-     ハンバーガーメニューと同じ0.07秒刻み。仕掛け(font-fade)は base.css。 */
+/* ★上の余白と、下の文字の下の余白は 0 にすること。
+     ブラウザ既定の余白が残ると、見出しと文字のまとまりが画面の中央からずれる。 */
 .hero h1 {
+    margin: 0 0 0.67em;
+
     font-size: 4rem;
-    margin-top: 20px;
 
     --fade-delay: 0.7s;
 }
 
 .hero p {
-    margin-top: 15px;
-    font-size: 2.0rem;
+    margin: 15px 0 0;
+
+    font-size: 2rem;
 
     --fade-delay: 0.7s;
+}
+
+/* 他のページから戻ってきたとき以外は、動かさず最初から見せる。
+   読み込み画面が閉じると、そのまま見えている状態にするため。
+   ★html.home-return は index.html の <head> が付ける。
+   ★base.css の font-fade より強くするために #welcome まで書いている。 */
+html:not(.home-return) #welcome .font-fade {
+    animation: none;
+    opacity: 1;
 }
 
 .scroll-indicator {
@@ -61,12 +72,7 @@
     left: 50%;
 
     /* ★左右の中央そろえ。left: 50% は「左端を画面中央に置く」だけなので、
-         自分の幅の半分だけ左に戻して初めて中央に来る。
-
-       ★下の font-slide-in-centered にも同じ translateX(-50%) が入っているが、
-         あれは font-fade が付いているときだけ効くもの。
-         index.html の .scroll-indicator は font-fade を付けない方針なので、
-         ここに書いておかないと中央から右へずれたままになる。 */
+         自分の幅の半分だけ左に戻して初めて中央に来る。 */
     transform: translateX(-50%);
 
     display: flex;
@@ -77,31 +83,6 @@
     font-weight: 500;
 
     z-index: 2;
-}
-
-/* ★ここだけ、ずらす動き(base.css の font-slide-in)を差し替えている。
-
-     font-fade は「下から20pxずらして出す」を transform で行うが、
-     ここは左右の中央そろえにも transform(translateX(-50%))を使っている。
-     transform は1つしか持てないので、そのまま重ねると中央そろえが消えて
-     文字が右にずれてしまう。そこで中央そろえを含んだ動きを別に用意する。
-
-   ★差し替えるのは animation-name だけ。
-     長さ(0.5秒/0.4秒)・待ち時間・both は base.css の指定がそのまま使われる。
-     濃さのほう(font-fade-in)も base.css のものをそのまま並べること。
-     省くと、そちらの長さの指定が余ってずれる。 */
-@keyframes font-slide-in-centered {
-    from {
-        transform: translate(-50%, 20px);
-    }
-
-    to {
-        transform: translate(-50%, 0);
-    }
-}
-
-html:not(.wf-loading):not(.fade-hold) .scroll-indicator.font-fade {
-    animation-name: font-fade-in, font-slide-in-centered;
 }
 
 .scroll-indicator::after {

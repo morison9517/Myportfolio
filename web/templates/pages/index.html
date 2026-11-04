@@ -6,6 +6,73 @@
        本文が一度そのまま表示され、あとから隠れてちらつく。 */}}
 {{ define "head_extra" }}
     <link rel="stylesheet" href="/static/css/reveal.css">
+    <link rel="stylesheet" href="/static/css/page-loader.css">
+
+    {{/* トップページの入り方を判断する。
+
+           初めて開いた・更新した  → 読み込み画面(page-loading。閉じる係は page-loader.js)
+           他のページから戻ってきた → 見出しのアニメーション(home-return。見た目は welcome.css) */}}
+    <script>
+      (function () {
+        var html = document.documentElement;
+        var hash = window.location.hash;
+
+        /* /#about へ直接来た人にはどちらも出さない(見たい場所をすぐ見せるため)。 */
+        if (hash !== "" && hash !== "#") {
+          return;
+        }
+
+        var replayHeading = function () {
+          var heading = document.querySelector(".hero h1");
+
+          html.classList.remove("home-return");
+
+          if (heading) {
+            /* ★一度スタイルを確定させないと、付け直してもアニメーションが再生されない。 */
+            heading.getBoundingClientRect();
+          }
+
+          html.classList.add("home-return");
+        };
+
+        /* ★ブラウザの「戻る」は、ページを保存された状態のまま復元することがあり、
+             その場合はこのスクリプトが動き直さないので、pageshow で再生する。 */
+        window.addEventListener("pageshow", function (event) {
+          if (event.persisted && (location.hash === "" || location.hash === "#")) {
+            replayHeading();
+          }
+        });
+
+        var navigation = performance.getEntriesByType
+          ? performance.getEntriesByType("navigation")[0]
+          : null;
+        var type = navigation ? navigation.type : "";
+
+        var cameFromOtherPage = false;
+
+        try {
+          var from = new URL(document.referrer);
+
+          cameFromOtherPage = from.origin === location.origin && from.pathname !== "/";
+        } catch (error) {
+          /* referrer が空のとき(直接開いたとき)はここに来る。 */
+        }
+
+        /* ★type も見ること。更新(reload)は referrer が残るので、referrer だけでは
+             「戻ってきた」と誤判定する。 */
+        if (type === "back_forward" || (type === "navigate" && cameFromOtherPage)) {
+          html.classList.add("home-return");
+          return;
+        }
+
+        html.classList.add("page-loading");
+
+        /* ★保険。page-loader.js が読み込めないと画面が隠れたままになる。 */
+        window.pageLoaderFallbackTimer = setTimeout(function () {
+          html.classList.remove("page-loading");
+        }, 8000);
+      })();
+    </script>
 
     <script>
       (function () {
@@ -34,26 +101,35 @@
     </script>
 {{ end }}
 
+{{/* 読み込み画面。見た目は page-loader.css、閉じる係は page-loader.js。 */}}
+{{ define "body_start" }}
+    <div id="page-loader" role="status">
+        <p class="page-loader__text">
+            <span class="page-loader__label">loading...</span>
+            <span class="page-loader__wave" aria-hidden="true"><span style="--i: 0">l</span><span style="--i: 1">o</span><span style="--i: 2">a</span><span style="--i: 3">d</span><span style="--i: 4">i</span><span style="--i: 5">n</span><span style="--i: 6">g</span><span style="--i: 7">.</span><span style="--i: 8">.</span><span style="--i: 9">.</span></span>
+        </p>
+    </div>
+{{ end }}
+
 {{ define "content" }}
         {{/* ページ全体の背景画像レイヤー。
              #welcome と #experience は背景を持たず、ここから透けて見える。
              仕掛けは background.css。 */}}
         <div class="page-bg"></div>
 
-        {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
-             出る順番は welcome.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
+        {{/* font-fade … 他のページから戻ってきたときだけ、フォントを待ってふわっと出す。
+             読み込み画面のときは動かさない(welcome.css)。仕掛けは base.css。 */}}
         <section id="welcome">
             <div class="hero">
 
                 <h1 class="font-fade">Welcome to My Portfolio!</h1>
 
                 <p class="font-fade">
-                    Aspiring System Engineer
+                    Kota Morito's Portfolio
                 </p>
 
             </div>
 
-            {{/* ★ここは font-fade を付けない(最初から出しておく)。 */}}
             <div class="scroll-indicator">
                 <p>Scroll</p>
             </div>
@@ -520,4 +596,6 @@
 
     {{/* ★<head> で reveal の印が付いたときだけ働く。無いときは何もしない。 */}}
     <script src="/static/js/reveal.js"></script>
+
+    <script src="/static/js/page-loader.js"></script>
 {{ end }}

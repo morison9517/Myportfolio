@@ -206,6 +206,20 @@
 {{/* theme-loading … 読み込み直後のフェードを止めるための印。
      script.js がテーマを決めた直後に外す(仕掛けは base.css)。 */}}
 <body class="theme-loading">
+    {{/* 保存されたテーマを、何かが画面に映る前に当てる。
+         script.js はページの最後に読まれるので、任せると読み込み画面が
+         一瞬ライトで映ってしまう。 */}}
+    <script>
+      try {
+        if (localStorage.getItem("theme") === "dark") {
+          document.body.classList.add("dark");
+        }
+      } catch (error) {}
+    </script>
+
+    {{/* ページ本体より先に出したいもの用の穴(読み込み画面など)。 */}}
+    {{ block "body_start" . }}{{ end }}
+
     {{/* キーボードで最初に止まる部品。Tab を押すまでは見えない(base.css)。 */}}
     <a class="skip-link" href="#main-content">本文へ移動</a>
 
@@ -223,8 +237,15 @@
                     aria-controls="site-menu"
                     onclick="toggleMenu()"
                 >
-                    <span></span>
-                    <span></span>
+                    {{/* 三本線のアイコン。動きは header.css。
+                         真ん中の線は「まっすぐ進んで右で折り返し、円を一周する」1本のパスで、
+                         そのうちの見えている部分をずらして動かしている。
+                         ★d を変えたら header.css の --menu-* の長さも計算し直すこと。 */}}
+                    <svg class="menu-icon" viewBox="0 0 44 44" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+                        <line class="menu-icon__top" x1="5" y1="12" x2="39" y2="12" />
+                        <path class="menu-icon__middle" stroke-dasharray="34 999" d="M5 22H44C54 22 46.04 17.757 36.142 7.858A20 20 0 0 0 7.858 36.142A20 20 0 0 0 36.142 7.858" />
+                        <line class="menu-icon__bottom" x1="5" y1="32" x2="39" y2="32" />
+                    </svg>
                 </button>
                 {{/* ★リンク先を "#about" ではなく "/#about" にしている。
                      "#about" は「今開いているページの中の #about」という意味なので、
@@ -244,27 +265,30 @@
                 </div>
             </div>
         </nav>
-
-        <div class="theme-switch">
-            <input
-                type="checkbox"
-                id="themeSwitch"
-                class="theme-switch__input"
-                role="switch"
-                aria-label="ダークモード"
-            >
-            <label
-                for="themeSwitch"
-                class="theme-switch__label"
-            >
-
-                <i class="fa-solid fa-moon theme-switch__moon" aria-hidden="true"></i>
-                <i class="fa-solid fa-sun theme-switch__sun" aria-hidden="true"></i>
-
-                <span></span>
-            </label>
-        </div>
     </header>
+
+    {{/* ★ヘッダーの中に戻さないこと。ヘッダーの z-index の内側に閉じ込められて、
+         読み込み画面などに隠れてしまう。トグルはどんな場合でも隠さない約束。
+         ポップアップが開いている間の扱いは script.js。 */}}
+    <div class="theme-switch">
+        <input
+            type="checkbox"
+            id="themeSwitch"
+            class="theme-switch__input"
+            role="switch"
+            aria-label="ダークモード"
+        >
+        <label
+            for="themeSwitch"
+            class="theme-switch__label"
+        >
+
+            <i class="fa-solid fa-moon theme-switch__moon" aria-hidden="true"></i>
+            <i class="fa-solid fa-sun theme-switch__sun" aria-hidden="true"></i>
+
+            <span></span>
+        </label>
+    </div>
 
     {{/* ▼ メッセージの表示場所(全ページ共通なのでここに1回だけ書く)
 

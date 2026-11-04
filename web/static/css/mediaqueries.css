@@ -66,6 +66,7 @@
 
 .hero p {
     font-size: clamp(1.15rem, 4vw, 2rem);
+    text-wrap: balance;
 }
 
 @media (max-width: 768px) {
@@ -74,21 +75,16 @@
          画面幅に対する割合で決めて、後ろのページが見える余地を残す。 */
     .menu-links {
         width: min(62vw, 260px);
-        padding-top: 80px;
+
+        --menu-gap: 2.875rem;
     }
 
     .menu-title {
-        font-size: 2rem;
-        margin-top: 30px;
-        margin-bottom: 24px;
+        font-size: 2.4rem;
     }
 
     .menu-links a {
-        font-size: 1.05rem;
-    }
-
-    .menu-links li {
-        margin: 14px 0;
+        font-size: 1.26rem;
     }
 
     /* ポップアップ
@@ -370,20 +366,22 @@
    ★画面幅の指定より強くしたいので、このファイルの最後に置く。 */
 @media (max-height: 560px) {
     .menu-links {
-        padding-top: 56px;
+        --menu-gap: 1.15rem;
     }
 
     .menu-title {
-        margin: 0 0 8px;
-
-        font-size: 1.5rem;
-    }
-
-    .menu-links li {
-        margin: 4px 0;
+        font-size: 1.8rem;
     }
 
     .menu-links a {
-        font-size: 1.05rem;
+        font-size: 1.26rem;
+    }
+
+    /* ★幅があれば「Menu」はアイコンの右に来るので、上の余白を詰められる。
+         狭い画面で詰めるとアイコンに重なる。 */
+    @media (min-width: 560px) {
+        .menu-links {
+            padding-top: 19px;
+        }
     }
 }

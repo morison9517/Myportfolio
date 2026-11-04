@@ -1,6 +1,35 @@
 const themeSwitch =
     document.getElementById("themeSwitch");
 
+/* ポップアップ(<dialog>)が開いている間も、テーマのトグルを隠さない。
+
+   <dialog> はブラウザの最前面の層に出るので、z-index では越えられない。
+   開いている間だけ、トグルもその層(popover)へ上げる。
+
+   ★<dialog> の中へ移すのは、外に置くと見えていても操作できないため。
+     開いた <dialog> の外側はブラウザが押せなくする。
+   ★最前面の層に出た要素は、<dialog> の位置や透明度の影響を受けず、
+     画面に対して同じ位置に出る。 */
+if ("showPopover" in HTMLElement.prototype) {
+    const toggle = themeSwitch.closest(".theme-switch");
+    const homeParent = toggle.parentNode;
+    const homeNext = toggle.nextSibling;
+
+    document.querySelectorAll("dialog").forEach((dialog) => {
+        new MutationObserver(() => {
+            if (dialog.open) {
+                dialog.append(toggle);
+                toggle.popover = "manual";
+                toggle.showPopover();
+            } else if (dialog.contains(toggle)) {
+                toggle.hidePopover();
+                toggle.removeAttribute("popover");
+                homeParent.insertBefore(toggle, homeNext);
+            }
+        }).observe(dialog, { attributes: true, attributeFilter: ["open"] });
+    });
+}
+
 themeSwitch.addEventListener("change", () => {
     document.body.classList.toggle("dark");
 });

@@ -21,6 +21,9 @@ header{
 
     box-sizing: border-box;
 
+    /* ★トグルをヘッダーの外へ出したので、高さはここで保つ。 */
+    min-height: 75px;
+
     z-index: 100;
 }
 
@@ -40,8 +43,26 @@ nav a{
     transition: color var(--theme-fade);
 }
 /*ヘッダー：ダークモード*/
+/* ★どんな場合でも他の要素で隠さない。
+     読み込み画面(2000)・メニュー(1000)・お知らせ(200)より手前に置く。
+     ポップアップ(<dialog>)はこの数字では越えられないので script.js が別に扱う。
+
+   ★margin・border・padding・background などは、ポップアップの間に使う popover の
+     ブラウザ既定の見た目を打ち消すための指定。 */
 .theme-switch{
-    position: relative;
+    position: fixed;
+    inset: 20px 40px auto auto;
+
+    z-index: 3000;
+
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    background: none;
+    overflow: visible;
 }
 
 /* display: none にするとキーボードで選べず、読み上げにも伝わらない。
@@ -74,9 +95,6 @@ nav a{
 
     /* ライトモード時のトラック(溝)の色。ダークは下の :checked 側。 */
     background-color: #FFEF6C;
-
-    /* 黄色のトラックは明るい背景に溶けるので、スイッチの形が分かるよう線を引く。 */
-    box-shadow: inset 0 0 0 1px #92400e;
 
     cursor: pointer;
 
@@ -181,7 +199,6 @@ nav a{
 .theme-switch__input:checked
 + .theme-switch__label{
     background-color: #64748b;
-    box-shadow: none;
 }
 
 .theme-switch__input:checked
@@ -192,11 +209,11 @@ nav a{
 /*ヘッダー：ハンバーガーメニュー*/
 /* 押せる範囲は44px四方。負のマージンで、ヘッダーの高さと線の位置は元のまま保つ。 */
 .hamburger-icon {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
+    display: block;
+
+    /* 線の色。アイコンの SVG は currentColor でこの色を使う。 */
+    color: var(--text-color);
+    transition: color var(--theme-fade);
 
     width: 44px;
     height: 44px;
@@ -217,33 +234,76 @@ nav a{
     outline-offset: 2px;
 }
 
-.hamburger-icon.open:focus-visible {
-    outline-color: white;
+/* ▼ アイコンの動き
+
+     開く   上下の線が×を組み、真ん中の線が右へ抜けて〇になる
+     閉じる その逆再生
+
+   ★イージングは前後対称のものにすること(x1 + x2 = 1、y1 + y2 = 1)。
+     transition は戻るときも同じ曲線を使うので、対称でないと逆再生に見えない。
+     同じ理由で transition-delay も付けない。
+
+   ★--menu-path-line は線の長さ、--menu-path-circle は円周(2π × 半径20)。
+     --menu-path-to-circle は、パスの始点から円の始まりまでの長さ。
+     stroke-dasharray で「見えている長さ」を、stroke-dashoffset で「位置」を動かす。 */
+.menu-icon {
+    --menu-path-line: 34;
+    --menu-path-circle: 125.664;
+    --menu-path-to-circle: 62.149;
+    --menu-icon-motion: 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+
+    display: block;
+
+    /* 右へ抜けるとき、線が一瞬アイコンの枠の外を通る。 */
+    overflow: visible;
 }
 
-.hamburger-icon span {
-    width: 40px;
-    height: 2px;
-    background-color: var(--text-color);
+.menu-icon__top,
+.menu-icon__bottom {
+    transition: transform var(--menu-icon-motion);
+}
+
+/* ★回転と縮小の中心は、線それぞれの中央(単位は viewBox の座標)。 */
+.menu-icon__top {
+    transform-origin: 22px 12px;
+    transform: translateY(0) rotate(0deg) scaleX(1);
+}
+
+.menu-icon__bottom {
+    transform-origin: 22px 32px;
+    transform: translateY(0) rotate(0deg) scaleX(1);
+}
+
+/* ★scaleX(0.824) … 〇の内側に収まる長さ(28px)まで×を縮める。
+     線の長さ34px × 0.824 = 28px。線の長さを変えたらここも計算し直す。 */
+.hamburger-icon.open .menu-icon__top {
+    transform: translateY(10px) rotate(45deg) scaleX(0.824);
+}
+
+.hamburger-icon.open .menu-icon__bottom {
+    transform: translateY(-10px) rotate(-45deg) scaleX(0.824);
+}
+
+.menu-icon__middle {
+    stroke-dasharray: var(--menu-path-line) 999;
+    stroke-dashoffset: 0;
+
     transition:
-        transform 0.3s ease,
-        background-color var(--theme-fade);
+        stroke-dasharray var(--menu-icon-motion),
+        stroke-dashoffset var(--menu-icon-motion);
 }
 
-.hamburger-icon.open span {
-    background-color: white;
+.hamburger-icon.open .menu-icon__middle {
+    stroke-dasharray: var(--menu-path-circle) 999;
+    stroke-dashoffset: calc(var(--menu-path-to-circle) * -1);
 }
 
-.hamburger-icon span:first-child {
-    opacity: 1;
-}
-
-.hamburger-icon.open span:first-child {
-    transform: rotate(45deg) translate(6px, 6px);
-}
-
-.hamburger-icon.open span:last-child {
-    transform: rotate(-45deg) translate(6px, -6px);
+@media (prefers-reduced-motion: reduce) {
+    .menu-icon__top,
+    .menu-icon__bottom,
+    .menu-icon__middle {
+        transition: none;
+    }
 }
 
 
@@ -264,14 +324,18 @@ nav a{
     overflow-y: auto;
     overscroll-behavior: contain;
 
-    background-color: #737272;
+    /* サイトと同じ色にする。テーマの切り替えにも同じ速さで追従する。 */
+    background-color: var(--bg-color);
+    box-shadow: var(--menu-shadow);
 
     opacity: 0;
     visibility: hidden;
 
     transition:
         opacity 0.5s ease,
-        visibility 0s linear 0.5s;
+        visibility 0s linear 0.5s,
+        background-color var(--theme-fade),
+        box-shadow var(--theme-fade);
 
     z-index: 1000;
 
@@ -280,7 +344,12 @@ nav a{
     justify-content: flex-start;
     align-items: center;
 
-    padding-top: 50px;
+    /* ★項目の間隔はこの1か所で決める。Menu と About me の間も同じ値になる。 */
+    --menu-gap: 3.25rem;
+
+    /* ★アイコン(下端が約60px)と「Menu」の文字が重ならない高さ。 */
+    padding-top: 82px;
+    padding-bottom: 1.5rem;
 }
 
 .menu-title,
@@ -290,7 +359,8 @@ nav a{
 
     transition:
         opacity 0.4s ease,
-        transform 0.4s ease;
+        transform 0.4s ease,
+        color var(--theme-fade);
 }
 
 .menu-links.open .menu-title,
@@ -300,18 +370,22 @@ nav a{
 }
 
 .menu-title {
-    color: #f9fafb;
+    color: var(--text-color);
     font-size: 3.5rem;
     font-weight: 700;
-    margin-top: 50px;
-    margin-bottom: 40px;
+
+    /* ★+ 4px … リンクの上下の padding(4px)のぶん。
+         文字どうしの間隔を、リンクの間隔とそろえるために足している。 */
+    margin: 0 0 calc(var(--menu-gap) + 4px);
 }
 
 .menu-links ul {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: var(--menu-gap);
     list-style: none;
+    margin: 0;
     padding: 0;
 }
 
@@ -320,13 +394,13 @@ nav a{
     padding: 4px 12px;
 
     font-size: 1.5rem;
-    color: #f9fafb;
+    color: var(--text-color);
     text-decoration: none;
 }
 
 .menu-links li {
     list-style: none;
-    margin: 20px 0;
+    margin: 0;
 }
 
 .menu-links.open {
@@ -335,7 +409,9 @@ nav a{
 
     transition:
         opacity 0.5s ease,
-        visibility 0s linear 0s;
+        visibility 0s linear 0s,
+        background-color var(--theme-fade),
+        box-shadow var(--theme-fade);
 }
 
 .menu-links.open .menu-title {

@@ -65,7 +65,7 @@ html.reveal #experience h2 {
     --reveal-delay: 0s;
 }
 
-/* 本文・カード類は下から上へ。#welcome の文字と同じ動き。 */
+/* 本文・カード類は下から上へ。 */
 html.reveal :where(
     .about-text,
     .skill-card,
@@ -146,13 +146,6 @@ html.reveal .timeline-year {
 
 html.reveal .timeline-body > * {
     --reveal-x: calc(var(--reveal-shift-x) * -1);
-}
-
-/* 印が付いていないときは、#welcome の font-fade も止めて最初から出す。
-   ★:not() を3つ重ねているのは base.css より強さを上げるため。 */
-html:not(.reveal):not(.wf-loading):not(.fade-hold) .font-fade {
-    animation: none;
-    opacity: 1;
 }
 
 /* ---------- スマホ用 ----------

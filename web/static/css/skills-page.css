@@ -212,9 +212,20 @@
 
 /* ---------- スマホ用 ---------- */
 @media (max-width: 768px) {
+    /* ★画面端に寄りすぎないよう、左右に余白を足す(トップの .about-text と同じ)。 */
+    .skills-lead,
+    .skill-categories {
+        padding-inline: 1rem;
+    }
+
+    /* ★折り返す行を右端までそろえて、左右の余白を一致させる。 */
+    .skills-lead,
+    .skill-item-body p {
+        text-align: justify;
+    }
+
     .skills-lead {
         margin: -1rem 0 2.5rem;
-        text-align: left;
         font-size: 0.95rem;
     }
 

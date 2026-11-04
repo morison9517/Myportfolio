@@ -200,8 +200,17 @@
             flex-direction: column;
         }
 
+        /* ★border-box … 無いと幅100%に余白が足されて、右へはみ出す。 */
         .about-text {
+            box-sizing: border-box;
             max-width: 100%;
+            padding-inline: 1rem;
+        }
+
+        /* ★折り返す行を右端までそろえて、左右の余白を一致させる。
+             左揃えのままだと行末が余り、右の余白だけ広く見える。 */
+        .about-text p {
+            text-align: justify;
         }
 
         .about-image {
@@ -256,7 +265,13 @@
         }
 
         .about-text {
+            box-sizing: border-box;
             max-width: 100%;
+            padding-inline: 1rem;
+        }
+
+        .about-text p {
+            text-align: justify;
         }
 
         .about-image {

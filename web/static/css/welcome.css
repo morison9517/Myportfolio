@@ -93,23 +93,8 @@ html:not(.home-return) #welcome .font-fade {
 
     background-color: #f9fafb;
 
-    /* WCAG 2.2.2: 動きが5秒を超えるなら止める手段が要るので、3回で止める。
-       止めたあとは線を出したまま、次の動きで静かに戻す。 */
-    animation:
-        scroll-line 1.4s ease-in-out 3,
-        scroll-line-settle 0.5s ease-out 4.2s forwards;
-}
-
-@keyframes scroll-line-settle {
-    from {
-        transform: scaleY(0);
-        transform-origin: top;
-    }
-
-    to {
-        transform: scaleY(1);
-        transform-origin: top;
-    }
+    /* ★繰り返し動かし続ける。動きを減らす設定の人には下で止めている。 */
+    animation: scroll-line 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

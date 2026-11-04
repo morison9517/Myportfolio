@@ -80,28 +80,21 @@
 
     /* ---------- 年表 ----------
        線がマークに届く瞬間にマークを出したいので、
-       「項目の高さのうちマークが何割の位置か」を測って渡す。CSSでは計算できない。
+       「項目の幅のうちマークが何割の位置か」を測って渡す。CSSでは計算できない。
        ★出す直前に測ること。先に測ると画面幅が変わったときに古くなる。 */
     const setMarkProgress = (item) => {
-        const body = item.querySelector(".timeline-body");
+        const width = item.getBoundingClientRect().width;
 
-        if (!body) {
+        if (width <= 0) {
             return;
         }
 
-        const height = body.getBoundingClientRect().height;
+        const markX = parseFloat(getComputedStyle(item).getPropertyValue("--mark-x")) || 0;
 
-        if (height <= 0) {
-            return;
-        }
-
-        const gapBottom = parseFloat(getComputedStyle(body).paddingBottom) || 0;
-
-        item.style.setProperty(
-            "--mark-progress",
-            ((height - gapBottom) / 2 / height).toFixed(3)
-        );
+        item.style.setProperty("--mark-progress", (markX / width).toFixed(3));
     };
+
+    const timelineScroller = document.querySelector("#experience .timeline-scroller");
 
     const timelineItems = Array.from(
         document.querySelectorAll("#experience .timeline-item")
@@ -112,8 +105,7 @@
     /* 1件目は待たずに出し、2件目からは「前の項目の線を引き終わった時刻」に出す。
        ★ここを lineDuration より短くしないこと。
          短くすると次の線が前の線より先に走り出し、
-         線がまだ届いていないのに次の点(丸・破断マーク)が出てしまう。
-       まとめて入ってきても必ず上から順になる。 */
+         線がまだ届いていないのに次の点(丸・破断マーク)が出てしまう。 */
     const queueTimelineItem = (item) => {
         setMarkProgress(item);
 
@@ -170,13 +162,20 @@
             .filter((entry) => entry.isIntersecting)
             .map((entry) => entry.target);
 
-        /* 合図が届く順番は決まっていないので、年表だけDOM順に並べ直す。 */
-        entering
-            .filter((target) => timelineItems.includes(target))
-            .sort((a, b) => timelineItems.indexOf(a) - timelineItems.indexOf(b))
-            .forEach(queueTimelineItem);
-
         entering.forEach((target) => {
+            /* ★年表は項目ごとに見張らず、全体が入った時点で左から順に全部出す。
+                 項目ごとだと、右端へ一気に送ったときに順番待ちが積み上がり、
+                 画面に入っている項目がしばらく空のままになる。 */
+            if (target === timelineScroller) {
+                timelineItems.forEach((item) => {
+                    queueTimelineItem(item);
+                    item.classList.add("is-visible");
+                });
+
+                self.unobserve(target);
+                return;
+            }
+
             target.classList.add("is-visible");
 
             const more = moreByGrid.get(target);
@@ -199,16 +198,16 @@
 
     const observer = makeObserver("-5%");
 
-    /* 年表は項目の途中から文字が出るので、判定線をその分だけ上げる。 */
+    /* 年表は線を引く動きを見せたいので、判定線を上げて画面の中ほどまで来てから始める。 */
     const timelineObserver = makeObserver("-45%");
 
     document.querySelectorAll(watched.join(", ")).forEach((target) => {
         observer.observe(target);
     });
 
-    timelineItems.forEach((item) => {
-        timelineObserver.observe(item);
-    });
+    if (timelineScroller) {
+        timelineObserver.observe(timelineScroller);
+    }
 
     /* ★最後に止めること。途中で失敗した場合はタイマーが生きているほうがよい。 */
     clearTimeout(window.revealFallbackTimer);

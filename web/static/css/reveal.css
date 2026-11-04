@@ -16,7 +16,7 @@ html.reveal {
     --reveal-shift-y: 20px;
     --reveal-shift-x: 30px;
 
-    /* 年表の縦線を、項目1つぶん引くのにかける時間。 */
+    /* 年表の線を、項目1つぶん引くのにかける時間。 */
     --line-duration: 0.55s;
 
     --reveal-lead: 0.3s;
@@ -38,7 +38,6 @@ html.reveal :where(
     #products .products-more,
 
     #experience h2,
-    #experience .timeline-year,
     #experience .timeline-body > *,
 
     #contact h2,
@@ -97,7 +96,6 @@ html.reveal .is-visible,
 html.reveal .is-visible :where(
     .skill-card,
     .product-card,
-    .timeline-year,
     .timeline-body > *
 ) {
     opacity: 1;
@@ -106,10 +104,11 @@ html.reveal .is-visible :where(
 
 /* ---------- 4. 年表(#experience) ----------
 
-   縦線が伸びる → 線がマークに届いたらマークが出る → 同時に文字が線から離れる向きへ。
+   線が伸びる → 線がマークに届いたらマークが出る
+   → 同時に細い線が内容へ伸び、文字が線から離れる向きへ。
 
-   ★--mark-progress は「項目の高さのうちマークが何割の位置か」。
-     項目ごとに高さが違うので reveal.js が実測して入れている。 */
+   ★--mark-progress は「項目の幅のうちマークが何割の位置か」。
+     項目の幅は画面幅で変わるので reveal.js が実測して入れている。 */
 html.reveal .timeline-item {
     --line-delay: 0s;
     --reveal-delay: calc(
@@ -117,42 +116,60 @@ html.reveal .timeline-item {
     );
 }
 
-/* 縦線。clip-path で見えている範囲を上から下へ広げる。
+/* 線。clip-path で見えている範囲を左から右へ広げる。
    線そのものの指定(色・位置・グラデーション)は experience.css。
    ★linear にすること。ease にすると引く速さが変わり、マークが出る時刻とずれる。 */
-html.reveal .timeline-body::after {
-    clip-path: inset(0 0 100% 0);
+html.reveal .timeline-item::after {
+    clip-path: inset(0 100% 0 0);
     transition: clip-path var(--line-duration) linear var(--line-delay);
 }
 
-html.reveal .timeline-item.is-visible .timeline-body::after {
+html.reveal .timeline-item.is-visible::after {
     clip-path: inset(0 0 0 0);
 }
 
 /* 丸・破断マーク。線がそこまで来たら出す。 */
-html.reveal .timeline-body::before {
+html.reveal .timeline-item::before {
     opacity: 0;
     transition: opacity 0.25s ease var(--reveal-delay, 0s);
 }
 
-html.reveal .timeline-item.is-visible .timeline-body::before {
+html.reveal .timeline-item.is-visible::before {
     opacity: 1;
 }
 
-/* 年は線の右から左へ、内容は線の左から右へ。線を中心に左右へ広がって見える。 */
-html.reveal .timeline-year {
-    --reveal-x: var(--reveal-shift-x);
+/* 細い線。マークが出るのと同時に、マークから内容へ向かって伸ばす。 */
+html.reveal .timeline-body::before {
+    transition: clip-path 0.3s ease var(--reveal-delay, 0s);
 }
 
-html.reveal .timeline-body > * {
-    --reveal-x: calc(var(--reveal-shift-x) * -1);
+html.reveal .timeline-item:nth-child(odd) .timeline-body::before {
+    clip-path: inset(100% 0 0 0);
+}
+
+html.reveal .timeline-item:nth-child(even) .timeline-body::before {
+    clip-path: inset(0 0 100% 0);
+}
+
+html.reveal .timeline-item.is-visible .timeline-body::before {
+    clip-path: inset(0 0 0 0);
+}
+
+/* 文字は線から離れる向きへ。上の段は上へ、下の段は下へ広がって見える。
+   ★10pxより大きくしないこと。線との隙間を超えて、線の上に乗り出す。 */
+html.reveal .timeline-item:nth-child(odd) .timeline-body > * {
+    --reveal-y: 10px;
+}
+
+html.reveal .timeline-item:nth-child(even) .timeline-body > * {
+    --reveal-y: -10px;
 }
 
 /* ---------- スマホ用 ----------
    ★★画面幅の調整もここに書く。reveal.css は head_extra から読み込まれるので
      mediaqueries.css より後になり、あちらに書いても打ち消される。 */
 @media (max-width: 768px) {
-    /* 年の列がスマホでは 3.2rem しかないので、30px だと線の上まで乗り出す。 */
+    /* 狭い画面では見出しの動きも小さくする。 */
     html.reveal {
         --reveal-shift-x: 20px;
     }

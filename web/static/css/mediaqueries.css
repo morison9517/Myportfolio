@@ -176,36 +176,6 @@
         height: clamp(136px, 14.8cqi, 182px);
     }
 
-    /* Experience */
-    .timeline-item {
-        grid-template-columns: clamp(3.2rem, 11.7cqi, 4.5rem) 1fr;
-        gap: clamp(1rem, 3.9cqi, 1.5rem);
-    }
-
-    .timeline-body {
-        padding-left: clamp(1.25rem, 4.6cqi, 1.75rem);
-    }
-
-    .timeline-year {
-        font-size: clamp(0.85rem, 2.9cqi, 1.1rem);
-    }
-
-    .timeline-gap .timeline-year {
-        font-size: clamp(0.7rem, 2.1cqi, 0.8rem);
-    }
-
-    .timeline-body h3 {
-        font-size: clamp(1.15rem, 3.9cqi, 1.5rem);
-    }
-
-    .timeline-body p {
-        font-size: clamp(0.9rem, 2.7cqi, 1.05rem);
-    }
-
-    .timeline-links {
-        font-size: clamp(0.85rem, 2.6cqi, 1rem);
-    }
-
     /* ▼ 12列×1行。72px × 12 + 隙間28px × 11 = 1172px に余裕を足した幅から。
        ★隙間を広げるなら、この幅も一緒に上げること。
          はみ出すと justify-content: center のせいで左側が画面外に出てしまう。 */
@@ -324,36 +294,6 @@
 
         .product-card img {
             aspect-ratio: 5 / 2;
-        }
-
-        .timeline-item {
-            grid-template-columns: 3.2rem 1fr;
-            gap: 1rem;
-        }
-
-        .timeline-body {
-            padding-left: 1.25rem;
-        }
-
-        .timeline-year {
-            font-size: 0.85rem;
-        }
-
-        .timeline-gap .timeline-year {
-            font-size: 0.7rem;
-        }
-
-        .timeline-body h3 {
-            font-size: 1.15rem;
-        }
-
-        .timeline-body p {
-            font-size: 0.9rem;
-            line-height: 1.7;
-        }
-
-        .timeline-links {
-            font-size: 0.85rem;
         }
 
         .contact-submit {

@@ -4,9 +4,12 @@
      ページ全体で1枚の板(.page-bg / background.css)を奥に敷いてあり、
      背景を置かないことで、そこから同じ画像が透けて見える。
      #welcome と同じ1枚なので、離れていても同じ景色として続いて見える。
-   その画像の上に黒い膜(::before)を敷いて、さらに上へ白文字を載せる。 */
+   その画像の上に黒い膜(::before)を敷いて、さらに上へ白文字を載せる。
+
+   ★左右の余白はセクションではなく中身の側に持たせている。
+     年表を画面の端まで流し、続きがあることを見せるため。 */
 #experience {
-    padding: var(--section-pad-y) var(--section-gutter);
+    padding: var(--section-pad-y) 0;
 
     position: relative;
 
@@ -24,9 +27,15 @@
 }
 
 /* ★中身を膜より前に出す。これが無いと膜の下に隠れて何も見えない。 */
-#experience .container {
+#experience .container,
+.timeline-scroller,
+.timeline-controls {
     position: relative;
     z-index: 1;
+}
+
+#experience .container {
+    padding-inline: var(--section-gutter);
 }
 
 /* 見出しは #about h2 / #skills h2 と同じ大きさ・余白 */
@@ -37,108 +46,118 @@
     text-align: center;
 }
 
-/* ---------- 年表 ---------- */
-.timeline {
-    list-style: none;
-    margin: 0 auto;
-    padding: 0;
+/* ---------- 年表 ----------
 
-    max-width: 720px;
+   横に流れる1本の線を中央に通し、奇数項目を上の段、偶数項目を下の段に置く。
+   ポイントと内容は細い線でつなぐ。
+
+     │2005/9              │2021/4
+     │香川県にて…          │香川高等…
+     ●─────────⌇──────────●─────────⌇──
+               │2005~               │2021~
+               │幼少・小…            │ITではなく…
+
+   ★スクロールはブラウザの標準機能のまま。バーを隠しているだけなので、
+     指・トラックパッド・キーボードがそのまま使える。縦のホイールは横に変換しない
+     (ページを読み進めている人が年表の上で止められてしまうため)。 */
+.timeline-scroller {
+    overflow-x: auto;
+
+    /* ★端まで行っても、ブラウザの「戻る」スワイプを発動させない。 */
+    overscroll-behavior-x: contain;
+
+    /* ★mandatory にしないこと。項目より狭い画面で文章の途中を読めなくなる。 */
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--section-gutter);
+
+    scrollbar-width: none;
 }
 
-/* 「年」と「内容」の2列。
-   ★縦線は内容側(.timeline-body)の左borderなので、
-     この1列目の幅が縦線の位置になる。左に寄せたいので狭くしてある。
+/* ★scrollbar-width が効かない古い Safari 用。 */
+.timeline-scroller::-webkit-scrollbar {
+    display: none;
+}
 
-   ▼ ★--gap-bottom と --mark-y について
+/* ★キーボードで矢印キーを使えるよう tabindex を付けてあるので、居場所を見せる。 */
+.timeline-scroller:focus-visible {
+    outline: 2px solid #f9fafb;
+    outline-offset: -2px;
+}
 
-     項目の下余白(--gap-bottom)は、縦線を途切れさせないため
-     margin ではなく padding で取っている。
-     そのため「項目の高さ」には余白ぶんが含まれていて、
-     単純に 50% を指定すると丸が余白のぶんだけ下にずれる。
+/* ★1件が持つのは線の1区間(--step)だけで、内容は2区間ぶんの幅で置く。
+     上下交互なので、同じ段の隣は2区間先になり、内容どうしは重ならない。
 
-     そこで余白を引いた中央 --mark-y を計算し、
-     丸・破断マーク・年 の3つを同じ高さにそろえている。
-     = タイトルと説明を一塊として見たときの、その真ん中。 */
-.timeline-item {
-    --gap-bottom: 6.0rem;
-    --mark-y: calc((100% - var(--gap-bottom)) / 2);
+   ★subgrid … 全項目で「上の段・線・下の段」の高さを共有するための指定。
+     これで内容の長さが項目ごとに違っても、線が1本にそろう。 */
+.timeline {
+    --step: clamp(8.75rem, 39vw, 13rem);
+    --line-row: 18px;   /* 線の段の高さ。破断マークの高さに合わせてある */
+
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--section-gutter);
 
     display: grid;
-    grid-template-columns: 4.5rem 1fr;
-    gap: 1.5rem;
+    width: max-content;
+    grid-template-rows: auto var(--line-row) auto;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--step);
 }
 
-/* 最後の項目。「この先も続く」ことを示すため、線を少し下に伸ばし、
-   末端をだんだん薄くして消す。
-   ★--gap-bottom がそのまま「伸ばす長さ」になる。
-     --mark-y の計算も追従するので、丸の位置はずれない。 */
+/* ★--mark-x は線の左端からマークの中心までの距離。
+     reveal.js もこの値を読み、線がマークに届く時刻を計算している。
+   ★--pole-reach は細い線を内容の外へ伸ばす長さ。ちょうど線の中心まで届く。 */
+.timeline-item {
+    --mark-x: 6px;
+    --pole-reach: calc(var(--line-row) / 2);
+
+    grid-row: 1 / -1;
+
+    display: grid;
+    grid-template-rows: subgrid;
+
+    /* ★minmax(0, ...) … 内容の幅で列が広がると、線の1区間まで伸びてしまう。 */
+    grid-template-columns: minmax(0, 1fr);
+
+    scroll-snap-align: start;
+}
+
+/* 最後の項目。「この先も続く」ことを示すため、線の末端をだんだん薄くして消す。
+   ★2区間ぶん取ること。1区間だと内容が年表の右端からはみ出し、右の余白が無くなる。 */
 .timeline-item:last-child {
-    --gap-bottom: 3.5rem;   /* 線を伸ばす長さ */
-    --tail-fade: 2.5rem;    /* そのうち、薄くしていく区間の長さ */
+    --tail-fade: 8rem;    /* 薄くしていく区間の長さ */
+
+    grid-column: span 2;
 }
 
-/* ★年も丸と同じ高さに置く。
-     下余白を同じだけ空けたうえで flex で中央寄せすると、
-     丸の中心とぴったり一致する。 */
-.timeline-year {
-    padding-bottom: var(--gap-bottom);
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.6;
-
-    text-align: right;
-}
-
-/* ★下の余白を margin ではなく padding にしている理由
-     margin にすると項目と項目の間に隙間ができ、そこで縦線が途切れる。
-     padding なら線が下まで伸びるので、線が1本につながる。 */
-.timeline-body {
-    /* ★文字を大きくしている人でも、長い単語で列が画面の外へ押し出されないようにする。 */
-    min-width: 0;
-    overflow-wrap: anywhere;
-
-    /* ★線は下の ::after が引く。この border は幅(2px)を確保するためだけの透明。
-         太さを変えるときは、ここと ::after の width の両方を直すこと。 */
-    border-left: 2px solid transparent;
-    padding: 0 0 var(--gap-bottom) 1.75rem;
-
-    position: relative;
-}
-
-/* 縦線の本体。
+/* 線の本体。
    ★border ではなく要素にしているのは、border は「途中まで引く」ができないため。
-     要素なら clip-path で見えている範囲を変えられ、上から下へ引く動きが作れる。
-   ★left: -2px … 透明にした border の位置にぴったり重ねる。
+     要素なら clip-path で見えている範囲を変えられ、左から右へ引く動きが作れる。
    ★z-index: 0 … 丸(::before)より後ろに置く。無いと線が丸の真ん中を横切る。 */
-.timeline-body::after {
+.timeline-item::after {
     content: "";
 
-    position: absolute;
-    left: -2px;
-    top: 0;
+    grid-row: 2;
+    grid-column: 1;
+    align-self: center;
 
-    width: 2px;
-    height: 100%;
+    height: 2px;
 
     background-color: rgba(249, 250, 251, 0.5);
 
     z-index: 0;
 }
 
-/* 縦線の上に載せる丸。タイトル＋説明の中央に置く。 */
-.timeline-body::before {
+/* 線の上に載せる丸。 */
+.timeline-item::before {
     content: "";
 
-    position: absolute;
-    left: -7px;                    /* 線(2px)の中心に来るようにずらす */
-    top: var(--mark-y);
-    transform: translateY(-50%);   /* 丸自身の高さの半分だけ戻す */
+    grid-row: 2;
+    grid-column: 1;
+    align-self: center;
+    justify-self: start;
+
+    margin-left: calc(var(--mark-x) - 6px);
 
     width: 12px;
     height: 12px;
@@ -153,15 +172,79 @@
 }
 
 /* ★単色は途中から薄くできないので、破断線と同じ手法でグラデーションに差し替える。 */
-.timeline-item:last-child .timeline-body::after {
+.timeline-item:last-child::after {
     background-color: transparent;
 
     background-image: linear-gradient(
-        to bottom,
+        to right,
         rgba(249, 250, 251, 0.5) 0,
         rgba(249, 250, 251, 0.5) calc(100% - var(--tail-fade)),
         rgba(249, 250, 251, 0)   100%
     );
+}
+
+/* 内容(年・タイトル・説明)。
+   ★左端をマークの中心にそろえ、そこに細い線(::before)を通している。 */
+.timeline-body {
+    /* ★文字を大きくしている人でも、長い単語で列の外へ押し出されないようにする。 */
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    grid-column: 1;
+    justify-self: start;
+
+    box-sizing: border-box;
+    width: calc(var(--step) * 2 - clamp(1rem, 2.5vw, 2.5rem));
+    margin-left: calc(var(--mark-x) - 0.5px);
+    padding-left: 0.9rem;
+
+    position: relative;
+}
+
+/* 奇数は上の段、偶数は下の段。
+   ★align-self は指定しないこと。段の高さいっぱいに伸びることで、
+     内容の長さに関係なく、年の高さと細い線の長さが同じ段でそろう。 */
+.timeline-item:nth-child(odd) .timeline-body {
+    grid-row: 1;
+    padding-bottom: 1.25rem;
+}
+
+.timeline-item:nth-child(even) .timeline-body {
+    grid-row: 3;
+    padding-top: 1.25rem;
+}
+
+/* ポイントと内容をつなぐ細い線。内容の端から端まで通す。 */
+.timeline-body::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 1px;
+
+    background-color: rgba(249, 250, 251, 0.45);
+}
+
+.timeline-item:nth-child(odd) .timeline-body::before {
+    bottom: calc(var(--pole-reach) * -1);
+}
+
+.timeline-item:nth-child(even) .timeline-body::before {
+    top: calc(var(--pole-reach) * -1);
+}
+
+.timeline-year {
+    display: block;
+    margin-bottom: 0.35rem;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.6;
+
+    white-space: nowrap;
 }
 
 /* ---------- 省略区間(破断線) ----------
@@ -171,84 +254,78 @@
 
    ▼ 仕組み
 
-     縦線を「途中で切って」、その切れ目に横向きの波(破断マーク)を置く。
+     線を「途中で切って」、その切れ目に縦向きの波(破断マーク)を置く。
      製図で長いものを省略するときの記号と同じ考え方。
 
-       │      ← 上の線
-      ～      ← 破断マーク(ここで省略している)
-       │      ← 下の線
+       ───  ⌇  ───
 
    ▼ ★なぜ単色ではなくグラデーションで線を引くか
 
      単色の線は途中で切ることができない。
-     そこで「線の色 → 途中だけ透明 → 線の色」というグラデーションで描いている。
-     色の切り替え位置を指定できるので、狙った場所でちょうど切れる。
+     そこで「途中まで透明 → 線の色」というグラデーションで描いている。
+     色の切り替え位置を指定できるので、狙った場所でちょうど切れる。 */
+.timeline-gap {
+    --mark-x: 10px;
 
-   ▼ ★なぜ波だけ別の疑似要素なのか
+    /* ★波は線の段いっぱいの高さなので、細い線は内容の端で止める。
+         伸ばすと波の真ん中まで線が入り込む。 */
+    --pole-reach: 0px;
+}
 
-     背景は要素の外にはみ出せない。
-     線(::after)は幅2pxしかなく、波は左右にはみ出すので、
-     はみ出せる ::before(絶対配置)で描いている。 */
-.timeline-gap .timeline-body::after {
+.timeline-gap::after {
     /* 一直線の線を消して、切れ目のあるグラデーションに差し替える。 */
     background-color: transparent;
 
-    /* 破断マーク(高さ12px)の上下に4pxずつ余裕を持たせ、
-       中央 ±10px の範囲を透明にして線を切っている。 */
+    /* 破断マーク(幅12px)の左右に4pxずつ余裕を持たせ、
+       その範囲を透明にして線を切っている。 */
     background-image: linear-gradient(
-        to bottom,
-        rgba(249, 250, 251, 0.5) 0,
-        rgba(249, 250, 251, 0.5) calc(var(--mark-y) - 10px),
-        transparent              calc(var(--mark-y) - 10px),
-        transparent              calc(var(--mark-y) + 10px),
-        rgba(249, 250, 251, 0.5) calc(var(--mark-y) + 10px),
+        to right,
+        transparent              calc(var(--mark-x) + 10px),
+        rgba(249, 250, 251, 0.5) calc(var(--mark-x) + 10px),
         rgba(249, 250, 251, 0.5) 100%
     );
 }
 
 /* 破断マーク。丸(::before)を打ち消して波に置き換えている。 */
-.timeline-gap .timeline-body::before {
+.timeline-gap::before {
     /* ★丸の指定を1つずつ打ち消す。消し忘れると丸が残る。 */
     border: none;
     border-radius: 0;
     background-color: transparent;
 
-    /* 幅18pxの中心が線の中心に来るよう -10px ずらす。
-       縦位置は丸と同じ --mark-y。 */
-    left: -10px;
-    top: var(--mark-y);
-    transform: translateY(-50%);
+    width: 12px;
+    height: var(--line-row);
 
-    width: 18px;
-    height: 12px;
-
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='12' viewBox='0 0 18 12'%3E%3Cpath d='M0 6 Q4.5 1 9 6 T18 6' fill='none' stroke='%23f9fafb' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='18' viewBox='0 0 12 18'%3E%3Cpath d='M6 0 Q1 4.5 6 9 T6 18' fill='none' stroke='%23f9fafb' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-size: 18px 12px;
-}
-
-/* 「2006~2020」は「2005/9」より長いので、年の列に収まるよう小さくする。
-   ★overflow-wrap は保険。列幅を狭めても、はみ出さずに折り返す。 */
-.timeline-gap .timeline-year {
-    font-size: 0.8rem;
-    line-height: 1.5;
-
-    overflow-wrap: anywhere;
+    background-size: 12px 18px;
 }
 
 .timeline-body h3 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.3rem);
+    line-height: 1.5;
+
+    /* ★列が狭いので、1文字だけ次の行に落ちないよう文節で折り返す。 */
+    word-break: auto-phrase;
+    text-wrap: balance;
 }
 
 .timeline-body p {
     margin: 0.5rem 0 0;
-    font-size: 1.05rem;
+    font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
     line-height: 1.8;
+
+    word-break: auto-phrase;
 
     /* ★opacity ではなく色の透明度で薄くする。
        opacity は reveal.css のフェードが使っているので、指定すると打ち消し合う。 */
     color: rgba(249, 250, 251, 0.85);
+}
+
+/* ★タイトルが無い項目(省略区間)でも、年との間隔を他の項目とそろえる。 */
+.timeline-year + p {
+    margin-top: 0;
 }
 
 /* 年表の中に置くリンク(インターン先など)。
@@ -258,6 +335,8 @@
     list-style: none;
     margin: 0.5rem 0 0;
     padding: 0;
+
+    font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
 }
 
 .timeline-links li {
@@ -282,4 +361,58 @@
 .timeline-links a:hover {
     color: #ffffff;
     text-decoration: underline;
+}
+
+/* ---------- 前後へ送るボタン ----------
+   スクロールバーを隠しているので、マウスの人はこれで送る。
+   動かすのは timeline-scroll.js。 */
+.timeline-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+
+    margin-top: 2rem;
+    padding-inline: var(--section-gutter);
+}
+
+/* ★display: flex は hidden 属性より強いので、明示して消す。
+     JavaScript が動かない環境では押しても何も起きないボタンになるため、最初は隠してある。 */
+.timeline-controls[hidden] {
+    display: none;
+}
+
+.timeline-controls button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+
+    border: 1px solid rgba(249, 250, 251, 0.5);
+    border-radius: 50%;
+
+    background: transparent;
+    color: #f9fafb;
+
+    cursor: pointer;
+
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.timeline-controls button:hover {
+    background-color: #f9fafb;
+    color: #111827;
+}
+
+.timeline-controls button:focus-visible {
+    outline: 2px solid #f9fafb;
+    outline-offset: 2px;
+}
+
+/* ★disabled にしないこと。押した瞬間にフォーカスが失われ、
+     キーボードの人が現在地を見失う。aria-disabled ならフォーカスが残る。 */
+.timeline-controls button[aria-disabled="true"] {
+    background: transparent;
+    border-color: rgba(249, 250, 251, 0.25);
+    color: rgba(249, 250, 251, 0.35);
+
+    cursor: default;
 }

@@ -294,36 +294,40 @@
 
         <section id="experience">
             <div class="container">
-                <h2>Experience</h2>
+                <h2 id="experience-heading">Experience</h2>
+            </div>
 
-                {{/* 年表。1件 = <li> 1つ。
-                     左に年(.timeline-year)、右に内容(.timeline-body)。
-                     縦線は .timeline-body の左borderで引いている。
+            {{/* 年表。1件 = <li> 1つ。項目を足すと右へ伸びる。
+                 奇数番目は線の上の段、偶数番目は下の段に自動で並ぶ。
+                 線とポイントは .timeline-item の疑似要素で描いている。
 
-                     ★中身は仮置きです。実際の経歴に書き換えてください。
-                       上が古く、下が新しい並びにしてあります。
-                       逆にしたい場合は <li> の順番を入れ替えるだけです。 */}}
+                 ★.container の外に置いているのは、画面の端まで流すため。
+                 ★tabindex="0" … キーボードの矢印キーで横にスクロールできるようにする。
+
+                 ★左が古く、右が新しい並びにしてあります。
+                   逆にしたい場合は <li> の順番を入れ替えるだけです。 */}}
+            <div class="timeline-scroller" role="region" aria-labelledby="experience-heading" tabindex="0">
                 <ol class="timeline">
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2005/9</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2005/9</span>
                             <h3>香川県にて生まれる</h3>
                         </div>
                     </li>
 
-                    {{/* 間が長く空くところ。timeline-gap を足すと縦線が波線になる。
-                         年の欄に期間、右側は他と同じくタイトルと説明。 */}}
+                    {{/* 間が長く空くところ。timeline-gap を足すと線に破断マークが入る。
+                         年の欄に期間、続けて他と同じくタイトルと説明。 */}}
                     <li class="timeline-item timeline-gap">
-                        <span class="timeline-year">2005~</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2005~</span>
                             <p>幼少・小・中学時代</p>
                         </div>
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2021/4</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2021/4</span>
                             <h3>香川高等専門学校へ入学</h3>
                             <p>高専に入ってIT、通信の業界で働くことを志し、<br>
                             香川高専　通信ネットワーク工学科へ入学。</p>
@@ -331,8 +335,8 @@
                     </li>
 
                     <li class="timeline-item timeline-gap">
-                        <span class="timeline-year">2021~</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2021~</span>
                             <h3>ITではなく電気の学科だった</h3>
                             <p>自分のやりたいこととは離れたことを専門としており<br>
                             日々の勉強に徐々についていけなくなる。</p>
@@ -340,8 +344,8 @@
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2024/3</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2024/3</span>
                             <h3>Kloudハッカソン#4へ参加　デザイン賞を受賞</h3>
                             <p>
                                 2週間2人でDjangoフルスタックを担当。<br>
@@ -352,8 +356,8 @@
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2024/8</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2024/8</span>
                             <h3>TwoGate Dev Camp 2024 Summerへ参加</h3>
                             <p>
                                 3日間2人でDjangoフルスタックを担当。<br>
@@ -364,8 +368,8 @@
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2025/3</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2025/3</span>
                             <h3>香川高等専門学校を中退</h3>
                             <p>
                                 2度のハッカソンを通じて自分の進みたい道はITの方であると<br>
@@ -375,8 +379,8 @@
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2025/4~</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2025/4~</span>
                             <h3>
                                 穴吹コンピュータカレッジへ入学/在学中<br>
                                 (現在は穴吹ITビジネスカレッジ)
@@ -388,8 +392,8 @@
                     </li>
 
                     <li class="timeline-item">
-                        <span class="timeline-year">2025/8</span>
                         <div class="timeline-body">
+                            <span class="timeline-year">2025/8</span>
                             <h3>
                                 ニフティ株式会社が開催するインターンシップに参加
                             </h3>
@@ -408,6 +412,17 @@
                     </li>
 
                 </ol>
+            </div>
+
+            {{/* 前後へ送るボタン。動かすのは timeline-scroll.js。
+                 ★hidden … JavaScript が動かないと押しても何も起きないので、最初は隠してある。 */}}
+            <div class="timeline-controls" hidden>
+                <button type="button" data-timeline-prev aria-label="前の出来事へ">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-timeline-next aria-label="次の出来事へ">
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
         </section>
 
@@ -596,6 +611,8 @@
 
     {{/* ★<head> で reveal の印が付いたときだけ働く。無いときは何もしない。 */}}
     <script src="/static/js/reveal.js"></script>
+
+    <script src="/static/js/timeline-scroll.js"></script>
 
     <script src="/static/js/page-loader.js"></script>
 {{ end }}

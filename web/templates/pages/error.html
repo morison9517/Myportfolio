@@ -21,6 +21,9 @@
 {{ define "content" }}
         {{/* font-fade … フォントの読み込みを待ってから、上から順に表示する。
              出る順番は error.css の --fade-delay で決めている(仕掛けは base.css)。 */}}
+        {{/* 画面に貼り付いた背景画像の板。仕掛けは background.css。 */}}
+        <div class="page-bg"></div>
+
         <section id="error">
             <div class="container">
                 <h1 class="font-fade">{{ .ErrorCode }}</h1>

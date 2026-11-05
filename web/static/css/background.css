@@ -1,4 +1,4 @@
-/* ページ全体の背景画像レイヤー(トップページ専用)
+/* ページ全体の背景画像レイヤー(トップページとエラーページで使う)
 
    ▼ 何をするものか
 
@@ -56,4 +56,28 @@
     /* ★奥にあるとはいえ、ページ全体を覆う板なので、
          クリックやタップは素通りさせておく。 */
     pointer-events: none;
+}
+
+/* ---------- 横長の広い画面(PCの全画面など) ----------
+   ★background.jpg は縦長なので、横長の画面では大きく拡大されてしまう。
+     そこで横長の写真に差し替える。
+   ★min-width も見ているのは、スマホで文字を入力するときの対策。
+     キーボードが出ると画面の高さが縮んで「横長」と判定されることがあり、
+     orientation だけだと、そのたびに画像が切り替わってしまう。
+   ★条件に合うほうの画像しか読み込まれないので、通信量は増えない。 */
+@media (orientation: landscape) and (min-width: 769px) {
+    .page-bg {
+        background-image: url("../images/full_bkg.jpg");
+    }
+}
+
+/* 切り替えの間だけ手前に重ねる、それまでの画像の板。
+   置くのも消すのも page-bg-fade.js。画像もそちらで指定する。 */
+.page-bg-outgoing {
+    position: absolute;
+    inset: 0;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }

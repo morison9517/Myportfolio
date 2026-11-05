@@ -93,8 +93,8 @@
     transition: color 0.15s ease;
 }
 
-/* 緑の背景では var(--hover-color) が沈むので、白と下線で示す。 */
+/* 緑の背景では var(--hover-color) が沈むので、色だけ白に変える。
+   下線を付けないのは .products-more と動きをそろえるため。 */
 .skills-more a:hover {
     color: #ffffff;
-    text-decoration: underline;
 }

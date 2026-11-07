@@ -62,8 +62,9 @@ func index(c *gin.Context) {
 		// ★カテゴリの区切りを外した1本の並び。
 		//   トップの一覧はアイコンを6列で並べるだけなので、区切りは要らない。
 		//   ★全部ではない。ロゴ待ちのものなどは skill.go の HideOnTop で外している。
-		"Skills":   models.TopSkills(),
-		"Products": models.Products,
+		"Skills": models.TopSkills(),
+		// ★こちらも全部ではない。product.go の HideOnTop で外したものは出ない。
+		"Products": models.TopProducts(),
 	}))
 }
 

@@ -40,15 +40,62 @@ type Product struct {
 	// ★まだ用意できていない作品は "no-image.svg" にしておく。
 	Image string
 
+	// WideLogo = true にすると、画像を切らずに全体を見せ、後ろにシルク色の下地を敷く。
+	//
+	// ★横長のロゴ(背景が透明なもの)向け。既定(false)は枠いっぱいに広げて上下を切る。
+	//   透明なロゴを既定のまま出すと、文字が大きくなりすぎるうえ、
+	//   ダークモードでは濃い色の部分が背景に沈んで見えなくなる。
+	WideLogo bool
+
+	// Outline = true にすると、画像のまわりに薄い枠線を付ける。
+	//
+	// ★画像の端がページの背景色に近く、境目が分かりにくいもの向け(Chorus など)。
+	//   既定(false)は枠線なし。
+	Outline bool
+
 	// Body = 詳細ページに出す説明。1つが1段落になる。
 	//
 	// ★詳細ページを作るまでは、どこにも表示されない。
 	// ★HTMLタグは書けない(そのまま文字として出る)。改行は行を分けて書く。
 	Body []string
+
+	// HideOnTop = true にすると、トップページの Products には出さない。
+	// /products のほうには、この値に関係なく必ず出る。
+	// ★既定(false)は「両方に出す」。skill.go の HideOnTop と同じ考え方。
+	HideOnTop bool
+}
+
+// TopProducts = トップページに出すぶんだけを返す。HideOnTop: true のものは飛ばす。
+// ★並び順は Products のまま。
+func TopProducts() []Product {
+	products := []Product{}
+
+	for _, product := range Products {
+		if product.HideOnTop {
+			continue
+		}
+
+		products = append(products, product)
+	}
+
+	return products
 }
 
 // Products = 作品の一覧。★上に書いたものが画面でも上に出る。
 var Products = []Product{
+	{
+		Slug:     "dether",
+		Name:     "dether",
+		Date:     "2026年10月",
+		Event:    "JPHacks2026 HackDay",
+		Award:    "Sponsor Award",
+		Image:    "dether_logo_light.png",
+		WideLogo: true,
+		Body: []string{
+			"説明はまだ書いていません。",
+		},
+		HideOnTop: false,
+	},
 	{
 		Slug:  "Kotas-Portfolio",
 		Name:  "Kota's Portfolio",
@@ -58,6 +105,7 @@ var Products = []Product{
 		Body: []string{
 			"説明はまだ書いていません。",
 		},
+		HideOnTop: false,
 	},
 	{
 		Slug:  "Minnano-Hiroba",
@@ -68,6 +116,7 @@ var Products = []Product{
 		Body: []string{
 			"説明はまだ書いていません。",
 		},
+		HideOnTop: false,
 	},
 	{
 		Slug:  "HENRO-plus",
@@ -78,16 +127,19 @@ var Products = []Product{
 		Body: []string{
 			"説明はまだ書いていません。",
 		},
+		HideOnTop: true,
 	},
 	{
-		Slug:  "Chorus",
-		Name:  "Chorus",
-		Date:  "2024年3月",
-		Event: "Kloudハッカソン#4",
-		Award: "デザイン賞",
-		Image: "Chorus-dark.png",
+		Slug:    "Chorus",
+		Name:    "Chorus",
+		Date:    "2024年3月",
+		Event:   "Kloudハッカソン#4",
+		Award:   "デザイン賞",
+		Image:   "Chorus-dark.png",
+		Outline: true,
 		Body: []string{
 			"説明はまだ書いていません。",
 		},
+		HideOnTop: false,
 	},
 }

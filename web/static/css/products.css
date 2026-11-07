@@ -60,6 +60,36 @@
     transition: filter 0.2s ease;
 }
 
+/* ▼ 横長ロゴ用(product.go の WideLogo: true)
+     cover のままだと横長ロゴの左右が切られ、文字だけが大きく映る。
+     ここだけ contain にして全体を見せ、透ける余白にシルク色の下地を敷く。
+
+   ★下地の色はテーマで変えない。ロゴは明るい背景向けの色で作られているので、
+     ダークモードでも下地は明るいままにしておかないと文字が沈む。
+   ★border-box … 無いと padding のぶん枠が大きくなり、他のカードと高さがずれる。
+   ★高さ・比率は上の .product-card img と mediaqueries.css のものをそのまま使う。 */
+.product-card img.is-wide-logo {
+    box-sizing: border-box;
+    padding: 6% 9%;
+
+    object-fit: contain;
+
+    /* シルク色の単色。★グラデーションにすると、ライトモードで斜めのムラに見える。 */
+    background-color: #f6f3ea;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ▼ 薄い枠線(product.go の Outline: true)
+     画像の端がページの背景色に近いと、どこまでが画像か分からなくなるため。
+
+   ★border-box … 無いと枠線のぶん枠が大きくなり、他のカードと高さがずれる。
+   ★色は黒の半透明。ダークモードでは見えにくくなるが、
+     そもそも明るい画像なら紺の背景との境目ははっきりしているので問題ない。 */
+.product-card img.is-outlined {
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 /* ホバーは拡大ではなく暗くする。
    ★拡大にすると .product-card に overflow: hidden が要るうえ、
      画像の端が動くぶん隣のカードとの間隔がちらついて見える。
@@ -104,6 +134,13 @@
 .product-date {
     margin: 0.4rem 0 0;
     font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* ★ダークモードだけ薄めのまま。
+     白い文字は 0.8 だとイベント名との差がほとんど無くなり、一段弱く見えない。
+     ライトモードは 0.65 だと薄すぎて読みにくかったので、上で濃くしてある。 */
+body.dark .product-date {
     opacity: 0.65;
 }
 

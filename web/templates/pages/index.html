@@ -263,13 +263,14 @@
                        internal/models/product.go の Products がそのまま出る。
                        作品を足す・直すときはあちらだけを触れば、
                        ここと /products の両方に反映される。
+                       ★ただし HideOnTop: true のものはここには出ない(/products だけ)。
 
                      ★range の中ではドットの意味が「今の1件」に変わる。 */}}
                 <ul class="products-grid">
                     {{ range .Products }}
                     <li class="product-card">
                         <a href="/products/{{ .Slug }}">
-                            <img src="/static/images/products/{{ .Image }}" alt="">
+                            <img src="/static/images/products/{{ .Image }}" alt=""{{ if or .WideLogo .Outline }} class="{{ if .WideLogo }}is-wide-logo{{ end }}{{ if and .WideLogo .Outline }} {{ end }}{{ if .Outline }}is-outlined{{ end }}"{{ end }}>
                             <h3>{{ .Name }}</h3>
                         </a>
                         <p class="product-date">{{ .Date }}</p>

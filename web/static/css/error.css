@@ -86,7 +86,11 @@
     --fade-delay: 0.15s;
 }
 
-/* ホームへ戻るリンク。大きさは上の説明文と同じ。 */
+/* ホームへ戻るリンク。
+   ★大きさ・太さ・ホバーは /products ・ /skills の「ホームへ戻る」(sub-page.css の
+     .sub-page-more)と同じ。変えるときは両方そろえること。
+   ★色だけは別。あちらは明るい背景用の var(--link-color) だが、
+     このページの背景は常に暗い写真なので、暗い背景用の色にしてある。 */
 .error-home,
 .error-home:visited {
     /* ★inline-block にすること。
@@ -98,9 +102,10 @@
 
     margin: 2.5rem 0 0;
 
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
 
-    /* 色とホバーは #experience のリンクと同じ。
+    /* 色は #experience のリンクと同じ。
        背景(写真+黒い膜)の作りが同じなのでそろえてある。 */
     color: var(--link-on-dark);
 
@@ -109,9 +114,9 @@
     --fade-delay: 0.45s;
 }
 
+/* ★下線は付けない。.sub-page-more と同じく、色が変わるだけにしてある。 */
 .error-home:hover {
     color: #ffffff;
-    text-decoration: underline;
 }
 
 /* ---------- スマホ用 ---------- */
@@ -127,7 +132,5 @@
         font-size: 1.1rem;
     }
 
-    .error-home {
-        font-size: 1.1rem;
-    }
+    /* ★.error-home はスマホでも小さくしない。.sub-page-more もスマホで 1.3rem のまま。 */
 }

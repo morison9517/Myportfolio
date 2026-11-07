@@ -306,112 +306,40 @@
                  ★tabindex="0" … キーボードの矢印キーで横にスクロールできるようにする。
 
                  ★左が古く、右が新しい並びにしてあります。
-                   逆にしたい場合は <li> の順番を入れ替えるだけです。 */}}
+                   逆にしたい場合は experience.go の並びを入れ替えるだけです。 */}}
             <div class="timeline-scroller" role="region" aria-labelledby="experience-heading" tabindex="0">
                 <ol class="timeline">
+                    {{/* ★1件ずつ手で書かないこと。並びも内容も
+                         internal/models/experience.go の Experiences がそのまま出る。
+                         経歴を足す・直すときはあちらだけを触ればよい。
 
-                    <li class="timeline-item">
+                         ★Title / Body は「1つ = 1行」。行の間にだけ <br> を入れる
+                           ($i が 0 = 1行目のときは入れない)。
+                         ★range の中ではドットの意味が「今の1件」に変わる。 */}}
+                    {{ range .Experiences }}
+                    <li class="timeline-item{{ if .Gap }} timeline-gap{{ end }}">
                         <div class="timeline-body">
-                            <span class="timeline-year">2005/9</span>
-                            <h3>香川県にて生まれる</h3>
-                        </div>
-                    </li>
-
-                    {{/* 間が長く空くところ。timeline-gap を足すと線に破断マークが入る。
-                         年の欄に期間、続けて他と同じくタイトルと説明。 */}}
-                    <li class="timeline-item timeline-gap">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2005~</span>
-                            <p>幼少・小・中学時代</p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2021/4</span>
-                            <h3>香川高等専門学校へ入学</h3>
-                            <p>高専に入ってIT、通信の業界で働くことを志し、<br>
-                            香川高専　通信ネットワーク工学科へ入学。</p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item timeline-gap">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2021~</span>
-                            <h3>ITではなく電気の学科だった</h3>
-                            <p>自分のやりたいこととは離れたことを専門としており<br>
-                            日々の勉強に徐々についていけなくなる。</p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2024/3</span>
-                            <h3>Kloudハッカソン#4へ参加　デザイン賞を受賞</h3>
-                            <p>
-                                2週間2人でDjangoフルスタックを担当。<br>
-                                音楽でつながるSNS『Chorus』を開発し<br>
-                                デザイン賞を受賞。
-                            </p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2024/8</span>
-                            <h3>TwoGate Dev Camp 2024 Summerへ参加</h3>
-                            <p>
-                                3日間2人でDjangoフルスタックを担当。<br>
-                                お遍路を快適にしてくれるLine bot『HENRO+』を開発<br>
-                                大きな経験となった。
-                            </p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2025/3</span>
-                            <h3>香川高等専門学校を中退</h3>
-                            <p>
-                                2度のハッカソンを通じて自分の進みたい道はITの方であると<br>
-                                再認識。意を決して高専を中退する。
-                            </p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2025/4~</span>
-                            <h3>
-                                穴吹コンピュータカレッジへ入学/在学中<br>
-                                (現在は穴吹ITビジネスカレッジ)
-                            </h3>
-                            <p>
-                                専門学校へ再入学し、現在授業や独学で様々な技術を学んでいる。
-                            </p>
-                        </div>
-                    </li>
-
-                    <li class="timeline-item">
-                        <div class="timeline-body">
-                            <span class="timeline-year">2025/8</span>
-                            <h3>
-                                ニフティ株式会社が開催するインターンシップに参加
-                            </h3>
-                            <p>
-                                ニフティ株式会社にて、プロダクト開発5daysインターンに参加。<br>
-                                Flaskを用いたチーム開発に臨む。
-                            </p>
+                            <span class="timeline-year">{{ .Date }}</span>
+                            {{ if .Title }}
+                            <h3>{{ range $i, $line := .Title }}{{ if $i }}<br>{{ end }}{{ $line }}{{ end }}</h3>
+                            {{ end }}
+                            {{ if .Body }}
+                            <p>{{ range $i, $line := .Body }}{{ if $i }}<br>{{ end }}{{ $line }}{{ end }}</p>
+                            {{ end }}
+                            {{ if .Links }}
                             <ul class="timeline-links">
+                                {{ range .Links }}
                                 <li>
                                     <i class="fa-solid fa-globe"></i>
-                                    <a href="https://www.nifty.co.jp/">ニフティ株式会社</a>
+                                    <a href="{{ .URL }}">{{ .Label }}</a>
                                     <i class="fa-solid fa-arrow-up-right-from-square external-link-icon"></i>
                                 </li>
+                                {{ end }}
                             </ul>
+                            {{ end }}
                         </div>
                     </li>
-
+                    {{ end }}
                 </ol>
             </div>
 

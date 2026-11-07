@@ -65,6 +65,8 @@ func index(c *gin.Context) {
 		"Skills": models.TopSkills(),
 		// ★こちらも全部ではない。product.go の HideOnTop で外したものは出ない。
 		"Products": models.TopProducts(),
+		// 年表。中身は models/experience.go。
+		"Experiences": models.Experiences,
 	}))
 }
 

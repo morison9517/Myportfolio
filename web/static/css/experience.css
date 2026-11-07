@@ -102,7 +102,11 @@
 
     display: grid;
     width: max-content;
-    grid-template-rows: auto var(--line-row) auto;
+    /* ★上下の段を 1fr ずつにして、同じ高さにそろえる。
+         年表の高さは決まっていないので、1fr の段は「中身がいちばん長い段」の高さに
+         そろえて広がる。これで上の段と下の段で、細い縦線の長さが同じになる。
+         auto にすると上下それぞれが自分の中身の高さになり、縦線の長さがずれる。 */
+    grid-template-rows: 1fr var(--line-row) 1fr;
     grid-auto-flow: column;
     grid-auto-columns: var(--step);
 }

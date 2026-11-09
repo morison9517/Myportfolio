@@ -19,20 +19,19 @@
    ★head_extra から読み込まれるので mediaqueries.css より後になる。
      画面幅の調整もこのファイルの末尾に書くこと。 */
 
-/* 見出しの下に置くひとこと。--fade-delay は上から順に出すための待ち時間。
+/* --fade-delay は上から順に出すための待ち時間。h1(0.15s)の次に出す。
 
    ▼ ★★font-fade を付けた要素に opacity を書かないこと
 
      base.css は、フォントを待っている間 .font-fade { opacity: 0 } で隠している。
-     ところが .font-fade も .skills-lead も詳細度が同じ (0,1,0) なので、
+     ところが .font-fade もこのファイルのクラスも詳細度が同じ (0,1,0) なので、
      あとから読み込まれる側(head_extra のこのファイル)が勝ってしまう。
 
        base.css:288        .font-fade   { opacity: 0; }
-       skills-page.css     .skills-lead { opacity: 0.75; }  ← こちらが勝つ
+       skills-page.css     .〇〇        { opacity: 0.75; }  ← こちらが勝つ
 
      結果、隠す指定が効かなくなり、フォント読み込み中(最大3秒)は
-     この一文だけが薄いまま先に表示される。
-     ★h1 より先に出たのはこのため。h1 は opacity を持たないので正しく隠れていた。
+     その要素だけが薄いまま先に表示される(以前、見出し下の説明文で実際に起きた)。
 
      ★animation の both では防げない。
        animation が効くのは html:not(.wf-loading):not(.fade-hold) のときだけで、
@@ -40,21 +39,12 @@
 
      ★弱く見せたいときは opacity ではなく font-size で差を付ける
        (.skill-category-label / .skill-item-body p と同じ方針)。
-       legal.css の .legal-lead も opacity を持っていない。 */
-.skills-lead {
-    margin: -1.5rem 0 3rem;
 
-    text-align: center;
-    line-height: 1.9;
-
-    --fade-delay: 0.3s;
-}
-
-/* ★カテゴリを1つずつずらして出さない(まとめて1回で出す)。
+   ★カテゴリを1つずつずらして出さない(まとめて1回で出す)。
      カテゴリの数だけずらすと、最後のカテゴリが出るまで何秒も待つことになる。
      legal.css の本文と同じ考え方。 */
 .skill-categories {
-    --fade-delay: 0.45s;
+    --fade-delay: 0.3s;
 }
 
 /* カテゴリ同士の間隔。★最初の1つには付けないので + で書く。 */
@@ -213,20 +203,13 @@
 /* ---------- スマホ用 ---------- */
 @media (max-width: 768px) {
     /* ★画面端に寄りすぎないよう、左右に余白を足す(トップの .about-text と同じ)。 */
-    .skills-lead,
     .skill-categories {
         padding-inline: 1rem;
     }
 
     /* ★折り返す行を右端までそろえて、左右の余白を一致させる。 */
-    .skills-lead,
     .skill-item-body p {
         text-align: justify;
-    }
-
-    .skills-lead {
-        margin: -1rem 0 2.5rem;
-        font-size: 0.95rem;
     }
 
     .skill-category + .skill-category {

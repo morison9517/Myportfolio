@@ -110,6 +110,7 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 	// --- 全ページ共通の仕掛け(順番に意味がある) ---
 	// ★2つ目の引数が「HTTPSのときだけメモ(Cookie)を送る」の指定。
 	//   本番でも練習中はHTTPなので、.env の SECURE_COOKIES で切り替えられる。
+	r.Use(middleware.NoCache())
 	r.Use(middleware.Session(cfg.SecretKey, cfg.IsProduction() && cfg.SecureCookies))
 	r.Use(middleware.CSRF())
 

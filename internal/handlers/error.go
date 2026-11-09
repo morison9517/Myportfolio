@@ -75,8 +75,21 @@ var fallbackErrorPage = errorPage{
 //	Ginの素っ気ない「404 page not found」ではなくこのページが出る。
 func RegisterErrorRoutes(r *gin.Engine) {
 	r.NoRoute(func(c *gin.Context) {
+		if isAssetPath(c.Request.URL.Path) {
+			c.String(http.StatusNotFound, "404 page not found")
+			c.Abort()
+			return
+		}
+
 		ShowError(c, http.StatusNotFound)
 	})
+}
+
+func isAssetPath(path string) bool {
+	return strings.HasPrefix(path, "/static/") ||
+		strings.HasPrefix(path, "/media/") ||
+		path == "/favicon.ico" ||
+		path == "/robots.txt"
 }
 
 // ShowError = エラー画面を返して、以降の処理を止める。

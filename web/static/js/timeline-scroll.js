@@ -19,10 +19,21 @@
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    /* ボタン1回で何項目先へ送るか。スマホは画面が狭いので少なくする。
-       ★768px は他のCSS(reveal.css など)のスマホの境目とそろえてある。 */
-    const narrowScreen = window.matchMedia("(max-width: 768px)");
-    const jumpCount = () => (narrowScreen.matches ? 1 : 4);
+    /* ボタン1回で何項目先へ送るか。画面が狭いほど少なくする。
+         スマホ(〜768px)         1項目
+         タブレット(769〜1200px)  2項目
+         デスクトップ(1201px〜)   4項目
+       ★境目は mediaqueries.css とそろえてある。
+         768px はスマホ、1200px はハンバーガーメニューに切り替わる幅。 */
+    const phoneScreen = window.matchMedia("(max-width: 768px)");
+    const tabletScreen = window.matchMedia("(max-width: 1200px)");
+    const jumpCount = () => {
+        if (phoneScreen.matches) {
+            return 1;
+        }
+
+        return tabletScreen.matches ? 2 : 4;
+    };
 
     const maxScroll = () => scroller.scrollWidth - scroller.clientWidth;
 

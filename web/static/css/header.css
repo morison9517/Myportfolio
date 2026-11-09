@@ -293,9 +293,13 @@ nav a{
         stroke-dashoffset var(--menu-icon-motion);
 }
 
+/* ★calc の中で単位 px を付けること。calc(var(--menu-path-to-circle) * -1) のように
+     単位なしの数値だけで計算すると、Firefox では無効になって 0 に戻り、
+     真ん中の線が〇まで進まず右上にはみ出す(Chrome では動くので気づきにくい)。
+     viewBox とアイコンの大きさが同じ 44 なので、1px = viewBox の 1。 */
 .hamburger-icon.open .menu-icon__middle {
     stroke-dasharray: var(--menu-path-circle) 999;
-    stroke-dashoffset: calc(var(--menu-path-to-circle) * -1);
+    stroke-dashoffset: calc(var(--menu-path-to-circle) * -1px);
 }
 
 @media (prefers-reduced-motion: reduce) {

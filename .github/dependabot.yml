@@ -1,0 +1,81 @@
+# =============================================================================
+# dependabot.yml = 部品の「新しい版が出たよ」係
+#
+#   GitHub が週に1回、使っている部品(ライブラリ・Dockerの箱)の新しい版を探し、
+#   見つかったら「この版に上げませんか」というプルリクエストを自動で作る。
+#   ★勝手に本番へ反映されることはない。マージするかどうかは自分で決める。
+#
+#   ▼ 見ている場所は3つ
+#       gomod          … go.mod / go.sum(Goのライブラリ)
+#       docker         … Dockerfile の FROM 行(golang / alpine)
+#       docker-compose … compose.yml / compose.prod.yml の image 行(mysql / nginx)
+#
+#   ★小さな更新(minor / patch)は1つのプルリクエストにまとめる。
+#     まとめないと、毎週月曜にプルリクエストが10個近く並ぶことになる。
+# =============================================================================
+
+version: 2
+
+updates:
+  # ===========================================================================
+  # Goのライブラリ(go.mod)
+  # ===========================================================================
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    groups:
+      # 小さな更新はまとめて1つに。大きな更新(major)は壊れやすいので個別に来る。
+      go-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "deps(go)"
+
+  # ===========================================================================
+  # Dockerfile の土台の箱(golang / alpine)
+  #
+  #   ★golang の箱を上げるプルリクエストが来たら、go.mod の
+  #     「go 1.26.10」の行も同じ版に手で揃えること。
+  #     Dependabot はこの行までは書き換えてくれない。
+  # ===========================================================================
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "deps(docker)"
+
+  # ===========================================================================
+  # compose の借り物の箱(mysql / nginx)
+  # ===========================================================================
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    groups:
+      compose-images:
+        patterns:
+          - "*"
+    ignore:
+      # ★MySQL は 8.4(長期サポート版)に留める。
+      #   9 系へ上げるとデータの形式が変わり、戻せなくなることがある。
+      #   上げるときは Dependabot 任せにせず、バックアップを取ってから手で行う。
+      - dependency-name: "mysql"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "deps(compose)"

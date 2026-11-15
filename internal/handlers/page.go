@@ -41,6 +41,7 @@ func RegisterPageRoutes(r *gin.Engine) {
 	r.GET("/", index)
 	r.GET("/skills", skills)
 	r.GET("/products", products)
+	r.GET("/products/:slug", productDetail)
 	r.GET("/privacy", privacy)
 	r.GET("/terms", terms)
 	r.GET("/health", health)
@@ -84,14 +85,50 @@ func skills(c *gin.Context) {
 
 // products = 作品の一覧ページ(/products)。中身はトップページの Products と同じ。
 //
-//	★作品ごとの詳細ページ(/products/Chorus など)はまだ無い。
-//	  登録していないURLなので、開かれたら404になる(受け皿は error.go の NoRoute)。
+//	カードを押した先は、下の productDetail(/products/Chorus など)。
 func products(c *gin.Context) {
 	c.HTML(http.StatusOK, "products.html", view.Page(c, gin.H{
 		"Title":       "Products",
 		"Description": "これまでに制作した作品の一覧です。ハッカソンやインターンで開発したものを掲載しています。",
 		"Products":    models.Products,
 	}))
+}
+
+// productDetail = 作品1件の詳細ページ(/products/Chorus など)。
+//
+//	:slug の部分に product.go の Slug が入る。中身も product.go から出す。
+//
+//	★product.go に無い Slug は404。
+//	★大文字・小文字だけ違うとき(/products/chorus)は、正しい形へ移す(301)。
+//	  同じページが2つのURLで開けると、検索エンジンが別のページとして数えてしまう。
+func productDetail(c *gin.Context) {
+	slug := c.Param("slug")
+
+	product, ok := models.FindProduct(slug)
+	if !ok {
+		ShowError(c, http.StatusNotFound)
+		return
+	}
+
+	if product.Slug != slug {
+		c.Redirect(http.StatusMovedPermanently, "/products/"+product.Slug)
+		return
+	}
+
+	data := gin.H{
+		"Title":   product.Name,
+		"Product": product,
+		// SNSに貼ったときの画像。空なら base.html が共通の ogp.jpg を使う。
+		"OGImage": product.OGImage(),
+	}
+
+	// ★説明文は、空のときは渡さない。空文字を渡すと view.Page が
+	//   「説明文あり」と見なし、サイト共通の説明文を入れてくれない。
+	if description := product.Description(); description != "" {
+		data["Description"] = description
+	}
+
+	c.HTML(http.StatusOK, "product.html", view.Page(c, data))
 }
 
 // privacy = プライバシーポリシー。フッター(base.html)から開く。

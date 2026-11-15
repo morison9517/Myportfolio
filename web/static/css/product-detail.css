@@ -1,0 +1,367 @@
+/* product-detail = 作品1件の詳細ページ(/products/Chorus など)
+
+   ページの外枠(余白・h1・戻るリンク)は sub-page.css。
+   ここは画像・題名まわり・詳細内容・使用技術などの並びと、写真の拡大表示。
+
+   ★賞のバッジ(.product-award)と、アイコンの白い角丸(.skill-icon)は
+     products.css / skills.css のものを借りている。どちらも base.html から
+     全ページで読み込まれる。ここでは大きさなどの差分だけ書く。
+
+   ▼ ★★font-fade を付けた要素に opacity を書かないこと
+
+     理由は skills-page.css の先頭。年月を薄く見せたいので、
+     opacity は font-fade の付いた <p> ではなく、中の <span> に付けている。
+
+   ★head_extra から読み込まれるので mediaqueries.css より後になる。
+     画面幅の調整もこのファイルの末尾に書くこと。 */
+
+/* ★本文を読ませるページなので、一覧ページ(900px)より幅を絞る。
+     1行が長すぎると、次の行の頭を目で探しにくくなる。 */
+#product-detail .container {
+    max-width: 760px;
+}
+
+/* ★sub-page.css の h1 の大きさは cqi(.container の幅)で決めている。
+     ここにも基準を作っておかないと、画面全体の幅が基準になってしまう。 */
+@supports (container-type: inline-size) {
+    #product-detail .container {
+        container-type: inline-size;
+    }
+}
+
+/* ---------- 上から出る順番 ---------- */
+.product-hero               { --fade-delay: 0.1s; }
+/* h1 は sub-page.css の 0.15s */
+.product-detail-meta        { --fade-delay: 0.2s; }
+.product-summary            { --fade-delay: 0.25s; }
+.product-detail-sections    { --fade-delay: 0.3s; }
+#product-detail .sub-page-more { --fade-delay: 0.35s; }
+
+/* ===========================================================================
+   画像・題名・時期・概要
+   =========================================================================== */
+
+/* ▼ ★カードと違って、画像を切らずに全体を見せる
+
+     カードは横長の窓から覗く形で上下を切っているが(products.css)、
+     ここは作品のページなので全体を出す。
+     正方形のロゴを横幅いっぱいに出すと画面が埋まるので、高さに上限を付けている。
+
+   ★width: auto … max-height で縮んだとき、横幅も同じ比率で縮ませる。 */
+.product-hero img {
+    display: block;
+    margin: 0 auto;
+
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 320px;
+}
+
+/* 横長ロゴ(product.go の WideLogo: true)。
+   ★下地の色と枠はカード(products.css の .is-wide-logo)とそろえること。 */
+.product-hero img.is-wide-logo {
+    width: 100%;
+    max-height: none;
+
+    box-sizing: border-box;
+    padding: 7% 10%;
+
+    background-color: #f6f3ea;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 薄い枠線(product.go の Outline: true)。★カードとそろえること。 */
+.product-hero img.is-outlined {
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* ★sub-page.css の h1 は下に 3rem 空けている(一覧ページ用)。
+     ここでは画像との間を空け、すぐ下の年月とは近づける。 */
+#product-detail h1 {
+    margin: 2rem 0 0.8rem;
+}
+
+.product-detail-meta {
+    margin: 0;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+
+    font-size: 0.95rem;
+}
+
+/* ★opacity はここ(中の span)に付ける。親の <p> は font-fade なので付けない。
+     値はカードの .product-date とそろえてある。 */
+.product-detail-date {
+    opacity: 0.8;
+}
+
+body.dark .product-detail-date {
+    opacity: 0.65;
+}
+
+.product-summary {
+    margin: 1.6rem auto 0;
+    max-width: 34em;
+
+    font-size: 1.1rem;
+    line-height: 1.9;
+    text-align: center;
+}
+
+/* ===========================================================================
+   詳細内容と、その下の見出しつきの区切り(使用技術・インフラ・共同制作者・リンク)
+   =========================================================================== */
+.product-detail-sections {
+    margin-top: 3.5rem;
+}
+
+/* ★詳細内容の見出し(Heading)と、使用技術などの見出しは同じ見た目にする。
+     読む側からは、どちらも同じ大きさの区切りに見えてほしい。
+     下線の色は legal.css / skills-page.css の h2 とそろえてある。 */
+.product-body h2,
+.product-section h2 {
+    margin: 3rem 0 1.2rem;
+    padding-bottom: 0.5rem;
+
+    font-size: 1.4rem;
+
+    border-bottom: 1px solid var(--divider-color);
+
+    transition: border-color var(--theme-fade);
+}
+
+/* ★いちばん最初の見出しだけは上を空けない。
+     .product-detail-sections の margin-top と二重になって、間が空きすぎる。 */
+.product-detail-sections > :first-child > h2:first-child {
+    margin-top: 0;
+}
+
+.product-body h3 {
+    margin: 2rem 0 0.6rem;
+    font-size: 1.15rem;
+}
+
+/* 段落の行の高さは legal.css の本文とそろえてある。 */
+.product-body p {
+    margin: 0 0 1rem;
+    line-height: 1.9;
+}
+
+/* ---------- 写真 ---------- */
+.product-photo {
+    margin: 1.8rem 0;
+}
+
+/* ★写真の周りに枠を付けるのは、スクリーンショットの端が
+     ページの背景と同じ白や紺のとき、どこまでが写真か分からなくなるため。 */
+.product-photo-link {
+    display: block;
+
+    cursor: zoom-in;
+}
+
+.product-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+
+    box-sizing: border-box;
+    border: 1px solid var(--divider-color);
+
+    transition:
+        filter 0.2s ease,
+        border-color var(--theme-fade);
+}
+
+/* ホバーはカードと同じく暗くする(拡大はしない。理由は products.css)。 */
+.product-photo-link:hover img {
+    filter: brightness(0.85);
+}
+
+.product-photo figcaption {
+    margin-top: 0.6rem;
+
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* ---------- 使用技術・インフラ ---------- */
+/* ★.product-section には上の余白を付けない。間隔は h2 の margin-top(3rem)だけで取る。
+     両方に付けると二重になり、詳細内容との間だけ広く空く。 */
+
+/* ★アイコンの下に名前を置いた小さな枠を、入るだけ横に並べる。
+     auto-fill … 幅を見て列の数をブラウザが決める。何pxで折り返すかを書かなくてよい。
+     ★auto-fit にしないこと。数が少ないと1つずつが横に伸びて、間延びする。 */
+.product-tech-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 1.4rem 0.8rem;
+}
+
+.product-tech-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: center;
+
+    /* 「Virtual Machine」のような長い名前は、枠の中で折り返す。 */
+    overflow-wrap: anywhere;
+}
+
+/* 大きさは /skills(skills-page.css)の .skill-icon とそろえてある。 */
+#product-detail .skill-icon {
+    width: 56px;
+    height: 56px;
+
+    border: 1px solid var(--divider-color);
+    border-radius: 12px;
+
+    transition: border-color var(--theme-fade);
+}
+
+/* ---------- 共同制作者・リンク ---------- */
+.product-members,
+.product-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 2rem;
+}
+
+.product-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* リンクの色とホバーは、ほかのページのリンク(.sub-page-more など)とそろえてある。 */
+.product-members a,
+.product-members a:visited,
+.product-links a,
+.product-links a:visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    color: var(--link-color);
+
+    transition: color 0.15s ease;
+}
+
+.product-members a:hover,
+.product-links a:hover {
+    color: var(--hover-color);
+}
+
+/* GitHub などのアイコン。文字より少しだけ大きくする。 */
+.product-members .fa-brands,
+.product-members .fa-solid,
+.product-links .fa-brands,
+.product-links .fa-globe {
+    font-size: 1.15em;
+}
+
+/* ===========================================================================
+   画面には出さず、読み上げだけさせる文字
+   ===========================================================================
+
+   ★display: none にしないこと。読み上げソフトからも消えてしまう。 */
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===========================================================================
+   写真の拡大表示(<dialog id="photo-viewer">)
+   ===========================================================================
+
+   ★出入りの動き・幕・× ボタンは contact.css の .modal をそのまま使う。
+     ここでは大きさと中身の並びだけ変える。 */
+.photo-viewer {
+    width: min(1100px, calc(100% - 2rem));
+    max-height: 92vh;
+
+    /* ★写真は下の max-height で画面に収めるので、ポップアップの中は
+         スクロールさせない(.modal はスクロールする設定になっている)。 */
+    overflow: hidden;
+}
+
+.photo-viewer .modal-head {
+    padding: 0.8rem 0.8rem 0 1.4rem;
+}
+
+.photo-viewer-caption {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* ★縦長のスクリーンショットでも画面からはみ出さないよう、高さに上限を付ける。
+     4.5rem は上の見出しの行のぶん。 */
+.photo-viewer-image {
+    display: block;
+
+    width: 100%;
+    height: auto;
+    max-height: calc(92vh - 4.5rem);
+
+    object-fit: contain;
+
+    box-sizing: border-box;
+    padding: 0.8rem 1.4rem 1.4rem;
+}
+
+/* ---------- スマホ用 ---------- */
+@media (max-width: 768px) {
+    .product-hero img {
+        max-height: 240px;
+    }
+
+    .product-summary {
+        font-size: 1rem;
+    }
+
+    .product-body h2,
+    .product-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .product-body p {
+        font-size: 0.95rem;
+    }
+
+    .photo-viewer .modal-head {
+        padding-left: 1rem;
+    }
+
+    .photo-viewer-image {
+        padding: 0.6rem 0.8rem 0.8rem;
+    }
+}

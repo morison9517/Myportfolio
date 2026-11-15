@@ -76,7 +76,9 @@
     <meta property="og:title" content="{{ if .Title }}{{ .Title }} | {{ end }}{{ .SiteName }}">
     <meta property="og:description" content="{{ .Description }}">
     <meta property="og:url" content="{{ .CanonicalURL }}">
-    <meta property="og:image" content="{{ .SiteURL }}/static/images/ogp.jpg">
+    {{/* ★作品の詳細ページだけは、その作品の画像を使う(OGImage は handlers/page.go)。
+         渡されなかったページと、作品の画像がSVGのものはサイト共通の ogp.jpg。 */}}
+    <meta property="og:image" content="{{ .SiteURL }}{{ if .OGImage }}{{ .OGImage }}{{ else }}/static/images/ogp.jpg{{ end }}">
     <meta property="og:locale" content="ja_JP">
 
     {{/* summary_large_image = 画像を大きく出す形式。 */}}

@@ -1,7 +1,8 @@
 {{/* product.html = 作品1件の詳細ページ(/products/Chorus など)
 
-     {{ .Product }} … 作品1件(internal/models/product.go)
-     ★作品の中身を直すときにこのファイルを触る必要はない。product.go を直せば出る。
+     {{ .Product }} … 作品1件(型は internal/models/product.go)
+     ★作品の中身を直すときにこのファイルを触る必要はない。
+       中身は web/content/products/<Slug>.md(書き方は同じフォルダの README.md)。
 
      ▼ 上から並ぶ順番
 
@@ -43,28 +44,14 @@
                 {{/* ★font-fade はここに1つだけ。段落や写真ごとに付けてずらすと、
                      下のほうが出るまで何秒も待つことになる(skills.html と同じ考え方)。 */}}
                 <div class="product-detail-sections font-fade">
-                    {{ if .Body }}
+                    {{/* 詳細内容 = .md の本文を HTML にしたもの。
+                         見出し・段落・写真の出し方は models/product_markdown.go で決めている。
+                         ★写真は <a class="product-photo-link"> で包んである。
+                           JavaScript が動かないときも、押せば写真そのものが開く。
+                           動くときは photo-viewer.js が止めて、拡大表示に切り替える。 */}}
+                    {{ if .BodyHTML }}
                     <div class="product-body">
-                        {{ range .Body }}
-                        {{ if eq .Kind "heading" }}
-                        <h2>{{ .Text }}</h2>
-                        {{ else if eq .Kind "subheading" }}
-                        <h3>{{ .Text }}</h3>
-                        {{ else if eq .Kind "photo" }}
-                        {{/* ★button ではなく a にしてある。
-                             JavaScript が動かないときも、押せば写真そのものが開く。
-                             動くときは photo-viewer.js が止めて、拡大表示に切り替える。 */}}
-                        <figure class="product-photo">
-                            <a class="product-photo-link" href="/static/images/products/{{ .Image }}" data-caption="{{ .Caption }}">
-                                <img src="/static/images/products/{{ .Image }}" alt="{{ .Alt }}" loading="lazy" decoding="async">
-                                <span class="visually-hidden">(拡大して表示)</span>
-                            </a>
-                            {{ if .Caption }}<figcaption>{{ .Caption }}</figcaption>{{ end }}
-                        </figure>
-                        {{ else }}
-                        <p>{{ .Text }}</p>
-                        {{ end }}
-                        {{ end }}
+                        {{ .BodyHTML }}
                     </div>
                     {{ end }}
 

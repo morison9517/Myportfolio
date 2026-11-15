@@ -22,12 +22,15 @@
 package router
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"case_gin/internal/config"
 	"case_gin/internal/handlers"
 	"case_gin/internal/mailer"
 	"case_gin/internal/middleware"
+	"case_gin/internal/models"
 	"case_gin/internal/recaptcha"
 	"case_gin/internal/view"
 )
@@ -36,6 +39,10 @@ import (
 const (
 	templateDir = "web/templates"
 	staticDir   = "web/static"
+
+	// 作品の .md の置き場所(models/product_load.go が読む)。
+	// ★web/ の下に置いているのは、本番の箱(Dockerfile)に入るのが web/ だけだから。
+	productDir = "web/content/products"
 )
 
 // New = アプリの受付を組み立てて返す。
@@ -82,6 +89,13 @@ func New(cfg *config.Config) (*gin.Engine, error) {
 		return nil, err
 	}
 	r.HTMLRender = renderer
+
+	// --- 作品(web/content/products/*.md)を読み込む ---
+	// ★書き間違いがあればここで起動を止める。壊れたまま公開しないため。
+	//   開発中だけ、ページを開くたびに読み直す(保存して更新すれば反映される)。
+	if err := models.SetupProducts(productDir, !cfg.IsProduction()); err != nil {
+		return nil, fmt.Errorf("作品の読み込みに失敗しました: %w", err)
+	}
 
 	// --- CSS / JS / 画像 ---
 	// ★ここを Use より先に書いている理由

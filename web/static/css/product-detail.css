@@ -153,6 +153,39 @@ body.dark .product-detail-date {
     line-height: 1.9;
 }
 
+/* 箇条書き。余白は legal.css の ul とそろえてある。 */
+.product-body ul,
+.product-body ol {
+    margin: 0 0 1rem;
+    padding-left: 1.4rem;
+
+    line-height: 1.9;
+}
+
+/* 文中のリンク。色とホバーは下の「リンク」の見出しのものとそろえてある。 */
+.product-body a:not(.product-photo-link),
+.product-body a:not(.product-photo-link):visited {
+    color: var(--link-color);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+
+    transition: color 0.15s ease;
+}
+
+.product-body a:not(.product-photo-link):hover {
+    color: var(--hover-color);
+}
+
+.product-body .external-link-icon {
+    margin-left: 0.3em;
+}
+
+/* 文章の途中に置かれた画像(写真だけの段落ではないもの)。はみ出さないようにだけする。 */
+.product-body p img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* ---------- 写真 ---------- */
 .product-photo {
     margin: 1.8rem 0;
@@ -189,6 +222,32 @@ body.dark .product-detail-date {
 
     font-size: 0.9rem;
     text-align: center;
+}
+
+/* ▼ 写真の横並び(Markdown で同じ段落に2枚以上並べたとき)
+
+     1枚が240pxより狭くなる幅では、自動で縦に並ぶ(スマホ)。
+     ★min(240px, 100%) … 240pxより狭い画面でも横にはみ出さないようにする。
+     ★auto-fit … 2枚なら2列、3枚なら3列と、枚数ぶんの列で幅いっぱいに広げる。
+
+   ★写真の高さがそろわないと下の説明文の位置がばらばらになるので、
+     横並びのときだけ 4:3 の枠に収める(はみ出す部分は切る)。
+     切れた部分は、押して拡大すれば全体が見える。 */
+.product-photo-row {
+    margin: 1.8rem 0;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 1.2rem;
+}
+
+.product-photo-row .product-photo {
+    margin: 0;
+}
+
+.product-photo-row .product-photo img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
 }
 
 /* ---------- 使用技術・インフラ ---------- */

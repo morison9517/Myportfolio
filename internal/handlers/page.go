@@ -90,15 +90,15 @@ func products(c *gin.Context) {
 	c.HTML(http.StatusOK, "products.html", view.Page(c, gin.H{
 		"Title":       "Products",
 		"Description": "これまでに制作した作品の一覧です。ハッカソンやインターンで開発したものを掲載しています。",
-		"Products":    models.Products,
+		"Products":    models.AllProducts(),
 	}))
 }
 
 // productDetail = 作品1件の詳細ページ(/products/Chorus など)。
 //
-//	:slug の部分に product.go の Slug が入る。中身も product.go から出す。
+//	:slug の部分に作品の Slug(web/content/products/ の .md のファイル名)が入る。
 //
-//	★product.go に無い Slug は404。
+//	★.md が無い Slug は404。
 //	★大文字・小文字だけ違うとき(/products/chorus)は、正しい形へ移す(301)。
 //	  同じページが2つのURLで開けると、検索エンジンが別のページとして数えてしまう。
 func productDetail(c *gin.Context) {
